@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://BabaGodotLib/Fonts/BoldCapsPixel48.tres" type="DynamicFont" id=1]
+[ext_resource path="res://BabaGodotLib/Menu/MenuOptionsBase.gd" type="Script" id=2]
+
+[node name="MenuOptionBase" type="Button"]
+light_mask = 0
+margin_right = 141.0
+margin_bottom = 44.0
+custom_fonts/font = ExtResource( 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+shortcut_in_tooltip = false
+text = "Button"
+flat = true
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_lock_": true
+}
