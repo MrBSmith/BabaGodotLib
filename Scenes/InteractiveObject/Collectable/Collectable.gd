@@ -10,6 +10,8 @@ onready var collect_particle = get_node_or_null("CollectParticle")
 export var average_amount : int = 1
 export(float, 0.0, 1.0) var amount_variance : float = 0.0
 
+export var collectable_name : String = "" setget set_collectable_name, get_collectable_name
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "Collectable" or .is_class(value)
@@ -18,6 +20,22 @@ func get_class() -> String: return "Collectable"
 func set_state(state): state_machine.set_state(state)
 func get_state() -> StateBase: return state_machine.get_state(0)
 func get_state_name(): return state_machine.get_state_name()
+
+func set_collectable_name(value: String): collectable_name = value
+func get_collectable_name() -> String: return collectable_name
+
+# FUNCTION OVERRIDE
+func set_interactable(value: bool): 
+	interactable = value
+	
+	# Desactivate the interact area
+	if interact_area != null:
+		interact_area.set_deferred("monitoring", value)
+	
+	var follow_area = get_node_or_null("FollowArea")
+	if follow_area != null:
+		follow_area.set_deferred("monitoring", value)
+
 
 #### BUILT-IN ####
 
@@ -34,20 +52,22 @@ func interact():
 
 
 func collect():
-	Events.emit_signal("collect", self)
+	EVENTS.emit_signal("collect", self)
 
 func follow(target: Node2D):
 	$StatesMachine/Follow.set_target(target)
 	set_state("Follow")
 
 
-func trigger_collect_animation(target_pos: Vector2):
-	$StatesMachine/Collect.set_target_position(target_pos)
+func trigger_collect_animation(target: Node2D):
+	$StatesMachine/Collect.set_target(target)
 	
 	if !is_ready:
 		default_state = "Collect"
 	else:
 		set_state("Collect")
+	
+	set_interactable(false)
 	
 	# Play the collect sound
 	var audio_stream = get_node_or_null("CollectSound")
@@ -76,4 +96,5 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 		collect()
 
 func _on_collect_animation_finished():
+	EVENTS.emit_signal("collectable_collected", self, compute_amount_collected())
 	queue_free()

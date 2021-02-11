@@ -17,7 +17,7 @@ func get_class() -> String: return "InteractiveObject"
 func set_interactable(value: bool): 
 	interactable = value
 	
-	# Desactivate every area2D
+	# Desactivate the interact area
 	if interact_area != null:
 		interact_area.set_deferred("monitoring", value)
 
@@ -26,7 +26,7 @@ func is_interactable() -> bool: return interactable
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = Events.connect("interact", self, "_on_interact")
+	var __ = EVENTS.connect("interact", self, "_on_interact")
 	
 	is_ready = true
 

@@ -8,15 +8,15 @@ var initial_dir = Vector2.ZERO
 export var initial_speed = 1000.0
 export var initial_speed_damping = 200.0
 
-var target_position := Vector2.INF setget set_target_position, get_target_position
+var target : Node2D = null setget set_target, get_target
 
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "CollectState" or .is_class(value)
 func get_class() -> String: return "CollectState"
 
-func set_target_position(value: Vector2): target_position = value
-func get_target_position() -> Vector2: return target_position
+func set_target(value: Node2D): target = value
+func get_target() -> Node2D: return target
 
 #### BUILT-IN ####
 
@@ -39,15 +39,16 @@ func exit_state():
 
 
 func update(delta: float):
-	var dir = owner.global_position.direction_to(target_position)
+	var target_pos = target.get_global_position()
+	var dir = owner.global_position.direction_to(target_pos)
 	var velocity = ((dir * speed) + (initial_dir * initial_speed)) * delta
 	
 	speed += acceleration
 	initial_speed -= initial_speed_damping
 	initial_speed = clamp(initial_speed, 0.0, INF)
 	
-	if owner.global_position.distance_to(target_position) < speed * delta:
-		owner.set_global_position(target_position)
+	if owner.global_position.distance_to(target_pos) < speed * delta:
+		owner.set_global_position(target_pos)
 		owner.emit_signal("collect_animation_finished")
 	
 	owner.global_position += velocity

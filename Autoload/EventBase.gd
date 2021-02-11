@@ -36,3 +36,8 @@ signal interact()
 signal collect(obj)
 signal collectable_collected(obj, amount)
 signal collectable_amount_changed(collectable_type, amount)
+
+#### SFX ####
+
+signal play_SFX(fx_name, pos)
+signal scatter_object(body, nb_debris, impulse_force)
