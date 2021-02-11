@@ -1,7 +1,9 @@
-extends Node
+extends StateBase
 class_name Collectable_FollowState
 
-export var speed := 100.0
+export var speed := 10.0
+export var acceleration := 10.0
+var start_speed := 0.0
 var target : Node2D = null setget set_target, get_target
 
 #### ACCESSORS ####
@@ -15,12 +17,20 @@ func get_target() -> Node2D: return target
 
 #### BUILT-IN ####
 
+func _ready() -> void:
+	speed = start_speed
 
 
 #### VIRTUALS ####
 
+func enter_state():
+	speed = start_speed
+
+
 func update(delta: float):
 	if target != null:
+		speed += acceleration
+		
 		var obj_pos = owner.get_position()
 		var target_pos = target.get_position()
 		var target_dir = obj_pos.direction_to(target_pos)
