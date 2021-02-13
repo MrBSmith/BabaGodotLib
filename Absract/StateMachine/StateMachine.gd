@@ -1,5 +1,4 @@
-extends Node
-
+extends Node2D
 class_name StatesMachine
 
 # An implementation of the Finite State Machine design pattern
