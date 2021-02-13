@@ -26,6 +26,7 @@ func get_target() -> Node2D: return target
 
 func enter_state():
 	owner.set_interactable(false)
+	owner.set_scale(owner.get_scale() / 3)
 	owner.set_as_toplevel(true)
 	var rdm_angle = deg2rad(rand_range(0.0, 360.0))
 	initial_dir = Vector2(cos(rdm_angle), sin(rdm_angle))

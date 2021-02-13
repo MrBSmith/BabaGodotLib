@@ -17,7 +17,7 @@ func get_class() -> String: return "Collectable_HUD_Label"
 
 func _ready() -> void:
 	var __ = EVENTS.connect("collect", self, "_on_collect_obj_event")
-	__ = EVENTS.connect("collectable_collected", self, "_on_collectable_collected")
+	__ = EVENTS.connect("collectable_amount_updated", self, "_on_collectable_amount_updated")
 
 #### VIRTUALS ####
 
@@ -69,8 +69,8 @@ func _on_obj_collect_animation_finished():
 	tween.start()
 
 
-func _on_collectable_collected(obj: Collectable, amount: int):
-	if obj == null or obj.get_collectable_name() != collectable_type:
+func _on_collectable_amount_updated(col_type: String, amount: int):
+	if col_type != collectable_type:
 		return
 	
 	label.set_text(String(amount))

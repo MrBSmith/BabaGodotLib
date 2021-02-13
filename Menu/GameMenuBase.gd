@@ -3,7 +3,7 @@ class_name MenuBase
 
 onready var opt_container = get_node("HBoxContainer/V_OptContainer")
 onready var choice_sound_node = get_node("OptionChoiceSound")
-onready var buttons_array = opt_container.get_children()
+onready var buttons_array : Array = []
 
 var default_button_state : Array = []
 
@@ -12,10 +12,10 @@ var default_button_state : Array = []
 # Check the options when the scenes is ready, to get sure at least one of them is clickable
 # Change the color of the option accordingly to their state
 func _ready():
-	_setup()
-
-
-func _setup():
+	for child in opt_container.get_children():
+		if child is Button:
+			buttons_array.append(child)
+	
 	connect_wrapping_menu()
 	focus_first_option()
 
@@ -24,7 +24,7 @@ func _setup():
 
 # Focus the first available option
 func focus_first_option():
-	for button in opt_container.get_children():
+	for button in buttons_array:
 		if !button.is_disabled():
 			button.set_focused(true)
 			break

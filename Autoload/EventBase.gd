@@ -24,6 +24,7 @@ class_name EventsBase
 signal gameover()
 signal win()
 
+
 #### PATHFINDER ####
 
 signal query_path(who, from, to)
@@ -34,10 +35,18 @@ signal send_path(who, path)
 
 signal interact()
 signal collect(obj)
-signal collectable_collected(obj, amount)
-signal collectable_amount_changed(collectable_type, amount)
+signal collectable_amount_collected(obj, amount)
+signal collectable_amount_updated(collectable_type, amount)
+signal update_HUD()
+signal approch_collactable(obj)
+
 
 #### SFX ####
 
 signal play_SFX(fx_name, pos)
 signal scatter_object(body, nb_debris, impulse_force)
+
+
+#### DIALOGUES ####
+
+signal dialogue_query(dialogue_index, is_cut_scene)

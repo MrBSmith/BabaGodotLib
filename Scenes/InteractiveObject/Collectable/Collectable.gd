@@ -96,5 +96,5 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 		collect()
 
 func _on_collect_animation_finished():
-	EVENTS.emit_signal("collectable_collected", self, compute_amount_collected())
+	EVENTS.emit_signal("collectable_amount_collected", self, compute_amount_collected())
 	queue_free()

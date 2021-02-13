@@ -10,11 +10,11 @@
 [node name="Collectable" instance=ExtResource( 1 )]
 script = ExtResource( 7 )
 
-[node name="FollowArea" type="Area2D" parent="." index="2"]
+[node name="FollowArea" type="Area2D" parent="." index="1"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FollowArea" index="0"]
 
-[node name="StatesMachine" type="Node" parent="." index="3"]
+[node name="StatesMachine" type="Node" parent="." index="2"]
 script = ExtResource( 3 )
 
 [node name="Idle" type="Node" parent="StatesMachine" index="0"]
@@ -26,11 +26,4 @@ script = ExtResource( 4 )
 [node name="Collect" type="Node" parent="StatesMachine" index="2"]
 script = ExtResource( 6 )
 
-[node name="CollectSound" type="AudioStreamPlayer" parent="." index="4"]
-
-[node name="CollectParticle" type="Particles2D" parent="." index="5"]
-show_behind_parent = true
-emitting = false
-amount = 100
-preprocess = 80.67
-local_coords = false
+[node name="CollectSound" type="AudioStreamPlayer" parent="." index="3"]
