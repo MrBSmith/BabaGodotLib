@@ -15,6 +15,7 @@ func _ready() -> void:
 func update(_delta : float):
 	pass
 
+
 func enter_state():
 	if animated_sprite == null:
 		return
@@ -25,6 +26,7 @@ func enter_state():
 	
 	if sprite_frames.has_animation(name):
 		animated_sprite.play(name)
+
 
 func exit_state():
 	pass
