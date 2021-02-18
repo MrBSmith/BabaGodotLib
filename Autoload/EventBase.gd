@@ -1,7 +1,7 @@
 extends Node
-class_name EventsBase
+class_name EVENTSBase
 
-#### A base class for the Events autoload
+#### A base class for the EVENTS autoload
 
 # This class must contain only signals
 # You can inherit this class if you need to add your own global signals
@@ -9,8 +9,8 @@ class_name EventsBase
 # It is usefull to decouple systems without having to fetch 
 # their references to connect their signal directly
 
-# Instead: the emitter send a signal using: Events.emit_signal("signal_name", some_arguments, ...)
-# The receiver must connect the signal: Events.connect("signal_name", self, "_on_signal_name")
+# Instead: the emitter send a signal using: EVENTS.emit_signal("signal_name", some_arguments, ...)
+# The receiver must connect the signal: EVENTS.connect("signal_name", self, "_on_signal_name")
 
 # Take care not to overuse this!
 # Please use this class only if you need two entities 
