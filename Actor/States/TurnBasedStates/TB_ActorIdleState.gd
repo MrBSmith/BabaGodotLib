@@ -1,4 +1,4 @@
-extends ActorIdleState
+extends ActorStateBase
 class_name TB_ActorIdleState
 
 #### ACCESSORS ####

@@ -1,4 +1,18 @@
 extends Node2D
+class_name IsoRenderer
+
+# A Base class to render an IsoMap with multiple layers of height and its IsoObject in it
+# Feed the renderer by giving it every layers of your map and every objects
+# using the init_rendering_queue method
+
+# The renderer create a RenderPart for each tile of the map, 
+# and as many RenderPart it needs to render IsoObjects a the correct height
+# for exemple a 2 tiles tall object will be scattered in 2 render parts
+
+# The rendering then order each render part based on its cell position on the map
+# Each time an object change cell, or an object is added or removed, 
+# the renderer is informed by the iso_object_cell_changed, iso_object_added & iso_object_removed signals. 
+# This is why it is mandatory to use IsoObject inherited objects for it to work with this renderer
 
 const TILE_SIZE = Vector2(32, 32)
 

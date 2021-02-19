@@ -1,5 +1,5 @@
 extends Node
-class_name EVENTSBase
+class_name EventsBase
 
 #### A base class for the EVENTS autoload
 

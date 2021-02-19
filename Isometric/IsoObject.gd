@@ -1,6 +1,9 @@
 extends Node2D
 class_name IsoObject
 
+# A base class every iso object should inherit from
+# Handles the object visibility and cell position on the map
+
 enum VISIBILITY {
 	VISIBLE,
 	BARELY_VISIBLE,

@@ -27,6 +27,8 @@ func _init(obj: Node, sprite_array: Array, cell: Vector3, world_pos: Vector2,
 		elif sprite is IsoSprite:
 			var _err = sprite.connect("sprite_texture_changed", self, "_on_sprite_texture_changed")
 		
+		var _err = sprite.connect("flip_changed", self, "_on_sprite_flip_changed")
+		
 		add_child(sprite_node, true)
 		sprite_node.set_owner(self)
 		var part_texture = AtlasTexture.new()
@@ -84,7 +86,9 @@ func apply_texture_change(obj_sprite: Node2D, sprite_node: Sprite) -> void:
 	var centered_offset = (Vector2(0, part_size.y) / 2) * int(sprite_centered && height > 1)
 	var offset = sprite_pos + sprite_offset + height_offset + centered_offset
 	
-	sprite_node.set_region(is_region_enabled or height > 1)
+	if not obj_sprite is IsoAnimatedSprite:
+		sprite_node.set_region(is_region_enabled or height > 1)
+	
 	sprite_node.set_texture(texture)
 	sprite_node.set_modulate(sprite_modul)
 	sprite_node.set_offset(offset)
@@ -107,9 +111,14 @@ func _on_object_global_position_changed(world_pos: Vector2):
 func _on_object_modulate_changed(mod: Color):
 	set_modulate(mod)
 
+func _on_sprite_flip_changed(flip_h: bool, flip_v: bool):
+	var sprite_node = get_node("Sprite")
+	sprite_node.set_flip_h(flip_h)
+	sprite_node.set_flip_v(flip_v)
+
 
 func _on_animated_sprite_texture_changed(obj_sprite: IsoAnimatedSprite):
-	var sprite_node = get_node(obj_sprite.name)
+	var sprite_node = get_node("Sprite")
 	apply_texture_change(obj_sprite, sprite_node)
 
 

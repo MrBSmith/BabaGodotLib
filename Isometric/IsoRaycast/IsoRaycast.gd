@@ -3,13 +3,13 @@ class_name IsoRaycast
 
 
 # Return the line between two given points 
-static func get_line(map_node: Map, origin: Vector3, dest: Vector3) -> PoolVector3Array:
+static func get_line(map_node: IsoMap, origin: Vector3, dest: Vector3) -> PoolVector3Array:
 	var line2D = get_line_2D(Vector2(origin.x, origin.y), Vector2(dest.x, dest.y))
 	return map_node.array2D_to_grid_cells(line2D)
 
 
 # Get every cells visible between the origin and the destination
-static func get_line_of_sight(map_node: Map, h: int, line: PoolVector3Array) -> PoolVector3Array:
+static func get_line_of_sight(map_node: IsoMap, h: int, line: PoolVector3Array) -> PoolVector3Array:
 	var origin = line[0] + Vector3(0, 0, h)
 	var dest = line[-1]
 	var line_xz = get_line_2D(Vector2(origin.x, origin.z), Vector2(dest.x, dest.z))
