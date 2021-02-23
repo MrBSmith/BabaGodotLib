@@ -54,6 +54,6 @@ func _on_interact():
 	else:
 		var bodies_array = interact_area.get_overlapping_bodies()
 		for body in bodies_array:
-			if body is Player:
+			if body.is_class("Player"):
 				interact()
 

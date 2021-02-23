@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://BabaGodotLib/Scenes/HUD/Gauge/Gauge.gd" type="Script" id=1]
+
+[node name="Gauge" type="Container"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -539.0
+margin_bottom = -348.0
+rect_min_size = Vector2( 101, 12 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FeedbackGauge" type="TextureProgress" parent="."]
+margin_right = 101.0
+margin_bottom = 40.0
+value = 100.0
+tint_progress = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Gauge" type="TextureProgress" parent="."]
+margin_right = 101.0
+margin_bottom = 40.0
+step = 0.1
+value = 100.0
+tint_progress = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tween" type="Tween" parent="."]
