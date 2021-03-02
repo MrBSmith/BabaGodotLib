@@ -4,6 +4,7 @@ class_name MenuOptionsBase
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
 
+var is_ready : bool = false
 var focused : bool = false setget set_focused, is_focused
 
 #### ACCESSSORS ####
@@ -25,6 +26,8 @@ func _ready() -> void:
 	_err = connect("pressed", self, "_on_pressed")
 	_err = connect("gui_input", self, "_on_gui_input")
 	_err = connect("mouse_entered", self, "_on_mouse_entered")
+	
+	is_ready = true
 
 
 #### LOGIC ####
