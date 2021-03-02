@@ -10,6 +10,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 opt_container_path = "NinePatchRect/HBoxContainer"
+max_lines = 4
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 anchor_right = 1.0

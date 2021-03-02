@@ -8,12 +8,15 @@ onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 onready var buttons_array : Array = []
 
 var default_button_state : Array = []
+var is_ready : bool = false
+
 
 #### BUILT-IN ####
 
 # Check the options when the scenes is ready, to get sure at least one of them is clickable
 # Change the color of the option accordingly to their state
 func _ready():
+	is_ready = true
 	_setup()
 
 
