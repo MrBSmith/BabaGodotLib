@@ -51,7 +51,6 @@ func get_state_name() -> String:
 
 # Set current_state at a new state, also set previous state, and emit a signal to notify the change, to anybody needing it 
 func set_state(new_state):
-	
 	# if the given argument is a string, get the 
 	if new_state is String:
 		new_state = get_node(new_state)

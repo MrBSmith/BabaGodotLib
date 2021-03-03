@@ -7,7 +7,7 @@
 
 [node name="MenuOptionBase" type="Button"]
 light_mask = 0
-margin_right = 141.0
+margin_right = 87.0
 margin_bottom = 44.0
 custom_styles/focus = SubResource( 1 )
 custom_fonts/font = ExtResource( 1 )
