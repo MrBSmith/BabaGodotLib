@@ -14,8 +14,7 @@ func get_class() -> String: return "ActorJumpState"
 func _ready():
 	yield(owner, "ready")
 	SFX_node = owner.get_node_or_null("SFX")
-	
-	var _err = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
+
 
 
 #### VIRTUALS ####
