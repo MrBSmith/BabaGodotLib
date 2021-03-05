@@ -11,13 +11,14 @@ onready var current_menu = menu_root setget set_current_menu, get_current_menu
 
 export var max_lines : int = 3 setget set_max_lines, get_max_lines
 export var max_columns : int = 2 setget set_max_columns, get_max_columns
+export var option_container_margin : int = 4
 
 var current_top_line : int = 0
 
 signal option_table_size_changed()
 signal update_column_finished()
 signal option_update_finished()
-signal menu_changed()
+signal menu_changed(menu_branch)
 
 #### ACCESSORS ####
 
@@ -44,9 +45,9 @@ func set_current_menu(menu: Node):
 	if menu_root.is_a_parent_of(menu) or menu == menu_root:
 		current_menu = menu
 		clear_options()
-		update_whole_display()
+		_update_whole_display()
 		
-		emit_signal("menu_changed")
+		emit_signal("menu_changed", menu)
 
 func get_current_menu() -> Node: return current_menu
 
@@ -55,6 +56,9 @@ func get_current_menu() -> Node: return current_menu
 func _ready() -> void:
 	var __ = connect("option_table_size_changed", self, "_on_option_table_size_changed")
 	__ = connect("menu_changed", self, "_on_menu_changed")
+	__ = connect("resized", self, "_on_menu_resized")
+	
+	update_option_container_size()
 
 #### VIRTUALS ####
 
@@ -65,7 +69,7 @@ func _ready() -> void:
 
 func _setup():
 	yield(self, "ready")
-	update_whole_display()
+	_update_whole_display()
 	
 	for column in column_container.get_children():
 		connect_menu_options(column, false)
@@ -79,15 +83,15 @@ func add_sub_menu(data_array: Array, menu: Node = menu_root):
 	set_current_menu(menu)
 
 
-func update_whole_display():
-	var result = update_columns()
+func _update_whole_display():
+	var result = _update_columns()
 	if result is GDScriptFunctionState:
 		yield(self, "update_column_finished")
 	
-	update_options()
+	_update_options()
 
 
-func update_columns():
+func _update_columns():
 	var nb_column = column_container.get_child_count()
 	if nb_column > max_columns:
 		var column_excess = nb_column - max_columns
@@ -100,14 +104,13 @@ func update_columns():
 			if i + 1 > nb_column:
 				var column = VBoxContainer.new()
 				column_container.add_child(column)
-				column.set_margin(MARGIN_BOTTOM, 0.0)
 				column.add_constant_override("separation", option_v_separation)
 				nb_column += 1
 	
 	emit_signal("update_column_finished")
 
 
-func update_options():
+func _update_options():
 	var last_added_option : Button = null
 	var data_array = current_menu.get_children()
 	
@@ -149,6 +152,7 @@ func update_options():
 		if !last_added_option.is_ready:
 			yield(last_added_option, "ready")
 	
+	update_option_container_size()
 	emit_signal("option_update_finished")
 
 
@@ -188,7 +192,7 @@ func scroll_down():
 	
 	if next_top_line != current_top_line:
 		current_top_line = next_top_line
-		var result = update_options()
+		var result = _update_options()
 		
 		if result is GDScriptFunctionState:
 			result = yield(self, "option_update_finished")
@@ -203,7 +207,7 @@ func scroll_up():
 	
 	if next_top_line != current_top_line:
 		current_top_line = next_top_line
-		var result = update_options()
+		var result = _update_options()
 		
 		if result is GDScriptFunctionState:
 			result = yield(self, "option_update_finished")
@@ -234,6 +238,15 @@ func are_all_columns_empty() -> bool:
 			return false
 	return true
 
+
+func get_every_options() -> Array:
+	var options_array : Array = []
+	for column in column_container.get_children():
+		for child in column.get_children():
+			options_array.append(child)
+	return options_array
+
+
 # Change this name?
 func navigate_upstream_menu():
 	if current_menu == menu_root:
@@ -243,6 +256,10 @@ func navigate_upstream_menu():
 	current_menu.clear()
 	
 	set_current_menu(next_menu)
+
+
+func update_option_container_size():
+	column_container.set_size(get_size() - Vector2.ONE * option_container_margin * 2)
 
 
 #### INPUTS ####
@@ -274,7 +291,10 @@ func _input(_event: InputEvent) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_option_table_size_changed():
-	update_whole_display()
+	_update_whole_display()
 
-func _on_menu_changed():
+func _on_menu_changed(_menu):
 	pass
+
+func _on_menu_resized():
+	update_option_container_size()

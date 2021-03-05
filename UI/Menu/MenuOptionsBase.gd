@@ -1,11 +1,14 @@
 extends Button
 class_name MenuOptionsBase
+tool
 
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
 
 var is_ready : bool = false
 var focused : bool = false setget set_focused, is_focused
+
+export var all_caps : bool = false setget set_all_caps
 
 #### ACCESSSORS ####
 
@@ -17,6 +20,18 @@ func set_focused(value: bool):
 
 func is_focused() -> bool: return focused
 
+func set_all_caps(value: bool):
+	all_caps = value
+	if all_caps:
+		text = text.to_upper()
+	else:
+		text = text.capitalize()
+
+func set_text(value: String):
+	if all_caps:
+		text = value.to_upper()
+	else:
+		text = value
 
 #### BUILT-IN ####
 
