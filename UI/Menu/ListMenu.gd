@@ -76,9 +76,8 @@ func _setup():
 
 
 func add_sub_menu(data_array: Array, menu: Node = menu_root):
-	for string in data_array:
-		var option = OptionDataContainer.new(string)
-		menu.add_child(option)
+	for option_container in data_array:
+		menu.add_child(option_container)
 	
 	set_current_menu(menu)
 
@@ -111,7 +110,7 @@ func _update_columns():
 
 
 func _update_options():
-	var last_added_option : Button = null
+	var last_added_option : Node = null
 	var data_array = current_menu.get_children()
 	
 	for i in data_array.size():
@@ -136,10 +135,10 @@ func _update_options():
 		# Add needed options
 		if must_option_be_displayed(i):
 			if option_already_displayed == null or !option_already_displayed.is_inside_tree():
-				var option = menu_option_scene.instance()
-				option.set_text(obj_name)
+				var option = instanciate_option(data_array[i])
 				
 				column.add_child(option)
+				option.connect("option_chose", self, "_on_option_chose")
 				option.owner = self
 				option.set_name(obj_name.capitalize())
 				last_added_option = option
@@ -155,6 +154,12 @@ func _update_options():
 	update_option_container_size()
 	emit_signal("option_update_finished")
 
+
+func instanciate_option(option_data_container: OptionDataContainer) -> Button:
+	var option = menu_option_scene.instance()
+	option.set_text(option_data_container.name)
+	
+	return option
 
 func clear_options():
 	for column in column_container.get_children():
@@ -176,7 +181,7 @@ func must_option_be_displayed(option_id: int) -> bool:
 func find_option(opt_text: String) -> Button:
 	for column in column_container.get_children():
 		for option in column.get_children():
-			if option.get_text().capitalize() == opt_text.capitalize():
+			if option.get_text().capitalize() == opt_text.capitalize() or option.name == opt_text:
 				return option
 	return null
 
@@ -247,6 +252,14 @@ func get_every_options() -> Array:
 	return options_array
 
 
+func get_data_container(sub_menu: Node, container_name: String) -> OptionDataContainer:
+	for child in sub_menu.get_children():
+		if child.name == container_name:
+			return child
+	return null
+
+
+
 # Change this name?
 func navigate_upstream_menu():
 	if current_menu == menu_root:
@@ -298,3 +311,6 @@ func _on_menu_changed(_menu):
 
 func _on_menu_resized():
 	update_option_container_size()
+
+func _on_option_chose(_option):
+	pass

@@ -41,7 +41,13 @@ func _ready() -> void:
 
 func _setup():
 	yield(self, "ready")
-	add_sub_menu(action_list)
+	var option_array = []
+	
+	for string in action_list:
+		var option_data_container = OptionDataContainer.new(null, string, int(INF), null)
+		option_array.append(option_data_container)
+	
+	add_sub_menu(option_array)
 	_update_whole_display()
 	
 	for column in column_container.get_children():
@@ -51,28 +57,34 @@ func _setup():
 		option.set_visible(true)
 
 
-func connect_action_options():
-	var options_array = get_every_options()
-	
-	for option in options_array:
-		option.connect("option_chose", self, "_on_option_chose")
+#func connect_action_options():
+#	var options_array = get_every_options()
+#
+#	for option in options_array:
+#		option.connect("option_chose", self, "_on_option_chose")
 
 
 func option_appear_animation():
 	var options_array = get_every_options()
-	var nb_options = options_array.size()
 	
-	for i in range(nb_options):
+	for i in range(options_array.size()):
 		var option = options_array[i]
 		if option == null:
 			continue
 		
-		option.set_visible(true)
 		timer_node.start(options_appear_delay)
+		yield(timer_node, "timeout")
 		
-		if i < nb_options - 1:
-			yield(timer_node, "timeout")
+		option.appear()
 
+
+func instanciate_option(data_container: OptionDataContainer) -> Button:
+	var option = menu_option_scene.instance()
+	option.set_text(data_container.name)
+	option.set_amount(data_container.amount)
+	option.set_icon_texture(data_container.icon_texture)
+	
+	return option
 
 #### INPUTS ####
 
@@ -105,11 +117,23 @@ func _on_menu_changed(menu):
 	if menu == menu_root && is_ready:
 		EVENTS.emit_signal("action_choice_menu_entered")
 		
-		connect_action_options()
+#		connect_action_options()
 	
 	option_appear_animation()
 
 
 func _on_option_chose(option):
 	if current_menu == menu_root:
-		EVENTS.emit_signal("actor_action_chosen", option.name)
+		EVENTS.emit_signal("actor_action_chosen", option.text.capitalize())
+	else:
+		var option_data_container = get_data_container(current_menu, option.name)
+		if option_data_container == null:
+			return
+		
+		var data_container_obj_ref = option_data_container.object_ref
+		if data_container_obj_ref == null:
+			return
+		
+		match(current_menu.name):
+			"Skill": EVENTS.emit_signal("skill_chosen", data_container_obj_ref)
+			"Item": EVENTS.emit_signal("item_chosen", data_container_obj_ref)

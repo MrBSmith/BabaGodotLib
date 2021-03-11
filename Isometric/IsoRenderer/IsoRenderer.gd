@@ -147,8 +147,6 @@ func add_iso_obj(obj: IsoObject) -> void:
 	
 	for part in parts_array:
 		add_iso_rendering_part(part, obj)
-	
-	return
 
 
 # Remove the given object from the rendering queue
@@ -195,9 +193,7 @@ func scatter_iso_object(obj: IsoObject) -> Array:
 	var scattered_obj : Array = []
 	var sprite_array : Array = []
 	
-	for child in obj.get_children():
-		if child is IsoSprite or child is IsoAnimatedSprite:
-			sprite_array.append(child)
+	get_every_iso_sprites(obj, sprite_array)
 	
 	var height = obj.get_height()
 	var obj_cell = obj.get_current_cell()
@@ -214,6 +210,15 @@ func scatter_iso_object(obj: IsoObject) -> Array:
 		scattered_obj.append(part)
 	
 	return scattered_obj
+
+
+# Get every children IsoSprite or IsoAnimatedSprite of the given node recursivly
+func get_every_iso_sprites(obj: Node, array: Array) -> void:
+	for child in obj.get_children():
+		if (child is IsoSprite or child is IsoAnimatedSprite) && not obj in array:
+			array.append(child)
+		else:
+			get_every_iso_sprites(child, array)
 
 
 # Check if the given object have at least one part of it in the rendering queue
