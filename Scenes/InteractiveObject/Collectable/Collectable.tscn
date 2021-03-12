@@ -14,7 +14,7 @@ script = ExtResource( 7 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FollowArea" index="0"]
 
-[node name="StatesMachine" type="Node" parent="." index="2"]
+[node name="StatesMachine" type="Node2D" parent="." index="2"]
 script = ExtResource( 3 )
 
 [node name="Idle" type="Node" parent="StatesMachine" index="0"]
