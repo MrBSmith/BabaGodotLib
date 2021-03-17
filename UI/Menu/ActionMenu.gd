@@ -1,9 +1,12 @@
 extends ListMenu
 class_name ActionMenu
 
+const description_window_scene = preload("res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn")
+
 export var options_appear_delay : float = 0.2
 
 var timer_node : Timer = null
+var description_instance : DescriptionWindow = null
 
 var action_list : Array = [
 	"Move",
@@ -32,12 +35,7 @@ func _ready() -> void:
 
 
 
-
 #### VIRTUALS ####
-
-
-
-#### LOGIC ####
 
 func _setup():
 	yield(self, "ready")
@@ -57,12 +55,7 @@ func _setup():
 		option.set_visible(true)
 
 
-#func connect_action_options():
-#	var options_array = get_every_options()
-#
-#	for option in options_array:
-#		option.connect("option_chose", self, "_on_option_chose")
-
+#### LOGIC ####
 
 func option_appear_animation():
 	var options_array = get_every_options()
@@ -85,6 +78,7 @@ func instanciate_option(data_container: OptionDataContainer) -> Button:
 	option.set_icon_texture(data_container.icon_texture)
 	
 	return option
+
 
 #### INPUTS ####
 
@@ -116,13 +110,11 @@ func _on_add_action_submenu(data_array: Array, menu_name: String):
 func _on_menu_changed(menu):
 	if menu == menu_root && is_ready:
 		EVENTS.emit_signal("action_choice_menu_entered")
-		
-#		connect_action_options()
 	
 	option_appear_animation()
 
 
-func _on_option_chose(option):
+func _on_option_chose(option: MenuOptionsBase):
 	if current_menu == menu_root:
 		EVENTS.emit_signal("actor_action_chosen", option.text.capitalize())
 	else:
@@ -137,3 +129,33 @@ func _on_option_chose(option):
 		match(current_menu.name):
 			"Skill": EVENTS.emit_signal("skill_chosen", data_container_obj_ref)
 			"Item": EVENTS.emit_signal("item_chosen", data_container_obj_ref)
+
+
+
+func _on_option_focus_changed(option: Control, focused: bool):
+	if option == null: return
+	
+	if focused:
+		var data_container : OptionDataContainer = get_data_container(current_menu, option.name)
+		
+		if data_container == null:
+			print("The given option: " + option.get_name() + " data container couldn't be found")
+		
+		var obj_ref = data_container.object_ref
+		
+		if obj_ref == null: return
+		
+		description_instance = description_window_scene.instance()
+		var descritpion_data = obj_ref.fetch_description_data()
+		
+		
+		add_child(description_instance)
+		
+		description_instance.feed(descritpion_data)
+		
+		description_instance.set_size(rect_size )
+		description_instance.set_position(Vector2(-rect_size.x + get_margin(MARGIN_RIGHT), 0))
+		
+	else:
+		if description_instance != null:
+			description_instance.queue_free()

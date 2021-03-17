@@ -1,7 +1,7 @@
 extends MenuBase
 class_name ListMenu
 
-export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/MenuOptionBase.tscn"
+export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn"
 export var option_v_separation : int = INF 
 
 onready var menu_root = $MenuRoot
@@ -139,6 +139,7 @@ func _update_options():
 				
 				column.add_child(option)
 				option.connect("option_chose", self, "_on_option_chose")
+				option.connect("focus_changed", self, "_on_option_focus_changed")
 				option.owner = self
 				option.set_name(obj_name.capitalize())
 				last_added_option = option
@@ -313,4 +314,7 @@ func _on_menu_resized():
 	update_option_container_size()
 
 func _on_option_chose(_option):
+	pass
+
+func _on_option_focus_changed(_option: Control, _focused: bool):
 	pass
