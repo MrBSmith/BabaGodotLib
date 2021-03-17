@@ -92,6 +92,8 @@ func _on_follow_area_body_entered(body: PhysicsBody2D):
 		follow(body)
 
 func _on_collect_area_body_entered(body: PhysicsBody2D):
+	if body == null:
+		return
 	if body.is_class("Player"):
 		collect()
 
