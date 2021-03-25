@@ -1,10 +1,10 @@
 tool
-extends NinePatchRect
+extends ResizableWindow
 class_name DescriptionWindow
 
 const text_line_container_scene = preload("res://BabaGodotLib/UI/LineContainer/TextLineContainer.tscn")
+const icon_line_container_scene = preload("res://BabaGodotLib/UI/LineContainer/IconsLineContainer.tscn")
 
-onready var tween = $Tween
 onready var lines_container = $VBoxContainer
 
 export var content_margin := Vector2(6.0, 6.0)
@@ -72,8 +72,12 @@ func instanciate_normal_line(line_data: NormalLineData) -> TextLineContainer:
 	return line
 
 
-func instanciate_icon_line(_line_data: LineData):
-	pass
+func instanciate_icon_line(line_data: LineData):
+	var line : IconsLineContainer = icon_line_container_scene.instance()
+	
+	line.set_icons_array(line_data.get_icons_array())
+	
+	return line
 
 
 func update_line_container_size():

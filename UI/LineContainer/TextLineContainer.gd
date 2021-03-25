@@ -44,7 +44,7 @@ func set_icon_texture(value: Texture):
 	if !is_ready:
 		yield(self, "ready")
 	
-	if icon_texture == null:
+	if value == null:
 		texture_rect.queue_free()
 		_update_alignment()
 		return 

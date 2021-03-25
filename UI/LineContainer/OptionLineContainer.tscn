@@ -7,6 +7,8 @@
 [ext_resource path="res://BabaGodotLib/UI/LineContainer/LineContainer.tscn" type="PackedScene" id=5]
 
 [node name="OptionLineContainer" instance=ExtResource( 5 )]
+margin_right = -578.0
+margin_bottom = -339.0
 script = ExtResource( 1 )
 
 [node name="MenuOptionBase" parent="." index="1" instance=ExtResource( 4 )]
@@ -21,6 +23,7 @@ all_caps = true
 margin_left = 58.0
 margin_right = 58.0
 margin_bottom = 21.0
+stretch_mode = 4
 
 [node name="AmountLabel" type="Label" parent="." index="3"]
 margin_left = 62.0

@@ -28,6 +28,7 @@ func set_all_caps(value: bool):
 	else:
 		text = text.capitalize()
 
+
 func set_text(value: String):
 	if all_caps:
 		text = value.to_upper()

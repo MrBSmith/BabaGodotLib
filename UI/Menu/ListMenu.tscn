@@ -2,25 +2,12 @@
 
 [ext_resource path="res://BabaGodotLib/UI/Menu/ListMenu.gd" type="Script" id=1]
 
-[node name="ListMenu" type="NinePatchRect"]
+[node name="ListMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-axis_stretch_horizontal = 2
-axis_stretch_vertical = 2
 script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 4.0
-margin_top = 4.0
-margin_right = 4.0
-margin_bottom = 4.0
 __meta__ = {
 "_edit_use_anchors_": false
 }

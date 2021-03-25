@@ -1,8 +1,14 @@
+tool
 extends ListMenu
 class_name ActionMenu
 
-const description_window_scene = preload("res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn")
+const list_menu_scene = preload("res://BabaGodotLib/UI/Menu/ListMenu.tscn") 
 
+onready var window_node = $ResizableWindow
+onready var initial_size = rect_size
+onready var submenu_size = rect_size * 1.5
+
+export var window_texture : Texture = null setget set_window_texture
 export var options_appear_delay : float = 0.2
 
 var timer_node : Timer = null
@@ -16,11 +22,17 @@ var action_list : Array = [
 	"Wait"
 ]
 
-
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "ActionMenu" or .is_class(value)
 func get_class() -> String: return "ActionMenu"
+
+func set_window_texture(value: Texture):
+	if !is_ready:
+		yield(self, "ready")
+	
+	window_texture = value
+	window_node.set_texture(value)
 
 
 #### BUILT-IN ####
@@ -35,9 +47,13 @@ func _ready() -> void:
 
 
 
+
 #### VIRTUALS ####
 
 func _setup():
+	if Engine.editor_hint:
+		return
+	
 	yield(self, "ready")
 	var option_array = []
 	
@@ -53,6 +69,9 @@ func _setup():
 	
 	for option in get_every_options():
 		option.set_visible(true)
+	
+	yield(get_tree(), "idle_frame")
+	_on_menu_resized()
 
 
 #### LOGIC ####
@@ -68,6 +87,8 @@ func option_appear_animation():
 		timer_node.start(options_appear_delay)
 		yield(timer_node, "timeout")
 		
+		if option == null:
+			continue
 		option.appear()
 
 
@@ -78,6 +99,23 @@ func instanciate_option(data_container: OptionDataContainer) -> Button:
 	option.set_icon_texture(data_container.icon_texture)
 	
 	return option
+
+
+func generate_submenu():
+	var new_menu = list_menu_scene.instance()
+	
+	add_child(new_menu)
+
+
+func set_option_all_caps(value: bool):
+	for option in get_every_options():
+		option.set_all_caps(value)
+	
+	yield(get_tree(), "idle_frame")
+	
+	for column in column_container.get_children():
+		column.set_margin(MARGIN_LEFT, 0.0) 
+
 
 
 #### INPUTS ####
@@ -108,8 +146,22 @@ func _on_add_action_submenu(data_array: Array, menu_name: String):
 
 
 func _on_menu_changed(menu):
-	if menu == menu_root && is_ready:
+	if !is_ready:
+		yield(self, "ready")
+	
+	if menu == menu_root:
 		EVENTS.emit_signal("action_choice_menu_entered")
+		window_node.trigger_resize_animation(initial_size, CORNER_TOP_LEFT)
+		if description_instance != null:
+			description_instance.queue_free()
+	else:
+		window_node.trigger_resize_animation(submenu_size, CORNER_TOP_LEFT)
+	
+	if window_node.is_resizing:
+		yield(window_node, "resize_animation_finished")
+	
+	if menu != menu_root:
+		set_option_all_caps(false)
 	
 	option_appear_animation()
 
@@ -118,6 +170,7 @@ func _on_option_chose(option: MenuOptionsBase):
 	if current_menu == menu_root:
 		EVENTS.emit_signal("actor_action_chosen", option.text.capitalize())
 	else:
+		
 		var option_data_container = get_data_container(current_menu, option.name)
 		if option_data_container == null:
 			return
@@ -148,13 +201,15 @@ func _on_option_focus_changed(option: Control, focused: bool):
 		description_instance = description_window_scene.instance()
 		var descritpion_data = obj_ref.fetch_description_data()
 		
-		
 		add_child(description_instance)
 		
 		description_instance.feed(descritpion_data)
 		
-		description_instance.set_size(rect_size )
-		description_instance.set_position(Vector2(-rect_size.x + get_margin(MARGIN_RIGHT), 0))
+		var window_size = initial_size * 2
+		var top_left_corner = $ResizableWindow.get_top_left_corner()
+		
+		description_instance.set_size(window_size)
+		description_instance.set_position(top_left_corner + Vector2(-window_size.x - 4, 0))
 		
 	else:
 		if description_instance != null:
