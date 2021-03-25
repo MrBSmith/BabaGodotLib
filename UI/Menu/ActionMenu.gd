@@ -41,7 +41,7 @@ func _ready() -> void:
 	var __ = EVENTS.connect("update_unabled_actions", self, "_on_update_unabled_actions")
 	__ = EVENTS.connect("disable_every_actions", self, "_on_disable_every_actions")
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
-	
+	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	timer_node = Timer.new()
 	add_child(timer_node)
 
@@ -214,3 +214,7 @@ func _on_option_focus_changed(option: Control, focused: bool):
 	else:
 		if description_instance != null:
 			description_instance.queue_free()
+
+
+func _on_window_resize_animation_finished():
+	_update_columns_size()
