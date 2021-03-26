@@ -5,7 +5,7 @@ onready var tween = $Tween
 
 export var default_margin_left : float = 0
 
-export var transition_duration : float = 0.2
+export var transition_duration : float = 0.18
 export var hidden : bool = true setget set_hidden, is_hidden
 export var hidden_margin_left : float = 30.0
 

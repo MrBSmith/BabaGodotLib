@@ -2,7 +2,7 @@ tool
 extends NinePatchRect
 class_name ResizableWindow
 
-export var follow_parent_rect : bool = false
+export var resize_duration : float = 0.5
 
 var tween_node : Tween = null
 var is_resizing : bool = false
@@ -60,7 +60,7 @@ func trigger_resize_animation(target_size: Vector2, grow_dir: int,
 			"margin_bottom": final_value = get(margin_name) + size_difference.y 
 		
 		var __ = tween_node.interpolate_property(self, margin_name, get(margin_name), 
-						final_value, 0.8, trans_type, ease_type)
+						final_value, resize_duration, trans_type, ease_type)
 	
 	is_resizing = true
 	var __ = tween_node.start()
