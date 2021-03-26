@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://BabaGodotLib/Fonts/BoldCapsPixel24.tres" type="DynamicFont" id=1]
+[ext_resource path="res://BabaGodotLib/UI/LineContainer/TextLineContainer.gd" type="Script" id=2]
+[ext_resource path="res://BabaGodotLib/UI/LineContainer/LineContainer.tscn" type="PackedScene" id=3]
+
+[node name="TextLineContainer" instance=ExtResource( 3 )]
+script = ExtResource( 2 )
+
+[node name="TextLabel" type="Label" parent="." index="1"]
+margin_bottom = 360.0
+size_flags_vertical = 1
+custom_fonts/font = ExtResource( 1 )
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="." index="2"]
+margin_left = 4.0
+margin_right = 4.0
+margin_bottom = 360.0
+
+[node name="AmountLabel" type="Label" parent="." index="3"]
+margin_left = 8.0
+margin_top = 173.0
+margin_right = 8.0
+margin_bottom = 186.0
+custom_fonts/font = ExtResource( 1 )
+valign = 1

@@ -1,8 +1,10 @@
 extends Node
 class_name OptionDataContainer
 
+var object_ref : Object = null
+
 var amount : int = INF
-var icon : Texture = null
+var icon_texture : Texture = null
 
 #### ACCESSORS ####
 
@@ -12,10 +14,11 @@ func get_class() -> String: return "OptionDataContainer"
 
 #### BUILT-IN ####
 
-func _init(_name: String, _amount : int = INF, _icon: Texture = null) -> void:
+func _init(obj: Object, _name: String, _amount : int = INF, _icon: Texture = null) -> void:
+	object_ref = obj
 	name = _name
 	amount = _amount
-	icon = _icon
+	icon_texture = _icon
 
 
 #### VIRTUALS ####

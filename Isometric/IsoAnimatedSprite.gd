@@ -4,7 +4,8 @@ class_name IsoAnimatedSprite
 # A base class for AnimatedSprite used to be rendered by the IsoRenderer
 
 signal texture_changed(sprite)
-signal flip_changed(flipH, flipV)
+signal flip_changed(sprite, flipH, flipV)
+signal visible_changed(sprite, value)
 
 #### ACCESSORS ####
 
@@ -14,13 +15,16 @@ func get_class() -> String: return "IsoAnimatedSprite"
 func set_flip_h(value: bool):
 	if value != flip_h:
 		.set_flip_h(value)
-		emit_signal("flip_changed", flip_h, flip_v)
+		emit_signal("flip_changed", self, flip_h, flip_v)
 
 func set_flip_v(value: bool):
 	if value != flip_v:
 		.set_flip_v(value)
-		emit_signal("flip_changed", flip_h, flip_v)
+		emit_signal("flip_changed", self, flip_h, flip_v)
 
+func set_visible(value: bool):
+	visible = value
+	emit_signal("visible_changed", self, visible)
 
 #### BUILT-IN ####
 

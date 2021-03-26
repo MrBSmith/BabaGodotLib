@@ -16,7 +16,7 @@ onready var states_machine = get_parent()
 # Called when the current state of the state machine is set to this node
 func enter_state():
 	pass
-	
+
 # Called when the current state of the state machine is switched to another one
 func exit_state():
 	pass

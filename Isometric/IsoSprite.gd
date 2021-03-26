@@ -6,6 +6,7 @@ class_name IsoSprite
 #warning-ignore:unused_signal
 signal sprite_texture_changed(sprite)
 signal flip_changed(flipH, flipV)
+signal visible_changed(sprite, value)
 
 #### ACCESSORS ####
 
@@ -21,6 +22,12 @@ func set_flip_v(value: bool):
 	if value != flip_v:
 		.set_flip_v(value)
 		emit_signal("flip_changed", flip_h, flip_v)
+
+func set_visible(value: bool):
+	visible = value
+	emit_signal("visible_changed", self, visible)
+
+
 
 #### BUILT-IN ####
 

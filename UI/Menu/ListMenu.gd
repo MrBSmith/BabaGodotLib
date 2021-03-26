@@ -1,17 +1,19 @@
 extends MenuBase
 class_name ListMenu
 
-export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/MenuOptionBase.tscn"
+const description_window_scene = preload("res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn")
+
+export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn"
 export var option_v_separation : int = INF 
+export var column_container_path : String = "HBoxContainer"
 
 onready var menu_root = $MenuRoot
-onready var column_container = $HBoxContainer
+onready var column_container = get_node_or_null(column_container_path)
 onready var menu_option_scene = load(menu_option_scene_path)
 onready var current_menu = menu_root setget set_current_menu, get_current_menu
 
 export var max_lines : int = 3 setget set_max_lines, get_max_lines
 export var max_columns : int = 2 setget set_max_columns, get_max_columns
-export var option_container_margin : int = 4
 
 var current_top_line : int = 0
 
@@ -51,14 +53,14 @@ func set_current_menu(menu: Node):
 
 func get_current_menu() -> Node: return current_menu
 
+
 #### BUILT-IN ####
 
 func _ready() -> void:
 	var __ = connect("option_table_size_changed", self, "_on_option_table_size_changed")
 	__ = connect("menu_changed", self, "_on_menu_changed")
 	__ = connect("resized", self, "_on_menu_resized")
-	
-	update_option_container_size()
+
 
 #### VIRTUALS ####
 
@@ -76,9 +78,8 @@ func _setup():
 
 
 func add_sub_menu(data_array: Array, menu: Node = menu_root):
-	for string in data_array:
-		var option = OptionDataContainer.new(string)
-		menu.add_child(option)
+	for option_container in data_array:
+		menu.add_child(option_container)
 	
 	set_current_menu(menu)
 
@@ -89,6 +90,9 @@ func _update_whole_display():
 		yield(self, "update_column_finished")
 	
 	_update_options()
+	yield(self, "option_update_finished")
+	
+	_update_columns_size()
 
 
 func _update_columns():
@@ -105,13 +109,15 @@ func _update_columns():
 				var column = VBoxContainer.new()
 				column_container.add_child(column)
 				column.add_constant_override("separation", option_v_separation)
+				column.set_owner(self)
+				column.set_name("VBoxContainer")
 				nb_column += 1
 	
 	emit_signal("update_column_finished")
 
 
 func _update_options():
-	var last_added_option : Button = null
+	var last_added_option : Node = null
 	var data_array = current_menu.get_children()
 	
 	for i in data_array.size():
@@ -136,10 +142,11 @@ func _update_options():
 		# Add needed options
 		if must_option_be_displayed(i):
 			if option_already_displayed == null or !option_already_displayed.is_inside_tree():
-				var option = menu_option_scene.instance()
-				option.set_text(obj_name)
+				var option = instanciate_option(data_array[i])
 				
 				column.add_child(option)
+				option.connect("option_chose", self, "_on_option_chose")
+				option.connect("focus_changed", self, "_on_option_focus_changed")
 				option.owner = self
 				option.set_name(obj_name.capitalize())
 				last_added_option = option
@@ -151,10 +158,20 @@ func _update_options():
 	if last_added_option != null:
 		if !last_added_option.is_ready:
 			yield(last_added_option, "ready")
-	
-	update_option_container_size()
+
 	emit_signal("option_update_finished")
 
+
+func _update_columns_size():
+	for column in column_container.get_children():
+		column.set_size(column_container.get_size() / Vector2(column_container.get_child_count(), 1))
+
+
+func instanciate_option(option_data_container: OptionDataContainer) -> Button:
+	var option = menu_option_scene.instance()
+	option.set_text(option_data_container.name)
+	
+	return option
 
 func clear_options():
 	for column in column_container.get_children():
@@ -176,7 +193,7 @@ func must_option_be_displayed(option_id: int) -> bool:
 func find_option(opt_text: String) -> Button:
 	for column in column_container.get_children():
 		for option in column.get_children():
-			if option.get_text().capitalize() == opt_text.capitalize():
+			if option.get_text().capitalize() == opt_text.capitalize() or option.name == opt_text:
 				return option
 	return null
 
@@ -247,6 +264,14 @@ func get_every_options() -> Array:
 	return options_array
 
 
+func get_data_container(sub_menu: Node, container_name: String) -> OptionDataContainer:
+	for child in sub_menu.get_children():
+		if child.name == container_name:
+			return child
+	return null
+
+
+
 # Change this name?
 func navigate_upstream_menu():
 	if current_menu == menu_root:
@@ -257,9 +282,6 @@ func navigate_upstream_menu():
 	
 	set_current_menu(next_menu)
 
-
-func update_option_container_size():
-	column_container.set_size(get_size() - Vector2.ONE * option_container_margin * 2)
 
 
 #### INPUTS ####
@@ -296,5 +318,11 @@ func _on_option_table_size_changed():
 func _on_menu_changed(_menu):
 	pass
 
+func _on_option_chose(_option):
+	pass
+
+func _on_option_focus_changed(_option: Control, _focused: bool):
+	pass
+
 func _on_menu_resized():
-	update_option_container_size()
+	_update_columns_size()

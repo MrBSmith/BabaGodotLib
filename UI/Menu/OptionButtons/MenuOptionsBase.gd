@@ -15,7 +15,8 @@ export var all_caps : bool = false setget set_all_caps
 func set_focused(value: bool):
 	if value != focused && !is_disabled():
 		focused = value
-		if focused: grab_focus()
+		if focused: 
+			grab_focus()
 		emit_signal("focus_changed", self, focused)
 
 func is_focused() -> bool: return focused
@@ -26,6 +27,7 @@ func set_all_caps(value: bool):
 		text = text.to_upper()
 	else:
 		text = text.capitalize()
+
 
 func set_text(value: String):
 	if all_caps:
@@ -41,6 +43,10 @@ func _ready() -> void:
 	_err = connect("pressed", self, "_on_pressed")
 	_err = connect("gui_input", self, "_on_gui_input")
 	_err = connect("mouse_entered", self, "_on_mouse_entered")
+	_err = connect("mouse_exited", self, "_on_mouse_exited")
+	
+	
+	set_text(text)
 	
 	is_ready = true
 
@@ -57,6 +63,10 @@ func _on_pressed(): emit_signal("option_chose", self)
 func _on_mouse_entered():
 	if !is_disabled():
 		set_focused(true)
+
+func _on_mouse_exited():
+	if !is_disabled():
+		set_focused(false)
 
 func _on_focus_entered():
 	set_focused(true)
