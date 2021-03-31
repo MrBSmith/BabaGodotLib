@@ -60,6 +60,8 @@ func _ready() -> void:
 	var __ = connect("option_table_size_changed", self, "_on_option_table_size_changed")
 	__ = connect("menu_changed", self, "_on_menu_changed")
 	__ = connect("resized", self, "_on_menu_resized")
+	
+	__ = EVENTS.connect("menu_cancel", self, "_on_menu_cancel")
 
 
 #### VIRTUALS ####
@@ -283,17 +285,9 @@ func navigate_upstream_menu():
 	set_current_menu(next_menu)
 
 
-
 #### INPUTS ####
 
 func _input(_event: InputEvent) -> void:
-	
-	if Input.is_action_just_pressed("ui_cancel"):
-		if current_menu != menu_root:
-			get_tree().set_input_as_handled()
-			navigate_upstream_menu()
-			return
-	
 	var focused_option = get_focus_owner()
 	if focused_option == null:
 		return
@@ -326,3 +320,7 @@ func _on_option_focus_changed(_option: Control, _focused: bool):
 
 func _on_menu_resized():
 	_update_columns_size()
+
+func _on_menu_cancel():
+	navigate_upstream_menu()
+

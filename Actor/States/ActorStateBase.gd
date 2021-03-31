@@ -17,7 +17,7 @@ func _ready() -> void:
 
 #### VIRTUALS ####
 
-func update(_delta : float):
+func update_state(_delta : float):
 	pass
 
 

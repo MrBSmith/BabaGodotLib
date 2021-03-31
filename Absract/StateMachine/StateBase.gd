@@ -7,7 +7,7 @@ class_name StateBase
 # when the entity is in this state
 
 # The enter_state is called every time the state is entered and exit_state when its exited
-# the update of the currrent state is called every physics tick,  
+# the update_state of the currrent state is called every physics tick,  
 # by the physics_process of the StateMachine 
 
 onready var states_machine = get_parent()
@@ -23,5 +23,13 @@ func exit_state():
 
 # Called every frames, for real time behaviour
 # Use a return "State_node_name" or return Node_reference to change the current state of the state machine at a given time
-func update(_delta):
+func update_state(_delta):
 	pass
+
+
+# Check if the entity is in this state. Check reccursivly in cas of nested StatesMachines/PushdownAutomata
+func is_current_state() -> bool:
+	if states_machine.has_method("is_current_state"):
+		return states_machine.current_state == self && states_machine.is_current_state()
+	else:
+		return states_machine.current_state == self

@@ -10,7 +10,7 @@ func _ready():
 
 #### VIRTUALS ####
 
-func update(_delta):
+func update_state(_delta):
 	if owner.is_on_floor():
 		return "Idle"
 

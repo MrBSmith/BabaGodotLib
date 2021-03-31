@@ -32,7 +32,7 @@ func _ready():
 func _physics_process(delta):
 	if current_state == null:
 		return
-	var state_name = current_state.update(delta)
+	var state_name = current_state.update_state(delta)
 	if state_name:
 		set_state(get_node(state_name))
 

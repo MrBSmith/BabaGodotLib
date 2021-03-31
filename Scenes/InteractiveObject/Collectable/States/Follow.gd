@@ -27,7 +27,7 @@ func enter_state():
 	speed = start_speed
 
 
-func update(delta: float):
+func update_state(delta: float):
 	if target != null:
 		speed += acceleration
 		

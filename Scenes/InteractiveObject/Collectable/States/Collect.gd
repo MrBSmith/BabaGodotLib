@@ -39,7 +39,7 @@ func exit_state():
 	pass
 
 
-func update(delta: float):
+func update_state(delta: float):
 	var target_pos = target.get_global_position()
 	var dir = owner.global_position.direction_to(target_pos)
 	var velocity = ((dir * speed) + (initial_dir * initial_speed)) * delta

@@ -39,9 +39,10 @@ func set_window_texture(value: Texture):
 
 func _ready() -> void:
 	var __ = EVENTS.connect("update_unabled_actions", self, "_on_update_unabled_actions")
-	__ = EVENTS.connect("disable_every_actions", self, "_on_disable_every_actions")
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
 	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
+	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
+	__ = EVENTS.connect("option_choice_state_entered", self, "_on_option_choice_state_entered")
 	timer_node = Timer.new()
 	add_child(timer_node)
 
@@ -117,6 +118,15 @@ func set_option_all_caps(value: bool):
 		column.set_margin(MARGIN_LEFT, 0.0) 
 
 
+func disable_every_actions(value: bool):
+	for option in column_container.get_child(0).get_children():
+		option.set_disabled(value)
+
+
+func destroy_description_window():
+	if description_instance != null:
+		description_instance.queue_free()
+
 
 #### INPUTS ####
 
@@ -135,11 +145,6 @@ func _on_update_unabled_actions(move: bool, attack: bool, item : bool, skill: bo
 	find_option("Wait").set_disabled(!wait)
 
 
-func _on_disable_every_actions():
-	for option in column_container.get_child(0).get_children():
-		option.set_disabled(true)
-
-
 func _on_add_action_submenu(data_array: Array, menu_name: String):
 	var menu = find_sub_menu(menu_name)
 	add_sub_menu(data_array, menu)
@@ -152,8 +157,7 @@ func _on_menu_changed(menu):
 	if menu == menu_root:
 		EVENTS.emit_signal("action_choice_menu_entered")
 		window_node.trigger_resize_animation(initial_size, CORNER_TOP_LEFT)
-		if description_instance != null:
-			description_instance.queue_free()
+		destroy_description_window()
 	else:
 		window_node.trigger_resize_animation(submenu_size, CORNER_TOP_LEFT)
 	
@@ -218,3 +222,11 @@ func _on_option_focus_changed(option: Control, focused: bool):
 
 func _on_window_resize_animation_finished():
 	_update_columns_size()
+
+
+func _on_option_choice_state_entered():
+	disable_every_actions(false)
+
+func _on_target_choice_state_entered():
+	disable_every_actions(true)
+	destroy_description_window()

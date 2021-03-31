@@ -50,3 +50,7 @@ signal scatter_object(body, nb_debris, impulse_force)
 #### DIALOGUES ####
 
 signal dialogue_query(dialogue_index, is_cut_scene)
+
+#### MENU ####
+
+signal menu_cancel()
