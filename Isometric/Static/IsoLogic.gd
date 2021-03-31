@@ -55,7 +55,7 @@ static func get_cell_in_perpendicular_line(origin: Vector3, dir: int, lenght: in
 		if i == 0:
 			cells_2D_array.append(Vector2(origin.x, origin.y) + vec_dir)
 		else:
-			var offset_amount = int((i - 1) / 2)
+			var offset_amount = int(float(i - 1) / 2)
 			var current_dir = perpendicular_dir if (i - 1) % 2 == 0 else perpendicular_dir.invert()
 			cells_2D_array.append(cells_2D_array[0] + current_dir * offset_amount)
 	

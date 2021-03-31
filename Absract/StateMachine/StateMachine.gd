@@ -13,8 +13,8 @@ class_name StatesMachine
 # The default state is always the first in the tree unless the owner of the scene 
 # as a default_state property (Must be a String corresponding to the name of a State node)
 
-onready var current_state : StateBase = null
-onready var previous_state : StateBase = null
+onready var current_state : Object = null
+onready var previous_state : Object = null
 
 signal state_changed
 
@@ -38,7 +38,7 @@ func _physics_process(delta):
 
 
 # Returns the current state
-func get_state() -> StateBase:
+func get_state() -> Object:
 	return current_state
 
 
