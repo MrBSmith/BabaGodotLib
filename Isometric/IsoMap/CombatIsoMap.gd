@@ -341,10 +341,12 @@ func update_view_field(actor: Actor):
 	var actor_height = actor.get_height()
 	
 	var visible_cells = Array(get_reachable_cells(actor_cell, actor_height, view_range, true))
-	var barely_visible_cells = Array(IsoLogic.get_cells_at_xy_dist(actor_cell, view_range, visible_cells))
+	var sharply_visible_cells = Array(get_cells_in_circle(actor_cell, view_range, visible_cells, true))
+	var barely_visible_cells := Array()
 	
 	for cell in visible_cells:
-		if cell in barely_visible_cells:
+		if not cell in sharply_visible_cells:
+			barely_visible_cells.append(cell)
 			visible_cells.erase(cell)
 	
 	actor.set_view_field([
@@ -385,6 +387,74 @@ func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_curre
 			if obj.is_in_group("Enemies"):
 				count += 1
 	return count
+
+
+
+# Return every cells at the given dist or more from the origin in the given array
+func get_cells_in_circle(origin: Vector3, radius: int, 
+		cells_array: PoolVector3Array = walkable_cells, ignore_origin: bool = false) -> PoolVector3Array:
+	var cells_at_dist = PoolVector3Array()
+	for cell in cells_array:
+		if ignore_origin && cell == origin: continue
+		var x_sum_diff = abs(cell.x - origin.x)
+		var y_sum_diff = abs(cell.y - origin.y)
+		var dif = x_sum_diff + y_sum_diff
+		if dif < radius:
+			cells_at_dist.append(cell)
+	return cells_at_dist
+
+
+# Returns every cell from the cells_array that are 
+# in a straight line starting from origin and going in the given direction for the given lenght
+func get_cells_in_straight_line(origin : Vector3, length: int, dir: int) -> PoolVector3Array:
+	if dir < 0 or dir > 3:
+		print_debug("the given direction: " + String(dir) + "is not valid.")
+		return PoolVector3Array()
+	
+	var cells_in_line = PoolVector3Array()
+	var vec_dir = IsoLogic.dir_to_vec2(dir)
+	
+	for i in range(length):
+		var cell_2d = Vector2(origin.x, origin.y) + vec_dir * (i + 1)
+		for cell in walkable_cells:
+			if cell.x == cell_2d.x && cell.y == cell_2d.y:
+				cells_in_line.append(cell)
+	
+	return cells_in_line
+
+
+# Returns every cells in the cells_array that are
+# in a perpendicular line of the given lenght, in the given direction
+func get_cell_in_perpendicular_line(origin: Vector3, lenght: int, dir: int) -> PoolVector3Array:
+	if dir < 0 or dir > 3 or lenght % 2 == 0:
+		if lenght % 2 == 0: print_debug("The lenght must be an uneven number")
+		else : print_debug("the given direction: " + String(dir) + "is not valid.")
+		return PoolVector3Array()
+	
+	var cells_2D_array := PoolVector2Array()
+	var cells_in_line = PoolVector3Array()
+	var vec_dir = IsoLogic.dir_to_vec2(dir)
+	var perpendicular_dir = vec_dir.rotated(0.5 * PI)
+	
+	for i in range(lenght):
+		if i == 0:
+			cells_2D_array.append(Vector2(origin.x, origin.y) + vec_dir)
+		else:
+			var offset_amount = int(float(i - 1) / 2)
+			var current_dir = perpendicular_dir if (i - 1) % 2 == 0 else perpendicular_dir.invert()
+			cells_2D_array.append(cells_2D_array[0] + current_dir * offset_amount)
+	
+	for cell in walkable_cells:
+		if Vector2(cell.x, cell.y) in cells_2D_array:
+			cells_in_line.append(cell)
+	
+	return cells_in_line
+
+
+func get_cells_in_square(_origin: Vector2, _size: int, _dir: int) -> PoolVector3Array:
+	var cells_in_square = PoolVector3Array()
+	
+	return cells_in_square
 
 
 #### SIGNAL RESPONSES ####

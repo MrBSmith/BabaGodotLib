@@ -65,7 +65,6 @@ func go_to_next_state():
 		print_debug("There is no next state - the current index is the last of the queue")
 		return
 	
-	
 	go_to_state_by_index(state_index + 1)
 
 
