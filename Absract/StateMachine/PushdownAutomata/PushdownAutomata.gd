@@ -2,7 +2,7 @@ extends StatesMachine
 class_name PushdownAutomata
 
 var state_queue : Array = []
-var state_index : int = 0
+var state_index : int = -1
 
 export var state_queue_max_size : int = 5
 
@@ -25,7 +25,10 @@ func get_class() -> String: return "PushdownAutomata"
 func set_state(state):
 	.set_state(state)
 	
-	if state_index == state_queue.size() - 1 or state_index == 0:
+	if state == null or state == "":
+		return
+	
+	if state_index == state_queue.size() - 1:
 		state_queue.append(state)
 		if state_queue.size() > state_queue_max_size:
 			state_queue.remove(0)
@@ -34,7 +37,6 @@ func set_state(state):
 	else:
 		for i in range(state_queue.size() - state_index - 1):
 			state_queue.remove(state_index + i + 1)
-		
 		
 		state_queue.append(state)
 		state_index += 1

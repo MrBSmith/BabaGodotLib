@@ -22,8 +22,11 @@ signal state_changed
 # Set the state to the first of the list
 func _ready():
 	yield(owner, "ready")
-	if owner.get("default_state") && owner.default_state != "":
-		set_state(owner.default_state)
+	
+	var default = get("default_state") if get("default_state") != null else owner.get("default_state")
+	
+	if default != null:
+		set_state(default)
 	else:
 		set_state(get_child(0))
 
@@ -53,10 +56,10 @@ func get_state_name() -> String:
 func set_state(new_state):
 	# if the given argument is a string, get the 
 	if new_state is String:
-		new_state = get_node(new_state)
+		new_state = get_node_or_null(new_state)
 	
 	# Discard the method if the new_state is the current_state
-	if new_state == current_state:
+	if new_state == current_state or new_state == null:
 		return
 	
 	# Use the exit state function of the current state
@@ -68,7 +71,6 @@ func set_state(new_state):
 	current_state = new_state
 	
 	# Use the enter_state function of the current state
-	if new_state != null:
-		current_state.enter_state()
+	current_state.enter_state()
 	
 	emit_signal("state_changed", current_state.name)
