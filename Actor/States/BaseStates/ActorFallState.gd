@@ -19,7 +19,7 @@ func update_state(_delta):
 
 # Triggers the fall animation when the start falling is over
 func on_animation_finished():
-	if states_machine.get_state() == self:
+	if is_current_state():
 		if animated_sprite.get_animation() == "StartFalling":
 				animated_sprite.play(self.name)
 

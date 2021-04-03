@@ -233,15 +233,15 @@ func is_obj_in_rendering_queue(obj: IsoObject):
 func get_type_priority(thing) -> int:
 	if thing is Vector3:
 		return type_priority.TILE
-	elif thing.get_object_ref() is TileArea:
+	elif thing.get_object_ref().is_class("TileArea"):
 		return type_priority.AREA
-	elif thing.get_object_ref() is MovementArrowSegment:
+	elif thing.get_object_ref().is_class("MovementArrowSegment"):
 		return type_priority.MOVEMENT_ARROW
-	elif thing.get_object_ref() is Cursor:
+	elif thing.get_object_ref().is_class("Cursor"):
 		return type_priority.CURSOR
-	elif thing.get_object_ref() is Obstacle:
+	elif thing.get_object_ref().is_class("Obstacle"):
 		return type_priority.OBSTACLE
-	elif thing.get_object_ref() is Actor:
+	elif thing.get_object_ref().is_class("Actor"):
 		return type_priority.ACTOR
 	
 	return -1

@@ -335,7 +335,7 @@ func get_reachable_cells(origin: Vector3, h: int, ran: int, include_self_cell: b
 
 
 # Update the view field of the given actor by fetchin every cells he can se and feed him
-func update_view_field(actor: Actor):
+func update_view_field(actor: IsoObject):
 	var view_range = actor.get_view_range()
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
@@ -355,7 +355,7 @@ func update_view_field(actor: Actor):
 
 
 # Return true if at least one target is reachable by the active actor
-func has_target_reachable(actor: Actor) -> bool:
+func has_target_reachable(actor: IsoObject) -> bool:
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	var actor_range = actor.get_current_range()
@@ -366,7 +366,7 @@ func has_target_reachable(actor: Actor) -> bool:
 		if obj == null:
 			continue
 		
-		if obj.is_in_group("Enemies") or obj is Obstacle:
+		if obj.is_in_group("Enemies") or obj.is_class("Obstacle"):
 			return true
 	return false
 
@@ -383,7 +383,7 @@ func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_curre
 		if obj == null:
 			continue
 		
-		if obj is Actor:
+		if obj.is_class("Actor"):
 			if obj.is_in_group("Enemies"):
 				count += 1
 	return count
@@ -473,7 +473,7 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 
 
 func on_iso_object_cell_changed(iso_object: IsoObject):
-	if iso_object is Ally:
+	if iso_object.is_class("Ally"):
 		update_view_field(iso_object)
 
 
