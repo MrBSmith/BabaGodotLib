@@ -1,4 +1,3 @@
-tool
 extends ListMenu
 class_name ActionMenu
 
@@ -39,6 +38,7 @@ func set_window_texture(value: Texture):
 
 func _ready() -> void:
 	var __ = EVENTS.connect("update_unabled_actions", self, "_on_update_unabled_actions")
+	__ = EVENTS.connect("disable_actions", self, "_on_disable_actions_event")
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
 	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
@@ -223,6 +223,8 @@ func _on_option_focus_changed(option: Control, focused: bool):
 func _on_window_resize_animation_finished():
 	_update_columns_size()
 
+func _on_disable_actions_event():
+	disable_every_actions(true)
 
 func _on_option_choice_state_entered():
 	disable_every_actions(false)
