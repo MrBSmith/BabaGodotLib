@@ -406,19 +406,21 @@ func get_cells_in_circle(origin: Vector3, radius: int,
 
 # Returns every cell from the cells_array that are 
 # in a straight line starting from origin and going in the given direction for the given lenght
-func get_cells_in_straight_line(origin : Vector3, length: int, dir: int) -> PoolVector3Array:
-	if dir < 0 or dir > 3:
-		print_debug("the given direction: " + String(dir) + "is not valid.")
+func get_cells_in_straight_line(origin : Vector3, length: int, direction) -> PoolVector3Array:
+	if direction is int && (direction < 0 or direction > 3):
+		print_debug("the given direction: " + String(direction) + "is not valid.")
 		return PoolVector3Array()
 	
 	var cells_in_line = PoolVector3Array()
-	var vec_dir = IsoLogic.dir_to_vec2(dir)
+	var dir_array = direction if direction is Array else [direction]
 	
-	for i in range(length):
-		var cell_2d = Vector2(origin.x, origin.y) + vec_dir * (i + 1)
-		for cell in walkable_cells:
-			if cell.x == cell_2d.x && cell.y == cell_2d.y:
-				cells_in_line.append(cell)
+	for dir in dir_array:
+		var vec_dir = IsoLogic.dir_to_vec2(dir)
+		for i in range(length):
+			var cell_2d = Vector2(origin.x, origin.y) + vec_dir * (i + 1)
+			for cell in walkable_cells:
+				if cell.x == cell_2d.x && cell.y == cell_2d.y:
+					cells_in_line.append(cell)
 	
 	return cells_in_line
 
