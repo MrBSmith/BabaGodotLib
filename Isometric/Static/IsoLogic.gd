@@ -32,10 +32,10 @@ static func iso_dir(from: Vector3, to: Vector3) -> int:
 
 static func dir_to_vec2(dir: int) -> Vector2:
 	match(dir):
-		DIRECTION.BOTTOM_RIGHT: return Vector2.RIGHT
-		DIRECTION.BOTTOM_LEFT: return Vector2.DOWN
-		DIRECTION.TOP_LEFT: return Vector2.UP
-		DIRECTION.TOP_RIGHT: return Vector2.LEFT
+		DIRECTION.BOTTOM_RIGHT: return Vector2(1, 0)
+		DIRECTION.BOTTOM_LEFT: return Vector2(0, 1)
+		DIRECTION.TOP_LEFT: return Vector2(0, -1)
+		DIRECTION.TOP_RIGHT: return Vector2(-1, 0)
 	return Vector2.ZERO
 
 
@@ -43,6 +43,6 @@ static func vec2_to_dir(vec: Vector2) -> int:
 	match(vec):
 		Vector2(1, 0): return DIRECTION.BOTTOM_RIGHT
 		Vector2(0, 1): return DIRECTION.BOTTOM_LEFT 
-		Vector2(-1, 0): return DIRECTION.TOP_RIGHT 
 		Vector2(0, -1): return DIRECTION.TOP_LEFT 
+		Vector2(-1, 0): return DIRECTION.TOP_RIGHT 
 	return -1

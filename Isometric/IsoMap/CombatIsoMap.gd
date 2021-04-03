@@ -426,8 +426,8 @@ func get_cells_in_straight_line(origin : Vector3, length: int, dir: int) -> Pool
 # Returns every cells in the cells_array that are
 # in a perpendicular line of the given lenght, in the given direction
 func get_cell_in_perpendicular_line(origin: Vector3, lenght: int, dir: int) -> PoolVector3Array:
-	if dir < 0 or dir > 3 or lenght % 2 == 0:
-		if lenght % 2 == 0: print_debug("The lenght must be an uneven number")
+	if dir < 0 or dir > 3 or Math.is_even(lenght):
+		if Math.is_even(lenght): print_debug("The lenght must be an uneven number")
 		else : print_debug("the given direction: " + String(dir) + "is not valid.")
 		return PoolVector3Array()
 	
@@ -440,8 +440,8 @@ func get_cell_in_perpendicular_line(origin: Vector3, lenght: int, dir: int) -> P
 		if i == 0:
 			cells_2D_array.append(Vector2(origin.x, origin.y) + vec_dir)
 		else:
-			var offset_amount = int(float(i - 1) / 2)
-			var current_dir = perpendicular_dir if (i - 1) % 2 == 0 else perpendicular_dir.invert()
+			var offset_amount = int(float(i + 1) / 2)
+			var current_dir = perpendicular_dir if Math.is_even(i + 1) else -perpendicular_dir
 			cells_2D_array.append(cells_2D_array[0] + current_dir * offset_amount)
 	
 	for cell in walkable_cells:
@@ -451,8 +451,20 @@ func get_cell_in_perpendicular_line(origin: Vector3, lenght: int, dir: int) -> P
 	return cells_in_line
 
 
-func get_cells_in_square(_origin: Vector2, _size: int, _dir: int) -> PoolVector3Array:
+func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Array:
 	var cells_in_square = PoolVector3Array()
+	if dir < 0 or dir > 3:
+		print_debug("The given dir: " + String(dir) + " isn't valid")
+		return PoolVector3Array()
+	
+	var vec_dir = IsoLogic.dir_to_vec2(dir)
+	var vec_dir_rotated = vec_dir.rotated(0.5 * PI)
+	var square_dir = Vector2(vec_dir.x, vec_dir_rotated.y) if vec_dir.x != 0 else Vector2(vec_dir_rotated.x, vec_dir.y)
+	
+	for i in range(size):
+		for j in range(size):
+			var vec2 = Vector2(origin.x, origin.y) + Vector2(j, i) * square_dir
+			cells_in_square.append(Vector3(vec2.x, vec2.y, get_cell_highest_layer(vec2)))
 	
 	return cells_in_square
 
@@ -463,6 +475,7 @@ func get_cells_in_square(_origin: Vector2, _size: int, _dir: int) -> PoolVector3
 func on_iso_object_cell_changed(iso_object: IsoObject):
 	if iso_object is Ally:
 		update_view_field(iso_object)
+
 
 func _on_iso_object_removed(iso_object: IsoObject):
 	if !iso_object.is_passable():
