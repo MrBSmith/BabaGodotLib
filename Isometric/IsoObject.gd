@@ -83,8 +83,11 @@ func is_in_view_field() -> bool:
 #### BUILT-IN ####
 
 func _ready():
+	var _err = EVENTS.connect("hide_iso_objects", self, "_on_hide_iso_objects_event")
 	add_to_group("IsoObject")
 	create()
+	
+	set_visible(false)
 	
 	is_ready = true
 
@@ -101,3 +104,9 @@ func destroy():
 		remove_from_group("IsoObject")
 	EVENTS.emit_signal("iso_object_removed", self)
 	queue_free()
+
+
+#### SIGNAL RESPONSES ####
+
+func _on_hide_iso_objects_event(hide: bool):
+	set_visible(!hide)
