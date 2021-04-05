@@ -8,7 +8,8 @@ class_name IsoMapLayer
 func _ready() -> void:
 	var _err = EVENTS.connect("hide_iso_objects", self, "_on_hide_iso_objects_event")
 	
-	set_visible(false)
+	if !Engine.editor_hint:
+		set_visible(false)
 
 
 
