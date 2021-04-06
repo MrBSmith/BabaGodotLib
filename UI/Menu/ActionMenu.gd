@@ -155,7 +155,6 @@ func _on_menu_changed(menu):
 		yield(self, "ready")
 	
 	if menu == menu_root:
-		EVENTS.emit_signal("action_choice_menu_entered")
 		window_node.trigger_resize_animation(initial_size, CORNER_TOP_LEFT)
 		destroy_description_window()
 	else:

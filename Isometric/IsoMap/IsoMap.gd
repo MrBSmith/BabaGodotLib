@@ -106,11 +106,12 @@ func get_layer_id(height: int) -> int:
 # Return the actor or obstacle placed on the given cell
 # Return null if the cell is empty
 func get_object_on_cell(cell: Vector3) -> IsoObject:
-	var objects_array = get_tree().get_nodes_in_group("Allies")
-	objects_array += get_tree().get_nodes_in_group("Enemies")
-	objects_array += $Interactives/Obstacles.get_children()
+	var objects_array = get_tree().get_nodes_in_group("IsoObject")
 	
 	for object in objects_array:
+		if not object is DamagableObject:
+			continue
+		
 		if object.get_current_cell() == cell:
 			return object
 	
