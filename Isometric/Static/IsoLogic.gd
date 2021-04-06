@@ -30,6 +30,14 @@ static func iso_dir(from: Vector3, to: Vector3) -> int:
 	return vec2_to_dir(iso_dirV(from, to))
 
 
+# Return the distance between the 2 given cells on a 2D plan (x, y)
+static func iso_2D_dist(from: Vector3, to: Vector3) -> int:
+	var x_dist = abs(to.x - from.x)
+	var y_dist = abs(to.y - from.y)
+
+	return int(x_dist + y_dist)
+
+
 static func dir_to_vec2(dir: int) -> Vector2:
 	match(dir):
 		DIRECTION.BOTTOM_RIGHT: return Vector2(1, 0)

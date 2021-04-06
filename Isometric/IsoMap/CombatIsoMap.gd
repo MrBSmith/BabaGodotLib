@@ -24,42 +24,44 @@ func draw_movement_area():
 
 
 # Get the reachable cells in the given range. Returns a PoolVector3Array of visible & reachable cells
-func get_reachable_cells(origin: Vector3, h: int, ran: int, include_self_cell: bool = false) -> PoolVector3Array:
+func get_visible_cells(origin: Vector3, h: int, ran: int, include_self_cell: bool = false) -> PoolVector3Array:
 	var ranged_cells = get_cells_in_circle(origin, ran)
-	var reachable_cells := PoolVector3Array()
+
+	var visible_cells := PoolVector3Array()
 	
 	if include_self_cell:
-		reachable_cells.append(origin)
+		visible_cells.append(origin)
 	
 	for i in range(ranged_cells.size()):
 		var cell = ranged_cells[-i - 1]
 		
-		if cell in reachable_cells: continue
+		if cell in visible_cells: continue
 		
 		var line = IsoRaycast.get_line(self, origin, cell.round())
 		var valid_cells = IsoRaycast.get_line_of_sight(self, h, line)
 		
 		for c in valid_cells:
-			if (not c in reachable_cells) && c in ranged_cells:
-				reachable_cells.append(c)
+			if (not c in visible_cells) && c in ranged_cells:
+				visible_cells.append(c)
 	
-	return reachable_cells
+	return visible_cells
 
 
-# Update the view field of the given actor by fetchin every cells he can se and feed him
+# Update the view field of the given actor by fetching every cells he can see and feed himù
 func update_view_field(actor: IsoObject):
 	var view_range = actor.get_view_range()
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	
-	var visible_cells = Array(get_reachable_cells(actor_cell, actor_height, view_range, true))
-	var sharply_visible_cells = Array(get_cells_in_circle(actor_cell, view_range, visible_cells, true))
-	var barely_visible_cells := Array()
+	var visible_cells = Array(get_visible_cells(actor_cell, actor_height, view_range, true))
+	var barely_visible_cells = Array()
 	
 	for cell in visible_cells:
-		if not cell in sharply_visible_cells:
+		if IsoLogic.iso_2D_dist(actor_cell, cell) == view_range - 1:
 			barely_visible_cells.append(cell)
-			visible_cells.erase(cell)
+	
+	for cell in barely_visible_cells:
+		visible_cells.erase(cell)
 	
 	actor.set_view_field([
 		visible_cells,
@@ -71,7 +73,8 @@ func has_target_reachable(actor: IsoObject) -> bool:
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	var actor_range = actor.get_current_range()
-	var reachables = get_reachable_cells(actor_cell, actor_height, actor_range)
+	# ENHANCEMENT: could fetch the visible cells of the actor instead of computing it
+	var reachables = get_visible_cells(actor_cell, actor_height, actor_range)
 	
 	for cell in reachables:
 		var obj = get_object_on_cell(cell)
