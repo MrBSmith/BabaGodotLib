@@ -69,20 +69,23 @@ func update_view_field(actor: IsoObject):
 
 
 # Return true if at least one target is reachable by the active actor
-func has_target_reachable(actor: IsoObject) -> bool:
+func has_target_reachable(actor: TRPG_Actor) -> bool:
+	var visibles_cells = actor.get_view_field_v3_array()
+	var attack_range = actor.get_current_range()
 	var actor_cell = actor.get_current_cell()
-	var actor_height = actor.get_height()
-	var actor_range = actor.get_current_range()
-	# ENHANCEMENT: could fetch the visible cells of the actor instead of computing it
-	var reachables = get_visible_cells(actor_cell, actor_height, actor_range)
 	
-	for cell in reachables:
+	for cell in visibles_cells:
+		var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
+		if dist > attack_range:
+			continue
+		
 		var obj = get_object_on_cell(cell)
 		if obj == null:
 			continue
 		
 		if obj.is_in_group("Enemies") or obj.is_class("Obstacle"):
 			return true
+	
 	return false
 
 
@@ -98,7 +101,7 @@ func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_curre
 		if obj == null:
 			continue
 		
-		if obj.is_class("Actor"):
+		if obj.is_class("TRPG_Actor"):
 			if obj.is_in_group("Enemies"):
 				count += 1
 	return count

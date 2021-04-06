@@ -49,7 +49,7 @@ func set_walkable_cells(cell_array : PoolVector3Array):
 
 
 # Connect walkables cells together
-func connect_walkable_cells(cells_array: PoolVector3Array, active_actor: Actor):
+func connect_walkable_cells(cells_array: PoolVector3Array, active_actor: TRPG_Actor):
 	if active_actor == null: return
 	
 	var max_height = active_actor.get_jump_max_height()
@@ -171,7 +171,7 @@ func compute_cell_index(cell: Vector3):
 
 #### SIGNAL RESPONSES ####
 
-func _on_actor_moved(_actor: Actor, from: Vector3, to: Vector3):
+func _on_actor_moved(_actor: TRPG_Actor, from: Vector3, to: Vector3):
 	if !map_node.is_cell_in_obstacle(from):
 		var id = compute_cell_index(from)
 		astar_node.set_point_disabled(id, false)

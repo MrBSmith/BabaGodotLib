@@ -109,7 +109,7 @@ func get_object_on_cell(cell: Vector3) -> IsoObject:
 	var objects_array = get_tree().get_nodes_in_group("IsoObject")
 	
 	for object in objects_array:
-		if not object is DamagableObject:
+		if not object is TRPG_DamagableObject:
 			continue
 		
 		if object.get_current_cell() == cell:
