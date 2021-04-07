@@ -25,7 +25,7 @@ func _ready():
 	
 	var default = get("default_state") if get("default_state") != null else owner.get("default_state")
 	
-	if default != null:
+	if default != null && default != "":
 		set_state(default)
 	else:
 		set_state(get_child(0))

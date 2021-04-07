@@ -2,6 +2,7 @@ extends StateBase
 class_name ActorStateBase
 
 var animated_sprite : AnimatedSprite
+onready var audio_stream_player := get_node_or_null("AudioStreamPlayer")
 
 # If this bool is true, the state will return to the previous one whenever the animation is over
 export var toggle_state : bool = false
@@ -31,6 +32,9 @@ func enter_state():
 	
 	if sprite_frames.has_animation(name):
 		animated_sprite.play(name)
+	
+	if audio_stream_player != null:
+		audio_stream_player.play()
 
 
 func exit_state():
