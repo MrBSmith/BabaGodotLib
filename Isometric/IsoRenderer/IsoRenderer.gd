@@ -241,7 +241,7 @@ func get_type_priority(thing) -> int:
 		return type_priority.CURSOR
 	elif thing.get_object_ref().is_class("Obstacle"):
 		return type_priority.OBSTACLE
-	elif thing.get_object_ref().is_class("Actor"):
+	elif thing.get_object_ref().is_class("TRPG_Actor"):
 		return type_priority.ACTOR
 	
 	return -1

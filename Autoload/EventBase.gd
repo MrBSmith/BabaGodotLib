@@ -54,3 +54,4 @@ signal dialogue_query(dialogue_index, is_cut_scene)
 #### MENU ####
 
 signal menu_cancel()
+signal goto_menu_root()

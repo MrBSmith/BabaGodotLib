@@ -1,8 +1,7 @@
 extends MenuBase
 class_name ListMenu
 
-const description_window_scene = preload("res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn")
-
+export var description_window_path : String = "res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn"
 export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn"
 export var option_v_separation : int = INF 
 export var column_container_path : String = "HBoxContainer"
@@ -10,7 +9,8 @@ export var column_container_path : String = "HBoxContainer"
 onready var menu_root = $MenuRoot
 onready var column_container = get_node_or_null(column_container_path)
 onready var menu_option_scene = load(menu_option_scene_path)
-onready var current_menu = menu_root setget set_current_menu, get_current_menu
+onready var description_window_scene = load(description_window_path)
+onready var current_menu = null setget set_current_menu, get_current_menu
 
 export var max_lines : int = 3 setget set_max_lines, get_max_lines
 export var max_columns : int = 2 setget set_max_columns, get_max_columns
@@ -44,7 +44,10 @@ func set_max_columns(value: int):
 func get_max_columns() -> int: return max_columns
 
 func set_current_menu(menu: Node):
-	if menu_root.is_a_parent_of(menu) or menu == menu_root:
+	if !is_ready:
+		yield(self, "ready")
+	
+	if (menu_root.is_a_parent_of(menu) or menu == menu_root) && menu != current_menu:
 		current_menu = menu
 		clear_options()
 		_update_whole_display()
@@ -62,6 +65,7 @@ func _ready() -> void:
 	__ = connect("resized", self, "_on_menu_resized")
 	
 	__ = EVENTS.connect("menu_cancel", self, "_on_menu_cancel")
+	__ = EVENTS.connect("goto_menu_root", self, "_on_goto_menu_root")
 
 
 #### VIRTUALS ####
@@ -324,3 +328,7 @@ func _on_menu_resized():
 func _on_menu_cancel():
 	navigate_upstream_menu()
 
+func _on_goto_menu_root():
+	if current_menu != menu_root && current_menu != null:
+		current_menu.clear()
+		set_current_menu(menu_root)
