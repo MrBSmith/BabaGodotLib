@@ -1,0 +1,6 @@
+[gd_resource type="NoiseTexture" load_steps=2 format=2]
+
+[ext_resource path="res://BabaGodotLib/Shaders/Disolve/DisolveSimplexNoise.tres" type="OpenSimplexNoise" id=1]
+
+[resource]
+noise = ExtResource( 1 )
