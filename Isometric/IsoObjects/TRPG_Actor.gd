@@ -104,7 +104,7 @@ func get_jump_max_height() -> int: return jump_max_height
 func set_action_modifier(value: int): action_modifier = value
 func get_action_modifier() -> int: return action_modifier
 
-func set_weapon(value: Weapon): weapon = value
+func set_weapon(value: Resource): weapon = value
 func get_weapon() -> Resource: return weapon
 
 func get_defense() -> int: return MaxStats.get_defense()
@@ -136,7 +136,7 @@ func get_direction() -> int: return direction
 
 func set_skills(array: Array):
 	for value in array:
-		if not value is Skill:
+		if not value.is_class("Skill"):
 			return
 	skills = array
 

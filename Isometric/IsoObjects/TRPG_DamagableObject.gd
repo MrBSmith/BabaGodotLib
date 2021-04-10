@@ -1,12 +1,12 @@
 extends IsoObject
 class_name TRPG_DamagableObject
 
-const LIFEBAR_SCENE = preload("res://Scenes/Combat/LifeBar/LifeBar.tscn")
-
 onready var sprite_node = get_node_or_null("Sprite")
 onready var animated_sprite_node = get_node_or_null("AnimatedSprite")
 onready var animation_player_node = get_node_or_null("AnimationPlayer")
+onready var lifebar_scene = load(lifebar_scene_path)
 
+export var lifebar_scene_path = "res://Scenes/Combat/LifeBar/LifeBar.tscn"
 export var defense : int = 0 setget set_defense, get_defense
 
 export var max_HP : int = 0 setget set_max_HP, get_max_HP
@@ -62,7 +62,7 @@ func _ready():
 #### LOGIC ####
 
 func generate_lifebar():
-	lifebar = LIFEBAR_SCENE.instance()
+	lifebar = lifebar_scene.instance()
 	var sprite = get_node_or_null("Sprite")
 	
 	if sprite == null:
@@ -144,7 +144,7 @@ func hurt(damage: int):
 
 func destroy():
 	emit_signal("unfocused", self)
-	EXPLODE.scatter_sprite(self, 16)
+	EVENTS.emit_signal("scatter_object", self, 16)
 	.destroy()
 
 
