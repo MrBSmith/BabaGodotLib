@@ -18,6 +18,7 @@ static func get_cell_direction(origin_cell: Vector3, dest_cell: Vector3) -> int:
 	return vec2_to_dir(movement)
 
 
+# Returns the direction of the to vector from the perpective of the from vector, on the 2D plane, expressed in Vector2
 static func iso_dirV(from: Vector3, to: Vector3) -> Vector2:
 	var dist = to - from
 	var larger_member = max(abs(dist.x), abs(dist.y))
@@ -26,11 +27,12 @@ static func iso_dirV(from: Vector3, to: Vector3) -> Vector2:
 	return dir
 
 
+# Returns the direction of the to vector from the perpective of the from vector, on the 2D plane, expressed in DIRECTIOn
 static func iso_dir(from: Vector3, to: Vector3) -> int:
 	return vec2_to_dir(iso_dirV(from, to))
 
 
-# Return the distance between the 2 given cells on a 2D plan (x, y)
+# Return the distance between the 2 given cells on a 2D plan (x, y), expressed in cells
 static func iso_2D_dist(from: Vector3, to: Vector3) -> int:
 	var x_dist = abs(to.x - from.x)
 	var y_dist = abs(to.y - from.y)
@@ -38,6 +40,16 @@ static func iso_2D_dist(from: Vector3, to: Vector3) -> int:
 	return int(x_dist + y_dist)
 
 
+# Return the distance between the 2 given cells in the 3D space, expressed in cells
+static func iso_3D_dist(from: Vector3, to: Vector3) -> int:
+	var x_dist = abs(to.x - from.x)
+	var y_dist = abs(to.y - from.y)
+	var z_dist = abs(to.z - from.z)
+
+	return int(x_dist + y_dist + z_dist)
+
+
+# Convert from a DIRECTION value to a direction expressed as a Vector2
 static func dir_to_vec2(dir: int) -> Vector2:
 	match(dir):
 		DIRECTION.BOTTOM_RIGHT: return Vector2(1, 0)
@@ -47,6 +59,7 @@ static func dir_to_vec2(dir: int) -> Vector2:
 	return Vector2.ZERO
 
 
+# Convert from a direction expressed as a Vector2 to a DIRECTION value 
 static func vec2_to_dir(vec: Vector2) -> int:
 	match(vec):
 		Vector2(1, 0): return DIRECTION.BOTTOM_RIGHT
