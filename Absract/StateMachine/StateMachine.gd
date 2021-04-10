@@ -52,6 +52,7 @@ func get_state_name() -> String:
 	else:
 		return current_state.name
 
+
 # Set current_state at a new state, also set previous state, and emit a signal to notify the change, to anybody needing it 
 func set_state(new_state):
 	# if the given argument is a string, get the 
@@ -74,3 +75,24 @@ func set_state(new_state):
 	current_state.enter_state()
 	
 	emit_signal("state_changed", current_state.name)
+
+
+# Set the state based on the id of the state (id of the node, ie possition in the hierachy)
+func set_state_by_id(state_id: int):
+	var state = get_child(state_id)
+	if state == null:
+		if state_id >= get_child_count() or state_id < 0:
+			print_debug("The given state_id is out of bound")
+		elif !state.is_class("StateBase"):
+			print_debug("The child of the statemachine pointed by the state_id: " + String(state_id)
+			 + " does not inherit StateBase")
+		else:
+			set_state(state)
+
+
+# Returns true if a state with the given name is a direct child of the statemachine, and inherit StateBase
+func has_state(state_name: String) -> bool:
+	for state in get_children():
+		if state.is_class("StateBase") && state.name == state_name:
+			return true
+	return false
