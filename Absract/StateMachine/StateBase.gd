@@ -1,6 +1,9 @@
 extends Node
 class_name StateBase
 
+func get_class() -> String : return "StateBase"
+func is_class(value: String) -> bool: return value == "StateBase" or .is_class(value)
+
 # Abstract base class for a state in a statemachine
 
 # Defines the behaviour of the entity possesing the statemachine 
