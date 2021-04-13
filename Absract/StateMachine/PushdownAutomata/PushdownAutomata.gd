@@ -25,7 +25,7 @@ func get_class() -> String: return "PushdownAutomata"
 func set_state(state):
 	.set_state(state)
 	
-	if state == null or state == "":
+	if state == null or (state is String && state == ""):
 		return
 	
 	if state_index == state_queue.size() - 1:
