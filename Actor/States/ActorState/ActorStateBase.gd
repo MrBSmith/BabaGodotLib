@@ -12,7 +12,7 @@ export var toggle_state : bool = false
 func _ready() -> void:
 	yield(owner, "ready")
 	animated_sprite = owner.get_node_or_null("AnimatedSprite")
-	
+
 	if animated_sprite != null:
 		var _err = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
 
@@ -25,16 +25,17 @@ func update_state(_delta : float):
 func enter_state():
 	if animated_sprite == null:
 		return
-	
+
 	var sprite_frames = animated_sprite.get_sprite_frames()
 	if sprite_frames == null:
 		return
-	
-	if sprite_frames.has_animation(name):
-		animated_sprite.play(name)
-	
-	if audio_stream_player != null:
-		audio_stream_player.play()
+
+	if sprite_frames.has_animation("Start" + name):
+		animated_sprite.play("Start" + name)
+
+	else:
+		if sprite_frames.has_animation(name):
+			animated_sprite.play(name)
 
 
 func exit_state():
@@ -46,5 +47,11 @@ func exit_state():
 func _on_animation_finished():
 	if states_machine.get_state() != self or !toggle_state or animated_sprite == null:
 		return
-	
+
+	var sprite_frames = animated_sprite.get_sprite_frames()
+
+	if animated_sprite.get_animation() == "Start" + name:
+		if sprite_frames != null and sprite_frames.has_animation(name):
+			animated_sprite.play(name)
+
 	states_machine.set_state(states_machine.previous_state)
