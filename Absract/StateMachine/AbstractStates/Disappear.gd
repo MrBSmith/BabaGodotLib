@@ -24,10 +24,12 @@ func enter_state():
 	if shader_material != null:
 		var __ = tween.interpolate_property(shader_material, "shader_param/amount", 0.0, 1.0, 1.0, 
 			Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-		
-		__ = tween.start()
-		
-		yield(tween, "tween_all_completed")
+	else:
+		var __ = tween.interpolate_property(owner, "modulate", owner.get_modulate(), Color.transparent,
+		1.0, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+	
+	var __ = tween.start()
+	yield(tween, "tween_all_completed")
 	
 	if states_machine.has_state("Visible"):
 		states_machine.set_state("Visible")
