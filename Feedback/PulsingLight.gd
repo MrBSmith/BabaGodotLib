@@ -28,8 +28,8 @@ func get_light_color() -> Color: return light_color
 
 func set_current_color(value: Color):
 	current_color = value
-	$Light2D.set_color(value)
-	$LightMask.set_color(value)
+	$Light2D.set_color(current_color)
+	$LightMask.set_color(current_color)
 
 func get_current_color() -> Color: return current_color
 
@@ -58,11 +58,21 @@ func start_pulsing():
 						pulse_duration, Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
 
 	__ = tween_node.interpolate_property($LightMask, "texture_scale", initial_mask_text_scale, 1.0, 
-						pulse_duration, Tween.TRANS_QUINT, Tween.EASE_IN)
+						pulse_duration, Tween.TRANS_SINE, Tween.EASE_IN)
 	
-	__ = tween_node.interpolate_property(self, "current_color", light_color, Color.transparent,
-							pulse_duration, Tween.TRANS_EXPO, Tween.EASE_IN)
+	__ = tween_node.start()
 	
+	var tween_delay_timer = Timer.new()
+	add_child(tween_delay_timer)
+	
+	tween_delay_timer.start(pulse_duration / 2)
+	
+	yield(tween_delay_timer, "timeout")
+	
+	tween_delay_timer.queue_free()
+	
+	__ = tween_node.interpolate_method(self, "set_current_color", light_color, Color.transparent,
+						pulse_duration / 2, Tween.TRANS_CUBIC, Tween.EASE_IN)
 	
 	__ = tween_node.start()
 
