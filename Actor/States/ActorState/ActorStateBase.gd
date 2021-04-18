@@ -23,6 +23,9 @@ func update_state(_delta : float):
 
 
 func enter_state():
+	if audio_stream_player != null:
+		audio_stream_player.play()
+	
 	if animated_sprite == null:
 		return
 
