@@ -137,6 +137,8 @@ func hurt(damage: int):
 	set_current_HP(get_current_HP() - damage)
 	$AnimationPlayer.play("RedFlash")
 	yield($AnimationPlayer, "animation_finished")
+	
+	EVENTS.emit_signal("damage_inflicted", damage, self)
 	emit_signal("hurt_animation_finished")
 	
 	if get_current_HP() == 0:

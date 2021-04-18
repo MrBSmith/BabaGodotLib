@@ -64,6 +64,6 @@ static func vec2_to_dir(vec: Vector2) -> int:
 	match(vec):
 		Vector2(1, 0): return DIRECTION.BOTTOM_RIGHT
 		Vector2(0, 1): return DIRECTION.BOTTOM_LEFT 
-		Vector2(0, -1): return DIRECTION.TOP_LEFT 
-		Vector2(-1, 0): return DIRECTION.TOP_RIGHT 
+		Vector2(0, -1): return DIRECTION.TOP_RIGHT
+		Vector2(-1, 0): return DIRECTION.TOP_LEFT 
 	return -1

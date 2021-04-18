@@ -189,6 +189,7 @@ func move_to(delta: float, world_pos: Vector2) -> bool:
 
 func hurt(damage: int):
 	set_current_HP(int(clamp(get_current_HP() - damage, 0.0, get_max_HP())))
+	EVENTS.emit_signal("damage_inflicted", damage, self)
 	set_state("Hurt")
 
 # Return the altitude of the current cell of the character

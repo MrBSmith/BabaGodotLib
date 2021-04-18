@@ -14,7 +14,7 @@ enum SLOPE_TYPE {
 onready var pathfinding = $Pathfinding
 onready var layer_0_node = $Layer
 
-var layer_array : Array
+var layers_array : Array setget , get_layers_array
 
 var grounds : PoolVector3Array = []
 var walkable_cells : PoolVector3Array = []
@@ -32,30 +32,26 @@ func set_obstacles(array: Array):
 		walkable_cells = pathfinding.set_walkable_cells(grounds)
 		pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
 
-func get_obstacles() -> Array:
-	return obstacles
+func get_obstacles() -> Array: return obstacles
 
+func get_layers_array() -> Array: return layers_array
 
 #### BUILT IN ####
 
 func _ready():
 	if Engine.editor_hint:
 		return
-	
-	# Store every layers in the layer_ground_array
-	for child in get_children():
-		if child is IsoMapLayer:
-			layer_array.append(child)
-	
-	init_object_grid_pos()
-	
 	# Store all the passable cells into the array grounds
-	grounds = fetch_ground()
+	
+	_fetch_layers()
+	_init_object_grid_pos()
+	_fetch_ground()
+	_fetch_obstacles()
 	
 	yield(owner, "ready")
 	
-	var _err = EVENTS.connect("iso_object_cell_changed", self, "on_iso_object_cell_changed")
-	_err = EVENTS.connect("cursor_world_pos_changed", self, "on_cursor_world_pos_changed")
+	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
+	_err = EVENTS.connect("cursor_world_pos_changed", self, "_on_cursor_world_pos_changed")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
 	
 	# Store all the passable cells into the array walkable_cells_list, 
@@ -76,9 +72,56 @@ func _ready():
 
 #### LOGIC ####
 
+# Get every unpassable object form the IsoObject group 
+func _fetch_obstacles():
+	var iso_object_array = get_tree().get_nodes_in_group("IsoObject")
+	var unpassable_objects : Array = []
+	for object in iso_object_array:
+		if !object.is_passable():
+			unpassable_objects.append(object)
+	
+	set_obstacles(unpassable_objects)
+
+
+# Get the highest cell of every cells in the 2D plan,
+# Returns a 3 dimentional coordinates array of cells
+func _fetch_ground():
+	var feed_array : PoolVector3Array = []
+	for i in range(layers_array.size() - 1, -1, -1):
+		for cell in layers_array[i].get_used_cells():
+			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
+				var current_cell = Vector3(cell.x, cell.y, i)
+				if get_cell_slope_type(current_cell) != 0:
+					current_cell -= Vector3(0, 0, 0.5)
+				feed_array.append(current_cell)
+
+	# Handle bridges
+	for i in range(layers_array.size()):
+		for child in layers_array[i].get_children():
+			var tileset = child.get_tileset()
+			for cell in child.get_used_cells():
+				var tile_id = child.get_cellv(cell)
+				var tile_name = tileset.tile_get_name(tile_id)
+				if "Bridge" in tile_name:
+					var cell_3D = Vector3(cell.x, cell.y, i)
+					if "Left" in tile_name:
+						feed_array.append(cell_3D)
+						feed_array.append(cell_3D + Vector3(1, 0, 0))
+					elif "Right" in tile_name:
+						feed_array.append(cell_3D)
+						feed_array.append(cell_3D + Vector3(0, 1, 0))
+	
+	grounds = feed_array
+
+
+func _fetch_layers():
+	for child in get_children():
+		if child is IsoMapLayer && not child in layers_array:
+			layers_array.append(child)
+
 
 # Give every actor, his default grid pos
-func init_object_grid_pos():
+func _init_object_grid_pos():
 	yield(owner, "ready")
 	
 	for object in get_tree().get_nodes_in_group("IsoObject"):
@@ -86,20 +129,71 @@ func init_object_grid_pos():
 
 
 
-# Return the cell in the ground z grid pointed by the given position
-func world_to_ground_z(pos : Vector2, z : int = 0):
-	pos.y -= z * 16
-	return layer_array[z].world_to_map(pos)
+
+#### LAYERS ####
 
 
 # Return the layer at the given height
 func get_layer(height: int) -> IsoMapLayer:
-	return layer_array[height]
+	return layers_array[height]
 
 
 # Return the id of the layer at the given height
 func get_layer_id(height: int) -> int:
 	return get_layer(height).get_index()
+
+
+# Count the number of layers
+func count_layers() -> int:
+	var counter : int = 0
+	for child in get_children():
+		if child is IsoMapLayer:
+			counter += 1
+	return counter
+
+
+# Return the next layer child of the given IsoMap, starting from the given index
+func get_next_layer(index : int = 0) -> IsoMapLayer:
+	var children = get_children()
+	var nb_map_children = children.size()
+	if index >= nb_map_children:
+		return null
+	
+	for i in range(index + 1, nb_map_children):
+		if children[i] is IsoMapLayer:
+			return children[i]
+	return null
+
+
+# Return the next layer child of the given IsoMap, starting from the given index
+func get_previous_layer(index : int = 0) -> IsoMapLayer:
+	var children = get_children()
+	for i in range(index - 1, -1, -1):
+		if children[i] is IsoMapLayer:
+			return children[i]
+	return null
+
+
+# Return the first layer of the given IsoMap
+func get_first_layer() -> IsoMapLayer:
+	for child in get_children():
+		if child is IsoMapLayer:
+			return child
+	return null
+
+
+# Return the last layer of the given IsoMap
+# Alias for get_previous_layer(get_child_count())
+func get_last_layer() -> IsoMapLayer:
+	return get_previous_layer(get_child_count())
+
+
+
+
+# Return the cell in the ground z grid pointed by the given position
+func world_to_ground_z(pos : Vector2, z : int = 0):
+	pos.y -= z * 16
+	return layers_array[z].world_to_map(pos)
 
 
 
@@ -153,8 +247,8 @@ func cell_array_to_world(cell_array: PoolVector3Array) -> PoolVector2Array:
 # Return the highest layer where the given cell is used
 # If the given cell is nowhere: return -1
 func get_cell_highest_layer(cell : Vector2) -> int:
-	for i in range(layer_array.size() - 1, -1, -1):
-		if cell in layer_array[i].get_used_cells():
+	for i in range(layers_array.size() - 1, -1, -1):
+		if cell in layers_array[i].get_used_cells():
 			return i
 	return -1
 
@@ -184,44 +278,12 @@ func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 	
 	for z in range(highest_cell.z - 1, -1, -1):
 		var world_pos_adapted = Vector2(world_pos.x, world_pos.y + 16 * z)
-		var cell_2D = layer_array[z].world_to_map(world_pos_adapted)
+		var cell_2D = layers_array[z].world_to_map(world_pos_adapted)
 		var cell_3D = Vector3(cell_2D.x, cell_2D.y, z)
 		if is_position_valid(cell_3D):
 			cell_stack.append(cell_3D)
 	
 	return cell_stack
-
-
-# Get the highest cell of every cells in the 2D plan,
-# Returns a 3 dimentional coordinates array of cells
-func fetch_ground() -> PoolVector3Array:
-	var feed_array : PoolVector3Array = []
-	for i in range(layer_array.size() - 1, -1, -1):
-		for cell in layer_array[i].get_used_cells():
-			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
-				var current_cell = Vector3(cell.x, cell.y, i)
-				if get_cell_slope_type(current_cell) != 0:
-					current_cell -= Vector3(0, 0, 0.5)
-				feed_array.append(current_cell)
-	
-	# Handle bridges
-	for i in range(layer_array.size()):
-		for child in layer_array[i].get_children():
-			var tileset = child.get_tileset()
-			for cell in child.get_used_cells():
-				var tile_id = child.get_cellv(cell)
-				var tile_name = tileset.tile_get_name(tile_id)
-				if "Bridge" in tile_name:
-					var cell_3D = Vector3(cell.x, cell.y, i)
-					if "Left" in tile_name:
-						feed_array.append(cell_3D)
-						feed_array.append(cell_3D + Vector3(1, 0, 0))
-					elif "Right" in tile_name:
-						feed_array.append(cell_3D)
-						feed_array.append(cell_3D + Vector3(0, 1, 0))
-	
-	return feed_array
-
 
 
 # Return true if the given cell is occupied by an obstacle
@@ -237,7 +299,7 @@ func is_cell_in_obstacle(cell: Vector3) -> bool:
 func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 	var ground_0_cell_2D = layer_0_node.world_to_map(pos)
 	
-	var nb_grounds = layer_array.size()
+	var nb_grounds = layers_array.size()
 	if max_layer == 0 or max_layer > nb_grounds:
 		max_layer = nb_grounds
 		
@@ -310,54 +372,9 @@ static func get_adjacent_cells(cell: Vector3) -> Array:
 	]
 
 
-# Count the number of layers
-func count_layers() -> int:
-	var counter : int = 0
-	for child in get_children():
-		if child is IsoMapLayer:
-			counter += 1
-	return counter
-
-
-# Return the next layer child of the given IsoMap, starting from the given index
-func get_next_layer(index : int = 0) -> IsoMapLayer:
-	var children = get_children()
-	var nb_map_children = children.size()
-	if index >= nb_map_children:
-		return null
-	
-	for i in range(index + 1, nb_map_children):
-		if children[i] is IsoMapLayer:
-			return children[i]
-	return null
-
-
-# Return the next layer child of the given IsoMap, starting from the given index
-func get_previous_layer(index : int = 0) -> IsoMapLayer:
-	var children = get_children()
-	for i in range(index - 1, -1, -1):
-		if children[i] is IsoMapLayer:
-			return children[i]
-	return null
-
-
-# Return the first layer of the given IsoMap
-func get_first_layer() -> IsoMapLayer:
-	for child in get_children():
-		if child is IsoMapLayer:
-			return child
-	return null
-
-
-# Return the last layer of the given IsoMap
-# Alias for get_previous_layer(get_child_count())
-func get_last_layer() -> IsoMapLayer:
-	return get_previous_layer(get_child_count())
-
-
 #### SIGNAL RESPONSES ####
 
-func on_iso_object_cell_changed(_iso_object: IsoObject):
+func _on_iso_object_cell_changed(_iso_object: IsoObject):
 	pass
 
 func _on_iso_object_removed(iso_object: IsoObject):
