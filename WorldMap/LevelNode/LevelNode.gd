@@ -12,6 +12,7 @@ enum EDITOR_SELECTED{
 }
 
 export var level_scene_path : String = "" setget , get_level_scene_path
+export var level_name : String = "" setget set_level_name, get_level_name
 
 export var hidden : bool = false setget set_hidden, is_hidden
 export var accessible : bool = true
@@ -75,6 +76,12 @@ func set_hidden(value: bool):
 func is_hidden() -> bool : return hidden
 
 func get_level_scene_path() -> String: return level_scene_path
+
+func set_level_name(value: String): 
+	level_name = value
+	$Label.set_text(level_name)
+
+func get_level_name() -> String: return level_name
 
 func set_state(value): $StatesMachine.set_state(value)
 func get_state() -> StateBase: return $StatesMachine.get_state()
