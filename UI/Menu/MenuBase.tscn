@@ -34,9 +34,9 @@ __meta__ = {
 }
 
 [node name="V_OptContainer" type="VBoxContainer" parent="HBoxContainer"]
-margin_left = 58.0
-margin_right = 58.0
-margin_bottom = 143.0
+margin_left = 87.0
+margin_right = 87.0
+margin_bottom = 215.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
@@ -48,3 +48,4 @@ __meta__ = {
 stream = SubResource( 1 )
 volume_db = -15.0
 pitch_scale = 3.0
+bus = "Sounds"
