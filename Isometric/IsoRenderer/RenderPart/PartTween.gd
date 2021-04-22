@@ -1,7 +1,7 @@
 extends Tween
 class_name PartTween
 
-const BASE_DIST = GAME.TILE_SIZE.y / 2
+var base_dist = GAME.TILE_SIZE.y / 2
 
 var target_node : Node = null
 
@@ -58,7 +58,7 @@ func start_sin_move(node: Node, magn: int, duration: float = 0.7, nb_vawes : int
 
 
 func start_wave_interpolation(to_origin : bool = false):
-	var dest = dir * BASE_DIST * magnitude if !to_origin else Vector2.ZERO
+	var dest = dir * base_dist * magnitude if !to_origin else Vector2.ZERO
 	var duration = total_time / (nb_movements + 1)
 	
 	var __ = interpolate_property(target_node, "position",
