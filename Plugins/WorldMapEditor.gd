@@ -1,5 +1,6 @@
 tool
 extends EditorPlugin
+class_name WorldMapEditor
 
 var last_node_selected : Node = null
 var current_node_selected : Node = null
@@ -65,7 +66,7 @@ func handles(obj: Object) -> bool:
 	elif obj is LevelNodeBind:
 		generate_button("Reroll Bind Gen")
 	
-	return obj.get_class() in handeled_objects
+	return is_object_handled(obj)
 
 
 func edit(object: Object) -> void:
