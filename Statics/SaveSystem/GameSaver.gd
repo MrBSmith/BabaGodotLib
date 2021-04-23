@@ -1,9 +1,6 @@
 extends Node
 class_name GameSaver
 
-const debug : bool = false
-
-
 # Get audio and controls project settings and set them into a dictionary.
 # This dictionary _settings will be used later to save and load anytime a user wishes to
 static func settings_update_keys(settings_dictionary : Dictionary, save_name : String = ""):
@@ -13,26 +10,17 @@ static func settings_update_keys(settings_dictionary : Dictionary, save_name : S
 					settings_dictionary[section]["time"] = OS.get_datetime()
 					settings_dictionary[section]["save_name"] = save_name
 				"audio":
-					for keys in settings_dictionary[section]:
-						if str(AudioServer.get_bus_volume_db(AudioServer.get_bus_index(keys.capitalize()))) == "-1.#INF":
-							AudioServer.set_bus_volume_db(AudioServer.get_bus_index(keys.capitalize()), -100)
-						settings_dictionary[section][keys] = AudioServer.get_bus_volume_db(AudioServer.get_bus_index(keys.capitalize()))
+					for key in settings_dictionary[section]:
+						var bus_id = AudioServer.get_bus_index(key.capitalize())
+						if str(AudioServer.get_bus_volume_db(bus_id)) == "-1.#INF":
+							AudioServer.set_bus_volume_db(bus_id, -100)
+						settings_dictionary[section][key] = AudioServer.get_bus_volume_db(bus_id)
 				"controls":
-					for keys in settings_dictionary[section]:
-						settings_dictionary[section][keys] = InputMap.get_action_list(keys)[0].scancode
-				"gameplay":
-					for keys in settings_dictionary[section]:
-						match(keys):
-							"level_id":
-								settings_dictionary[section][keys] = GAME.progression.get_level()
-							"checkpoint_reached":
-								settings_dictionary[section][keys] = GAME.progression.get_checkpoint()
-							"xion":
-								settings_dictionary[section][keys] = GAME.progression.get_xion()
-							"gear":
-								settings_dictionary[section][keys] = GAME.progression.get_gear()
-				_:
-					pass
+					for key in settings_dictionary[section]:
+						settings_dictionary[section][key] = InputMap.get_action_list(key)[0].scancode
+				"progression":
+					for key in settings_dictionary[section]:
+						settings_dictionary[section][key] = GAME.progression.get(key)
 
 
 static func settings_update_save_name(settings_dictionary  : Dictionary, save_name : String):
@@ -45,6 +33,6 @@ static func save_settings(path : String, save_name : String):
 	for section in GAME._settings.keys():
 		for key in GAME._settings[section]:
 			GAME._config_file.set_value(section, key, GAME._settings[section][key])
-			
+	
 	GAME._config_file.save(path + "/settings.cfg")
 

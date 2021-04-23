@@ -1,49 +1,39 @@
 extends Node
 class_name GameLoader
 
-const debug : bool = false
 
 # Load the settings found in the ConfigFile settings.cfg at given path (default res://saves/save1/2/3
-static func load_settings(dir: String, slot_id : int):
-	var inputmapper = InputMapper.new()
+static func load_settings(dir: String, slot_id : int) -> String:
+	var input_mapper = InputMapper.new()
 
 	var save_name : String = find_corresponding_save_file(dir, slot_id)
-
-	if save_name == "":
-		return
+	if save_name == "": return ""
 	
 	var save_path : String = dir + "/" + save_name + "/"
-	var savecfg_path : String = dir + "/" + save_name + "/settings.cfg"
+	var save_cfg_path : String = save_path + "settings.cfg"
 	
-	var error = GAME._config_file.load(savecfg_path)
-
+	var error = GAME._config_file.load(save_cfg_path)
 	if error == OK:
-		if debug:
-			print("SUCCESSFULLY LOADED SETTINGS CFG FILE. SUCCESS CODE : " + str(error))
-			print("From GameSaver.gd : Method Line 87 - Print Line 102+103")
 		for section in GAME._config_file.get_sections():
 			match(section):
 				"audio":
 					#set audio settings
-					for audio_keys in GAME._config_file.get_section_keys(section):
-						AudioServer.set_bus_volume_db(AudioServer.get_bus_index(audio_keys.capitalize()), GAME._config_file.get_value(section, audio_keys))
+					for key in GAME._config_file.get_section_keys(section):
+						var value = GAME._config_file.get_value(section, key)
+						var bus_id = AudioServer.get_bus_index(key.capitalize())
+						AudioServer.set_bus_volume_db(bus_id, value)
 				"controls":
 					#set controls settings
-					for control_keys in GAME._config_file.get_section_keys(section):
-						inputmapper.change_action_key(control_keys, GAME._config_file.get_value(section, control_keys))
+					for key in GAME._config_file.get_section_keys(section):
+						var value = GAME._config_file.get_value(section, key)
+						input_mapper.change_action_key(key, value)
 				"gameplay":
-					for keys in GAME._config_file.get_section_keys(section):
-						match(keys):
-							"level_id": GAME.progression.set_level(GAME._config_file.get_value(section, keys))
-							"checkpoint_reached": GAME.progression.set_checkpoint(GAME._config_file.get_value(section, keys))
-							"xion": GAME.progression.set_xion(GAME._config_file.get_value(section, keys))
-							"gear": GAME.progression.set_gear(GAME._config_file.get_value(section, keys))
-				_:
-					pass
+					for key in GAME._config_file.get_section_keys(section):
+						var value = GAME._config_file.get_value(section, key)
+						GAME.progression.set(key, value)
 	else:
-		if debug:
-			print("FAILED TO LOAD SETTINGS CFG FILE. ERROR CODE : " + str(error))
-		return
+		push_error("Failed to load settings cfg file. error code : " + str(error))
+		return ""
 	
 	return save_path
 
@@ -59,34 +49,26 @@ static func find_corresponding_save_file(dir: String, save_id : int) -> String:
 			if save_id == file_save_id:
 				return str(file)
 		else:
-			if debug:
-				print("FAILED TO LOAD SETTINGS CFG FILE. ERROR CODE : " + str(error))
-			return ""
-
+			push_error("Failed to load settings cfg file. error code : " + str(error))
 	return ""
 
 
-static func get_cfg_property_value(dir: String, cfgproperty_name : String, save_id : int):
+static func get_cfg_property_value(dir: String, cfg_property_name : String, save_id : int):
 	var save_path : String
 
 	save_path = find_corresponding_save_file(dir, save_id)
+	if save_path == "": return ""
 	
-	var savecfg_path : String = dir + "/" + save_path + "/settings.cfg"
-	var error = GAME._config_file.load(savecfg_path)
+	var save_cfg_path : String = dir + "/" + save_path + "/settings.cfg"
+	var error = GAME._config_file.load(save_cfg_path)
 	
 	if error == OK:
-		if debug:
-			print("SUCCESSFULLY LOADED SETTINGS CFG FILE. SUCCESS CODE : " + str(error))
-			print("From GameSaver.gd : Method Line 180 - Print Line 192+193")
 		for section in GAME._config_file.get_sections():
-			for keys in GAME._config_file.get_section_keys(section):
-				if keys == cfgproperty_name:
-					var property_value = GAME._config_file.get_value(section, keys)
+			for key in GAME._config_file.get_section_keys(section):
+				if key == cfg_property_name:
+					var property_value = GAME._config_file.get_value(section, key)
 					return property_value
 	else:
-		if debug:
-			print("FAILED TO LOAD SETTINGS CFG FILE. ERROR CODE : " + str(error))
-		return ""
-	
+		push_error("Failed to load settings cfg file. error code : " + str(error))
 	return ""
 
