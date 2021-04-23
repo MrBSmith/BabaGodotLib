@@ -1,6 +1,7 @@
 extends Node
 class_name LevelSaver
 
+
 # Find recursivly every wanted nodes, and extract their wanted properties
 static func serialize_level_properties(property_dict: Dictionary, current_node : Node, dict_to_fill : Dictionary):
 	var classes_to_scan_array = property_dict.keys()
@@ -27,6 +28,7 @@ static func save_level_properties_as_json(property_dict: Dictionary, dir: String
 	json_file.store_line(to_json(dict_to_json))
 	json_file.close()
 
+
 # Take an object, find every properties needed in it and retrun the data as a dict
 static func get_object_properties(property_dict: Dictionary, object : Object, classname : String) -> Dictionary:
 	var property_list : Array = property_dict[classname]
@@ -39,39 +41,9 @@ static func get_object_properties(property_dict: Dictionary, object : Object, cl
 		elif object.has_method("get_" + property):
 			property_data_dict[property] = object.call("get_" + property)
 		else:
-			print("Property : " + property + " could not be found in " + object.name)
+			push_error("Property : " + property + " could not be found in " + object.name)
 
 	return property_data_dict
-
-
-# Navigate through the given dir then remove all files and folders there
-static func delete_all_level_temp_saves(dir_path: String, display_warning : bool = false):
-	var dir = Directory.new()
-	
-	var folders_array : Array = [dir_path]
-	
-	for folder in folders_array:
-		if dir.open(folder) == OK:
-			if display_warning:
-				print(folder + " has been opened successfully")
-			dir.list_dir_begin(true, true)
-			var file_name = dir.get_next()
-			if display_warning:
-				if file_name == "":
-					print("No folder or file detected in " + folder)
-			while file_name != "":
-				if dir.current_is_dir():
-					if display_warning:
-						print("Found dir: " + file_name)
-					dir.remove(file_name)
-				else:
-					if display_warning:
-						print("Found file: " + file_name)
-					dir.remove(file_name)
-				file_name = dir.get_next()
-			dir.list_dir_end()
-		else:
-			print("An error occured when trying to access the path : " + folder)
 
 
 # Delete the .json temporary saves

@@ -3,31 +3,6 @@ class_name GameSaver
 
 const debug : bool = false
 
-# Create the directories 
-static func create_dirs(dir_path : String, directories_to_create : Array):
-	var dir = Directory.new()
-	
-	if !is_dir_exist(dir_path):
-		dir.open("res://")
-		dir.make_dir(dir_path)
-	
-	for directory_to_check in directories_to_create:
-		if !is_dir_exist(dir_path + "/" + directory_to_check):
-			if debug:
-				print("DIRECTORY DOES NOT EXIST. Creating one in " + dir_path + "...")
-			dir.open(dir_path)
-			dir.make_dir(directory_to_check)
-			
-			var created_directory_path : String = dir_path + "/" + directory_to_check
-			if debug:
-				print("Done ! Directory can in be found in : " + created_directory_path)
-
-
-static func is_dir_exist(dir_path : String) -> bool:
-	var dir = Directory.new()
-	var dirExist : bool = dir.dir_exists(dir_path)
-	return dirExist
-
 
 # Get audio and controls project settings and set them into a dictionary.
 # This dictionary _settings will be used later to save and load anytime a user wishes to
@@ -58,23 +33,6 @@ static func settings_update_keys(settings_dictionary : Dictionary, save_name : S
 								settings_dictionary[section][keys] = GAME.progression.get_gear()
 				_:
 					pass
-
-
-# Transfer every temp level .json file to the given destination
-static func transfer_level_save_to(temp_save_dir: String, dest_dir: String):
-	var dir := Directory.new()
-	
-	if dir.open(temp_save_dir) == OK:
-		var err = dir.list_dir_begin(true, true)
-		print_debug("dir navigation error code: " + String(err))
-		var file = dir.get_next()
-		
-		while file != "":
-			err = dir.copy(temp_save_dir + "/" + file, dest_dir + "/" + file)
-			print_debug("dir copy error code: " + String(err))
-			file = dir.get_next()
-		
-		dir.list_dir_end()
 
 
 static func settings_update_save_name(settings_dictionary  : Dictionary, save_name : String):

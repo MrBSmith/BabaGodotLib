@@ -50,7 +50,7 @@ static func load_settings(dir: String, slot_id : int):
 
 # This method will return the path of the save file that has been found according to the specified save_id
 static func find_corresponding_save_file(dir: String, save_id : int) -> String:
-	for file in find_all_saves_directories(dir):
+	for file in DirNavHelper.fetch_dir_content(dir, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY):
 
 		var error = GAME._config_file.load(dir + "/" + file + "/settings.cfg")
 
@@ -66,37 +66,7 @@ static func find_corresponding_save_file(dir: String, save_id : int) -> String:
 	return ""
 
 
-# This method will return an array of every file considered as a SAVE FILE
-static func find_all_saves_directories(dir: String) -> Array:
-	var saves_directory = Directory.new()
-	var error = saves_directory.open(dir)
-	var files = []
-
-	if error == OK:
-		if debug:
-			print("SUCCESSFULLY LOADED SETTINGS CFG FILE. SUCCESS CODE : " + str(error))
-			print("From GameSaver.gd : Method Line 130 - Print Line 137+138")
-
-		saves_directory.list_dir_begin(true, true)
-		while true:
-			var file = saves_directory.get_next()
-			if file == "":
-				break
-			else:
-				files.append(file)
-		saves_directory.list_dir_end()
-
-		return files
-
-	else:
-		if debug:
-			print("FAILED TO LOAD SETTINGS CFG FILE. ERROR CODE : " + str(error))
-		return []
-
-
-
-
-static func get_save_cfg_property_value_by_name_and_cfgid(dir: String, cfgproperty_name : String, save_id : int):
+static func get_cfg_property_value(dir: String, cfgproperty_name : String, save_id : int):
 	var save_path : String
 
 	save_path = find_corresponding_save_file(dir, save_id)
