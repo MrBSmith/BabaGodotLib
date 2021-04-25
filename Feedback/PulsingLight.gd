@@ -1,4 +1,3 @@
-tool
 extends Node2D
 class_name PulsingLight
 
@@ -13,7 +12,6 @@ export var pulsing : bool = false setget set_pulsing, is_pulsing
 onready var initial_scale = get_scale()
 onready var current_color : Color = get_light_color() setget set_current_color, get_current_color
 onready var initial_mask_text_scale : float = $LightMask.get_texture_scale()
-
 
 #### ACCESSORS ####
 
