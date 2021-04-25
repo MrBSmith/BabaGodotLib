@@ -18,6 +18,7 @@ func _ready() -> void:
 #### SIGNAL_RESPONSES ####
 
 func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0):
+	var body_owner = body.get_owner()
 	var sprite = body.get_node("Sprite")
 	var texture = sprite.get_texture()
 	var is_region = sprite.is_region()
@@ -57,7 +58,10 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
-			call_deferred("add_child", debris_node)
+			if body_owner != null:
+				body_owner.call_deferred("add_child", debris_node)
+			else:
+				call_deferred("add_child", debris_node)
 
 
 func _on_play_SFX(fx_name: String, pos: Vector2):
