@@ -56,5 +56,5 @@ func _on_animation_finished():
 	if animated_sprite.get_animation() == "Start" + name:
 		if sprite_frames != null and sprite_frames.has_animation(name):
 			animated_sprite.play(name)
-
+	
 	states_machine.set_state(states_machine.previous_state)

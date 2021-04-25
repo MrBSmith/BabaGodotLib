@@ -104,12 +104,15 @@ func increment_state(increment: int = 1, wrapping : bool = true):
 	var id = wrapi(current_state_id + increment, 0, get_child_count()) if wrapping else current_state_id + increment 
 	var state = get_child(id)
 	
-	while(!state is StateBase or state == null):
-		if wrapping:
-			id = wrapi(current_state_id + increment, 0, get_child_count())
-		else:
-			id = current_state_id + increment
-		state = get_child(id)
+	if state == null or not state is StateBase:
+		while(!state is StateBase):
+			if wrapping:
+				id = wrapi(id + increment, 0, get_child_count())
+			else:
+				id += increment
+			state = get_child(id)
+			if state == null && !wrapping:
+				break
 	
 	if state == null:
 		print_debug("There is no node at the given id: " + String(id))
