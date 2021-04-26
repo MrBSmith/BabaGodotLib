@@ -59,3 +59,4 @@ signal goto_menu_root()
 #### LEVEL NAVIGATION ####
 
 signal go_to_next_level()
+signal go_to_level(level_id)
