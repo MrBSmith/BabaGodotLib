@@ -95,6 +95,9 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 
 
 func feed_buttons_array(option_container: Control):
+	if option_container == null:
+		return
+	
 	buttons_array = []
 	for child in option_container.get_children():
 		if child is Button:
