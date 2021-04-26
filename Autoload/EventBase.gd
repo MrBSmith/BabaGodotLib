@@ -55,3 +55,7 @@ signal dialogue_query(dialogue_index, is_cut_scene)
 
 signal menu_cancel()
 signal goto_menu_root()
+
+#### LEVEL NAVIGATION ####
+
+signal go_to_next_level()

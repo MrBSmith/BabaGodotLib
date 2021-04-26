@@ -15,7 +15,7 @@ class_name StatesMachine
 onready var current_state : Object = null
 onready var previous_state : Object = null
 
-signal state_changed
+signal state_changed(state_name)
 
 
 # Set the state to the first of the list
