@@ -47,6 +47,11 @@ signal play_SFX(fx_name, pos)
 signal scatter_object(body, nb_debris, impulse_force)
 
 
+#### SOUND ####
+
+signal play_sound_effect(stream_player)
+
+
 #### DIALOGUES ####
 
 signal dialogue_query(dialogue_index, is_cut_scene)
