@@ -27,7 +27,7 @@ static func load_settings(dir: String, slot_id : int) -> String:
 					for key in GAME._config_file.get_section_keys(section):
 						var value = GAME._config_file.get_value(section, key)
 						input_mapper.change_action_key(key, value)
-				"gameplay":
+				"progression":
 					for key in GAME._config_file.get_section_keys(section):
 						var value = GAME._config_file.get_value(section, key)
 						GAME.progression.set(key, value)
@@ -45,7 +45,7 @@ static func find_corresponding_save_file(dir: String, save_id : int) -> String:
 		var error = GAME._config_file.load(dir + "/" + file + "/settings.cfg")
 
 		if error == OK:
-			var file_save_id : int = GAME._config_file.get_value("system","slot_id")
+			var file_save_id : int = GAME._config_file.get_value("system", "slot_id")
 			if save_id == file_save_id:
 				return str(file)
 		else:

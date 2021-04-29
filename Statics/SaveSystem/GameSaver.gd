@@ -28,7 +28,7 @@ static func settings_update_save_name(settings_dictionary  : Dictionary, save_na
 
 
 # Save settings into a config file : res://saves/save1/2/3
-static func save_settings(path : String, save_name : String):
+static func save_game(path : String, save_name : String):
 	settings_update_keys(GAME._settings, save_name)
 	for section in GAME._settings.keys():
 		for key in GAME._settings[section]:
@@ -36,3 +36,14 @@ static func save_settings(path : String, save_name : String):
 	
 	GAME._config_file.save(path + "/settings.cfg")
 
+
+static func save_game_in_slot(save_dir_path: String, slot_id : int) -> void:
+	var slot_paths_array = DirNavHelper.fetch_dir_content(save_dir_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY)
+	if slot_id < slot_paths_array.size() - 1:
+		push_error("The given slot_id doesn't exist")
+		return
+	
+	var slot_path = slot_paths_array[slot_id]
+	var slot_name = slot_path.split("/")[-1]
+	
+	save_game(save_dir_path + "/" + slot_name, slot_name)

@@ -29,17 +29,6 @@ func get_class() -> String: return "WorldMap"
 #### BUILT-IN ####
 
 func _ready():
-	var current_cursor_level = get_node_or_null(cursor_start_level_path)
-	
-	if current_cursor_level == null:
-		print_debug("the current level_node can't be found at path " + cursor_start_level_path)
-	else:
-		if current_cursor_level != null:
-			cursor.set_current_level(current_cursor_level)
-			cursor.set_global_position(current_cursor_level.get_global_position())
-			characters_container.set_current_level(current_cursor_level)
-			characters_container.set_global_position(current_cursor_level.get_global_position())
-	
 	is_ready = true
 
 
@@ -48,6 +37,19 @@ func _ready():
 
 
 #### LOGIC ####
+
+
+func init_cursor_position(level_node: LevelNode):
+	var level = get_node_or_null(cursor_start_level_path) if level_node == null else level_node
+	
+	if level == null:
+		push_error("the current level_node can't be found at path " + cursor_start_level_path)
+		return
+	
+	cursor.set_current_level(level)
+	cursor.set_global_position(level.get_global_position())
+	characters_container.set_current_level(level)
+	characters_container.set_global_position(level.get_global_position())
 
 
 # Returns true if the two given nodes are connected by a bind
@@ -81,6 +83,13 @@ func find_adequate_level(dir: Vector2) -> LevelNode:
 				return bind.get_origin()
 	
 	return null
+
+func get_level_nodes() -> Array:
+	var levels_array = []
+	for child in $Levels.get_children():
+		if child is LevelNode and not child in levels_array:
+			levels_array.append(child)
+	return levels_array
 
 
 # Get every nodes connected to the given one by a bind
@@ -129,7 +138,7 @@ func enter_current_level():
 		var current_level_path = current_cursor_level.get_level_scene_path()
 		
 		if current_level_path == "":
-			print("The LevelNode " + current_cursor_level.name + " doesn't have any scene path")
+			push_error("The LevelNode " + current_cursor_level.name + " doesn't have any scene path")
 		
 		GAME.goto_level_by_path(current_level_path)
 
