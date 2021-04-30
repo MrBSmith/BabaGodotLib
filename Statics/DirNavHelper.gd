@@ -36,6 +36,18 @@ static func is_dir_existing(dir_path : String) -> bool:
 	return dirExist
 
 
+# Check if the give directory is empty or not
+static func is_dir_empty(dir_path) -> bool:
+	var dir = Directory.new()
+	if dir.open(dir_path) == OK:
+		dir.list_dir_begin(true, true)
+		var file_name = dir.get_next()
+		return file_name == ""
+	else:
+		push_error("The directory at path " + dir_path + " could'nt be opened")
+		return true
+
+
 # Navigate through the given folder then removes all files and folders inside it
 static func empty_folder(dir_path: String, display_warning : bool = false):
 	var dir = Directory.new()
