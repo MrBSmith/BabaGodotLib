@@ -60,8 +60,8 @@ static func find_save_slot(dir_path: String, save_id : int) -> String:
 	return cfg_file_path.replacen("/settings.cfg", "")
 
 
-static func find_first_slot_available(dir_path: String) -> int:
-	for i in range(3):
+static func find_first_slot_available(dir_path: String, max_slots: int) -> int:
+	for i in range(max_slots):
 		var slot_path = find_corresponding_save_file(dir_path, i + 1)
 		if slot_path == "":
 			return i + 1
