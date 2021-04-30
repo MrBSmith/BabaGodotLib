@@ -21,6 +21,7 @@ class_name EventsBase
 
 # warnings-disable
 
+signal new_game()
 signal gameover()
 signal win()
 

@@ -17,33 +17,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-anchor_left = 0.409
-anchor_top = 0.3
-anchor_right = 0.591
-anchor_bottom = 0.7
-margin_left = -0.140015
-margin_right = 0.139954
-margin_bottom = -3.05176e-05
-size_flags_vertical = 3
-custom_constants/separation = 0
-alignment = 1
-__meta__ = {
-"_edit_lock_": true,
-"_edit_use_anchors_": false
-}
-
-[node name="V_OptContainer" type="VBoxContainer" parent="HBoxContainer"]
-margin_left = 87.0
-margin_right = 87.0
-margin_bottom = 215.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_vertical = 3
-__meta__ = {
-"_edit_lock_": true
-}
-
 [node name="OptionChoiceSound" type="AudioStreamPlayer" parent="."]
 stream = SubResource( 1 )
 volume_db = -15.0

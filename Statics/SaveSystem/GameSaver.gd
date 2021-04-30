@@ -29,6 +29,11 @@ static func settings_update_save_name(settings_dictionary  : Dictionary, save_na
 
 # Save settings into a config file : res://saves/save1/2/3
 static func save_game(path : String, save_name : String):
+	if !DirNavHelper.is_dir_existing(path):
+		var parent_path = path.replacen("/" + save_name, "")
+		DirNavHelper.create_dir(parent_path, save_name)
+	
+	#### DECOUPLE THIS FROM GAME ####
 	settings_update_keys(GAME._settings, save_name)
 	for section in GAME._settings.keys():
 		for key in GAME._settings[section]:
@@ -42,8 +47,12 @@ static func save_game_in_slot(save_dir_path: String, slot_id : int) -> void:
 	if slot_id < slot_paths_array.size() - 1:
 		push_error("The given slot_id doesn't exist")
 		return
-	
-	var slot_path = slot_paths_array[slot_id]
-	var slot_name = slot_path.split("/")[-1]
+		
+	var slot_name = ""
+	var slot_path = GameLoader.find_corresponding_save_file(save_dir_path, slot_id)
+	if slot_path == "":
+		slot_name = GAME.SAVEDFILE_DEFAULT_NAME + String(slot_id)
+	else:
+		slot_name = slot_path.split("/")[-1]
 	
 	save_game(save_dir_path + "/" + slot_name, slot_name)
