@@ -2,6 +2,29 @@ extends Node
 class_name GameLoader
 
 
+static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node) -> void:
+	var config_file = load_config_file(save_dir_path, slot_id)
+	var input_mapper = InputMapper.new()
+	
+	for section in config_file.get_sections():
+		match(section):
+			"audio":
+				#set audio settings
+				for key in config_file.get_section_keys(section):
+					var value = config_file.get_value(section, key)
+					var bus_id = AudioServer.get_bus_index(key.capitalize())
+					AudioServer.set_bus_volume_db(bus_id, value)
+			"controls":
+				#set controls settings
+				for key in config_file.get_section_keys(section):
+					var value = config_file.get_value(section, key)
+					input_mapper.change_action_key(key, value)
+			"progression":
+				for key in config_file.get_section_keys(section):
+					var value = config_file.get_value(section, key)
+					progression.set(key, value)
+
+
 # Load the settings found in the ConfigFile settings.cfg at given path (default res://saves/save1/2/3
 static func load_config_file(dir: String, slot_id : int) -> ConfigFile:
 	var config_file = ConfigFile.new()
