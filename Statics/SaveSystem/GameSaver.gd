@@ -49,5 +49,3 @@ static func _update_settings_dictionary(progression: Node, settings_dictionary :
 				"progression":
 					for key in settings_dictionary[section]:
 						settings_dictionary[section][key] = progression.get(key)
-
-

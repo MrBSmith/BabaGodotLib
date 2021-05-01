@@ -40,7 +40,7 @@ signal collectable_amount_collected(obj, amount)
 signal collectable_amount_updated(collectable_type, amount)
 signal update_HUD()
 signal approch_collactable(obj)
-
+signal checkpoint_reached(level, checkpoint_id)
 
 #### SFX ####
 
@@ -57,10 +57,12 @@ signal play_sound_effect(stream_player)
 
 signal dialogue_query(dialogue_index, is_cut_scene)
 
+
 #### MENU ####
 
 signal menu_cancel()
 signal goto_menu_root()
+
 
 #### LEVEL NAVIGATION ####
 
