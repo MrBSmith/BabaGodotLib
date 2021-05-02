@@ -28,12 +28,16 @@ static func create_dir(dir_path : String, dir_to_create : String):
 			print("Done ! Directory can in be found in : " + created_directory_path)
 
 
-
-# Check if the given directory exists or not
+# Check if the directory at the given path exists or not
 static func is_dir_existing(dir_path : String) -> bool:
 	var dir = Directory.new()
-	var dirExist : bool = dir.dir_exists(dir_path)
-	return dirExist
+	return dir.dir_exists(dir_path)
+
+
+# Check if the file at the given path exists or not
+static func is_file_existing(file_path: String) -> bool:
+	var dir = Directory.new()
+	return dir.file_exists(file_path)
 
 
 # Check if the give directory is empty or not

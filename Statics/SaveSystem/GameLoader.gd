@@ -3,7 +3,7 @@ class_name GameLoader
 
 
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node) -> void:
-	var config_file = load_config_file(save_dir_path, slot_id)
+	var config_file = load_save_config_file(save_dir_path, slot_id)
 	var input_mapper = InputMapper.new()
 	
 	for section in config_file.get_sections():
@@ -26,14 +26,18 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 
 
 # Load the settings found in the ConfigFile settings.cfg at given path (default res://saves/save1/2/3
-static func load_config_file(dir: String, slot_id : int) -> ConfigFile:
-	var config_file = ConfigFile.new()
+static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	var save_path : String = find_corresponding_save_file(dir, slot_id)
 	if save_path == "":
 		push_error("There is no save with id " + String(slot_id))
 		return null
 	
-	var error = config_file.load(save_path)
+	return load_config_file(save_path)
+
+
+static func load_config_file(cfg_file_path: String) -> ConfigFile:
+	var config_file = ConfigFile.new()
+	var error = config_file.load(cfg_file_path)
 	if error == OK:
 		return config_file
 	else:
@@ -62,7 +66,7 @@ static func find_save_slot(dir_path: String, save_id : int) -> String:
 	return cfg_file_path.replacen("/settings.cfg", "")
 
 
-static func find_first_slot_available(dir_path: String, max_slots: int) -> int:
+static func find_first_empty_slot(dir_path: String, max_slots: int) -> int:
 	for i in range(max_slots):
 		var slot_path = find_corresponding_save_file(dir_path, i + 1)
 		if slot_path == "":
@@ -70,20 +74,32 @@ static func find_first_slot_available(dir_path: String, max_slots: int) -> int:
 	return -1
 
 
-static func get_cfg_property_value(dir: String, cfg_property_name : String, save_id : int):
+static func find_first_save_file(dir_path: String, max_slots: int) -> int :
+	for i in range(max_slots):
+		var slot_path = find_corresponding_save_file(dir_path, i + 1)
+		if slot_path != "":
+			return i + 1
+	return -1
+
+
+static func get_save_property_value(dir: String, property_name : String, save_id : int):
 	var save_path : String
 	var config_file = ConfigFile.new()
 	
 	save_path = find_corresponding_save_file(dir, save_id)
 	var error = config_file.load(save_path)
-	
 	if error == OK:
-		for section in config_file.get_sections():
-			for key in config_file.get_section_keys(section):
-				if key == cfg_property_name:
-					var property_value = config_file.get_value(section, key)
-					return property_value
+		return get_cfg_property_value(config_file, property_name)
 	else:
 		push_error("Failed to load settings cfg file with save id " + String(save_id) + " . error code : " + str(error))
-		return ""
+		return null
 
+
+# Take a config file and returns the value of the given property_name
+# The config file have to be loaded before
+static func get_cfg_property_value(config_file: ConfigFile, property_name: String):
+	for section in config_file.get_sections():
+		for key in config_file.get_section_keys(section):
+			if key == property_name:
+				return config_file.get_value(section, key)
+	return null
