@@ -46,6 +46,9 @@ func _exit_tree() -> void:
 	destroy_every_buttons()
 
 func handles(obj: Object) -> bool:
+	if not obj is Node:
+		return false
+	
 	if !is_object_handled(obj):
 		destroy_every_buttons()
 	
