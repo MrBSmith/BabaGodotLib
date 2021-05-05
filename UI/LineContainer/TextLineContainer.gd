@@ -30,6 +30,7 @@ func set_amount(value: int):
 	
 	if amount == int(INF):
 		amount_label.queue_free()
+		amount_label = null
 		_update_alignment()
 		return
 	
@@ -46,6 +47,7 @@ func set_icon_texture(value: Texture):
 	
 	if value == null:
 		texture_rect.queue_free()
+		texture_rect = null
 		_update_alignment()
 		return 
 	

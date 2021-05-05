@@ -126,6 +126,7 @@ func disable_every_actions(value: bool):
 func destroy_description_window():
 	if description_instance != null:
 		description_instance.queue_free()
+		description_instance = null
 
 
 #### INPUTS ####
