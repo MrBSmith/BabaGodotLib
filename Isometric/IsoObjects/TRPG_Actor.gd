@@ -33,7 +33,7 @@ var default_range : int = 1 setget set_default_range, get_default_range
 var action_modifier : int = 0 setget set_action_modifier, get_action_modifier
 var jump_max_height : int = 2 setget set_jump_max_height, get_jump_max_height
 
-var move_speed : float = 300
+var move_speed : float = 50.0 #180.0
 var direction : int = IsoLogic.DIRECTION.BOTTOM_RIGHT setget set_direction, get_direction
 
 var view_field : Array = [[], []] setget set_view_field, get_view_field
@@ -182,9 +182,22 @@ func decrement_current_action(amount : int = 1):
 	set_current_actions(get_current_actions() - amount)
 
 
-func move_to(delta: float, world_pos: Vector2) -> bool:
-	set_state("Move")
-	return $States/Move.move_to(delta, world_pos)
+# Handle the movement to the next point on the path,
+# return true if the character is arrived
+func move(delta: float, world_pos : Vector2) -> bool:
+	if get_state_name() != "Move":
+		set_state("Move")
+	
+	var char_pos = get_global_position()
+	var spd = move_speed * delta
+	var velocity = (world_pos - char_pos).normalized() * spd
+	
+	if char_pos.distance_to(world_pos) <= spd:
+		set_global_position(world_pos)
+	else:
+		set_global_position(char_pos + velocity)
+	
+	return world_pos.is_equal_approx(get_global_position())
 
 
 func hurt(damage: int):

@@ -312,6 +312,13 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 	return Vector3.INF
 
 
+func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
+	var cell_stack = get_cell_stack_at_pos(pos)
+	for c in cell_stack:
+		if c == cell:
+			return true
+	return false
+
 
 # Check if a position is valid, return true if it is, false if it is not
 func is_position_valid(cell: Vector3) -> bool:
