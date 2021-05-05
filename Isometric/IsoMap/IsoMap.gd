@@ -63,6 +63,7 @@ func _ready():
 	
 	for obj in get_tree().get_nodes_in_group("IsoObject"):
 		obj.set_current_cell(get_pos_highest_cell(obj.position))
+		obj.map = self
 	
 	is_ready = true
 	
@@ -94,7 +95,7 @@ func _fetch_ground():
 				if get_cell_slope_type(current_cell) != 0:
 					current_cell -= Vector3(0, 0, 0.5)
 				feed_array.append(current_cell)
-
+	
 	# Handle bridges
 	for i in range(layers_array.size()):
 		for child in layers_array[i].get_children():
@@ -241,7 +242,6 @@ func cell_array_to_world(cell_array: PoolVector3Array) -> PoolVector2Array:
 			pos_array.append(new_pos)
 	
 	return pos_array
-
 
 
 # Return the highest layer where the given cell is used

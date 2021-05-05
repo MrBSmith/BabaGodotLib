@@ -11,16 +11,17 @@ enum ALERATION_TYPE {
 
 onready var states_node = $States
 onready var move_node = $States/Move
-
-var active : bool = false
+onready var sfx_node = get_node_or_null("SFX")
 
 export var portrait : Texture
 export var timeline_port : Texture
 export var MaxStats : Resource
 
 export var weapon : Resource setget set_weapon, get_weapon
-
 export var skills := Array() setget set_skills, get_skills
+
+var active : bool = false
+
 var items : Array = []
 var equipment : Array = []
 
@@ -33,13 +34,15 @@ var default_range : int = 1 setget set_default_range, get_default_range
 var action_modifier : int = 0 setget set_action_modifier, get_action_modifier
 var jump_max_height : int = 2 setget set_jump_max_height, get_jump_max_height
 
-var move_speed : float = 50.0 #180.0
+var move_speed : float = 150.0
 var direction : int = IsoLogic.DIRECTION.BOTTOM_RIGHT setget set_direction, get_direction
 
 var view_field : Array = [[], []] setget set_view_field, get_view_field
+var path := PoolVector3Array()
 
 signal changed_direction(dir)
 signal action_spent
+signal turn_finished
 
 ### ACCESORS ###
 
@@ -174,6 +177,7 @@ func turn_finish():
 
 #### LOGIC ####
 
+
 func update_equipment():
 	equipment = [weapon]
 
@@ -182,22 +186,70 @@ func decrement_current_action(amount : int = 1):
 	set_current_actions(get_current_actions() - amount)
 
 
-# Handle the movement to the next point on the path,
-# return true if the character is arrived
-func move(delta: float, world_pos : Vector2) -> bool:
-	if get_state_name() != "Move":
-		set_state("Move")
+func move(move_path: PoolVector3Array) -> void:
+	path = move_path
+	set_state("Move")
+
+
+func wait() -> void:
+	set_action_modifier(1)
+	emit_signal("turn_finished")
+
+
+func attack(_target: IsoObject) -> void:
+	pass
+
+
+func use_item(_item: Item, _target_cell: Vector3) -> void:
+	pass
+
+
+func use_skill(_skill: Skill, _target_cell: Vector3) -> void:
+	pass
+
+
+# Move the active_actor along the path
+func move_along_path(delta: float):
+	if path.size() > 0:
+		var target_point_world = map.cell_to_world(path[0])
+		
+		var future_cell = path[1] if path.size() > 1 else current_cell
+		var chara_iso_dir = IsoLogic.get_cell_direction(current_cell, future_cell)
+		
+		var is_moving_bottom = chara_iso_dir in [IsoLogic.DIRECTION.BOTTOM_LEFT, IsoLogic.DIRECTION.BOTTOM_RIGHT]
+		
+		var char_pos = get_global_position()
+		var spd = move_speed * delta
+		var velocity = (target_point_world - char_pos).normalized() * spd
+		
+		# Update actor's position if the actor is moving in a bottom direction
+		if !is_moving_bottom:
+			var future_pos = char_pos + velocity
+			
+			if !map.is_world_pos_in_cell(future_pos, get_current_cell()) && path.size() > 0:
+				set_current_cell(path[0])
+		
+		# Move the actor
+		if char_pos.distance_to(target_point_world) <= spd:
+			set_global_position(target_point_world)
+		else:
+			set_global_position(char_pos + velocity)
+		
+		var arrived_to_next_point = target_point_world.is_equal_approx(get_global_position())
+		
+		# If the actor is arrived to the next point, 
+		# remove this point from the path and take the next for destination
+		if arrived_to_next_point == true:
+			if path.size() > 1:
+				set_direction(chara_iso_dir)
+				if is_moving_bottom:
+					set_current_cell(future_cell)
+			path.remove(0)
 	
-	var char_pos = get_global_position()
-	var spd = move_speed * delta
-	var velocity = (world_pos - char_pos).normalized() * spd
-	
-	if char_pos.distance_to(world_pos) <= spd:
-		set_global_position(world_pos)
-	else:
-		set_global_position(char_pos + velocity)
-	
-	return world_pos.is_equal_approx(get_global_position())
+	if len(path) == 0:
+		set_state("Idle")
+		map.update_view_field(self)
+		EVENTS.emit_signal("actor_action_animation_finished", self)
 
 
 func hurt(damage: int):
@@ -205,12 +257,16 @@ func hurt(damage: int):
 	EVENTS.emit_signal("damage_inflicted", damage, self)
 	set_state("Hurt")
 
+
 # Return the altitude of the current cell of the character
 func get_altitude() -> int:
 	return int(current_cell.z)
 
+
 func set_flip_h_SFX(value: bool):
-	for child in $SFX.get_children():
+	if sfx_node == null: return
+	
+	for child in sfx_node.get_children():
 		if child.has_method("set_flip_h"):
 			if child.is_flipped_h() != value:
 				child.set_flip_h(value)

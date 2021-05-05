@@ -189,6 +189,17 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 	return cells_in_square
 
 
+
+func get_objects_in_area(area: PoolVector3Array) -> Array:
+	var objects_array = Array()
+	for cell in area:
+		var obj = get_object_on_cell(cell)
+		if obj != null:
+			objects_array.append(obj)
+	
+	return objects_array
+
+
 #### SIGNAL RESPONSES ####
 
 

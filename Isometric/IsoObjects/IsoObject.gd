@@ -18,6 +18,7 @@ const COLOR_SCHEME = {
 	VISIBILITY.HIDDEN : Color.transparent
 }
 
+var map = null
 var tween : Tween = null
 
 var current_cell := Vector3.INF setget set_current_cell, get_current_cell
