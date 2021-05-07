@@ -2,14 +2,9 @@ extends ActorStateBase
 class_name ActorHurtState
 
 func enter_state():
-	var anim_player : AnimationPlayer = owner.get_node_or_null("AnimationPlayer")
+	owner.tween.flash(Color.red)
+	yield(owner.tween, "flash_finished")
 	
-	if anim_player == null:
-		return
-	
-	anim_player.play("RedFlash")
-	
-	yield(anim_player, "animation_finished")
 	states_machine.set_state("Idle")
 
 

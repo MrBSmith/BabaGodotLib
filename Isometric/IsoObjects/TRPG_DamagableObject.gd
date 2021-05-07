@@ -22,6 +22,9 @@ signal hurt_animation_finished
 
 #### ACCESSORS ####
 
+func is_class(value: String): return value == "TRPG_DamagableObject" or .is_class(value)
+func get_class() -> String: return "TRPG_DamagableObject"
+
 func set_current_HP(value: int):
 	if value >= 0 && value <= get_max_HP() && value != current_HP:
 		current_HP = value

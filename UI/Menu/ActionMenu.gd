@@ -174,18 +174,17 @@ func _on_option_chose(option: MenuOptionsBase):
 	if current_menu == menu_root:
 		EVENTS.emit_signal("actor_action_chosen", option.text.capitalize())
 	else:
-		
 		var option_data_container = get_data_container(current_menu, option.name)
 		if option_data_container == null:
+			push_error("There is no data container associated with " + option.name)
 			return
 		
 		var data_container_obj_ref = option_data_container.object_ref
 		if data_container_obj_ref == null:
+			push_error("The object referenced in the data container of " + option.name + " is null")
 			return
 		
-		match(current_menu.name):
-			"Skill": EVENTS.emit_signal("skill_chosen", data_container_obj_ref)
-			"Item": EVENTS.emit_signal("item_chosen", data_container_obj_ref)
+		EVENTS.emit_signal("combat_effect_object_chosen", data_container_obj_ref)
 
 
 
@@ -218,6 +217,7 @@ func _on_option_focus_changed(option: Control, focused: bool):
 	else:
 		if description_instance != null:
 			description_instance.queue_free()
+			description_instance = null
 
 
 func _on_window_resize_animation_finished():

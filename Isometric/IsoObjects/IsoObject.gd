@@ -19,7 +19,7 @@ const COLOR_SCHEME = {
 }
 
 var map = null
-var tween : Tween = null
+onready var tween : Tween = get_node_or_null("Tween")
 
 var current_cell := Vector3.INF setget set_current_cell, get_current_cell
 
@@ -78,9 +78,8 @@ func set_global_position(value):
 		emit_signal("global_position_changed", value)
 
 func set_modulate(value: Color):
-	if value != get_modulate():
-		modulate = value
-		emit_signal("modulate_changed", modulate)
+	modulate = value
+	emit_signal("modulate_changed", modulate)
 
 func is_in_view_field() -> bool:
 	return get_visibility() in [VISIBILITY.VISIBLE, VISIBILITY.BARELY_VISIBLE]
@@ -104,10 +103,6 @@ func _ready():
 	_err = connect("targeted_feedback_loop_ended", self, "_on_targeted_feedback_loop_ended")
 	add_to_group("IsoObject")
 	create()
-	
-	tween = Tween.new()
-	add_child(tween)
-	tween.set_owner(self)
 	
 	set_visible(false)
 	
@@ -133,7 +128,7 @@ func destroy():
 
 
 func trigger_targeted_feedback(positive: bool = false):
-	var target_color = Color.red if !positive else Color.green
+	var target_color = Color.blue if !positive else Color.green
 	last_target_positive = positive
 	
 	for i in range(2):

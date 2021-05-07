@@ -16,6 +16,8 @@ onready var sfx_node = get_node_or_null("SFX")
 export var portrait : Texture
 export var timeline_port : Texture
 export var MaxStats : Resource
+export var default_attack_aoe : Resource = null setget , get_default_attack_aoe
+export var default_attack_effect : Resource = null setget , get_default_attack_effect
 
 export var weapon : Resource setget set_weapon, get_weapon
 export var skills := Array() setget set_skills, get_skills
@@ -147,6 +149,18 @@ func get_skills() -> Array: return skills
 
 func get_team() -> Node: return get_parent()
 
+func get_attack_aoe() -> Resource:
+	if weapon != null:
+		var weapon_aoe = weapon.aoe
+		if weapon_aoe != null:
+			return weapon_aoe
+	return default_attack_aoe
+
+
+func get_default_attack_aoe() -> Resource: return default_attack_aoe
+
+func get_default_attack_effect() -> Resource: return default_attack_effect
+
 #### BUILT-IN ####
 
 # Add the node to the group allies
@@ -196,16 +210,43 @@ func wait() -> void:
 	emit_signal("turn_finished")
 
 
-func attack(_target: IsoObject) -> void:
-	pass
+func attack(aoe_target: AOE_Target) -> void:
+	set_state("Attack")
+	apply_combat_effect(default_attack_effect, aoe_target)
 
 
-func use_item(_item: Item, _target_cell: Vector3) -> void:
-	pass
+func use_item(item: Item, aoe_target: AOE_Target) -> void:
+	set_state("Skill")
+	apply_combat_effect(item.effect, aoe_target)
 
 
-func use_skill(_skill: Skill, _target_cell: Vector3) -> void:
-	pass
+func use_skill(skill: Skill, aoe_target: AOE_Target) -> void:
+	set_state("Skill")
+	apply_combat_effect(skill.effect, aoe_target)
+
+
+func apply_combat_effect(effect: Effect, aoe_target: AOE_Target) -> void:
+	var cells_in_area = map.get_cells_in_area(aoe_target)
+	var targets_array = owner.map_node.get_objects_in_area(cells_in_area)
+
+	if targets_array == []:
+		return
+
+	# Trigger the attack
+	for target in targets_array:
+		var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
+
+		for damage in damage_array:
+			target.hurt(damage)
+
+		var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
+		set_direction(dir)
+
+		if target != self:
+			yield(target, "hurt_animation_finished")
+	
+	decrement_current_action()
+	EVENTS.emit_signal("actor_action_animation_finished", self)
 
 
 # Move the active_actor along the path
@@ -222,7 +263,8 @@ func move_along_path(delta: float):
 		var spd = move_speed * delta
 		var velocity = (target_point_world - char_pos).normalized() * spd
 		
-		# Update actor's position if the actor is moving in a bottom direction
+		# Update actor's current_cell if the actor is moving in a bottom direction 
+		# (So the rendering order is correct)
 		if !is_moving_bottom:
 			var future_pos = char_pos + velocity
 			
@@ -242,8 +284,11 @@ func move_along_path(delta: float):
 		if arrived_to_next_point == true:
 			if path.size() > 1:
 				set_direction(chara_iso_dir)
+				
+				# Update actor's current_cell if the actor is moving in a top direction 
 				if is_moving_bottom:
 					set_current_cell(future_cell)
+			
 			path.remove(0)
 	
 	if len(path) == 0:

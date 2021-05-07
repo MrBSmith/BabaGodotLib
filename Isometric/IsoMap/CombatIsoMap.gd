@@ -89,6 +89,7 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 	return false
 
 
+### REFACTO THIS TO USE get_targatables_in_range().size()
 # Return the number of targets reachable by the active actor 
 func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_current_cell()) -> int:
 	var actor_range = owner.active_actor.get_current_range()
@@ -107,10 +108,32 @@ func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_curre
 	return count
 
 
+# Get every TRPG_DamagableObject in range of the given actor that is not in same team
+func get_targetables_in_range(actor: TRPG_Actor, actor_range: int) -> Array:
+	var targetables = []
+	var reachables = get_cells_in_circle(actor.get_current_cell(), actor_range + 1, true)
+	
+	for cell in reachables:
+		var obj = get_object_on_cell(cell)
+		
+		if obj == null:
+			continue
+		
+		if obj.is_class("TRPG_DamagableObject"):
+			if actor.is_in_group("Allies") && obj.is_in_group("Allies") or \
+				actor.is_in_group("Enemies") && obj.is_in_group("Enemies"):
+				continue
+			
+			if not obj in targetables:
+				targetables.append(obj)
+	
+	return targetables
+
+
 
 # Return every cells at the given dist or more from the origin in the given array
-func get_cells_in_circle(origin: Vector3, radius: int, 
-		cells_array: PoolVector3Array = walkable_cells, ignore_origin: bool = false) -> PoolVector3Array:
+func get_cells_in_circle(origin: Vector3, radius: int, ignore_origin: bool = false,
+		cells_array: PoolVector3Array = walkable_cells) -> PoolVector3Array:
 	var cells_at_dist = PoolVector3Array()
 	for cell in cells_array:
 		if ignore_origin && cell == origin: continue
@@ -189,7 +212,28 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 	return cells_in_square
 
 
+# Get an PoolVector3Array of the cells in the given aoe
+func get_cells_in_area(aoe_target: AOE_Target) -> PoolVector3Array:
+	if aoe_target == null:
+		push_error("aoe_target is null")
+		return PoolVector3Array()
+	
+	var aoe = aoe_target.aoe
+	var origin_cell = aoe_target.origin_cell
+	var target_cell = aoe_target.target_cell
+	var aoe_dir = aoe_target.aoe_dir
+	
+	var dir = IsoLogic.iso_dir(origin_cell, target_cell)
+	match(aoe_target.aoe.area_type.name):
+		"LineForward": return get_cells_in_straight_line(origin_cell, aoe.area_size, dir)
+		"LnePerpendicular": return get_cell_in_perpendicular_line(origin_cell, aoe.area_size, dir)
+		"Circle": return get_cells_in_circle(target_cell, aoe.area_size)
+		"Square": return get_cells_in_square(target_cell, aoe.area_size, aoe_dir)
+	
+	return PoolVector3Array()
 
+
+# Get every DamagableObjects in the given area (represented by a PoolVector3Array of cells)
 func get_objects_in_area(area: PoolVector3Array) -> Array:
 	var objects_array = Array()
 	for cell in area:
