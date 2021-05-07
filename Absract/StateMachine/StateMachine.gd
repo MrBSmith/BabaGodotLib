@@ -82,12 +82,12 @@ func set_state_by_id(state_id: int):
 	var state = get_child(state_id)
 	if state == null:
 		if state_id >= get_child_count() or state_id < 0:
-			print_debug("The given state_id is out of bound")
+			push_error("The given state_id is out of bound")
 		elif !state.is_class("StateBase"):
-			print_debug("The child of the statemachine pointed by the state_id: " + String(state_id)
+			push_error("The child of the statemachine pointed by the state_id: " + String(state_id)
 			 + " does not inherit StateBase")
-		else:
-			set_state(state)
+	else:
+		set_state(state)
 
 
 # Returns true if a state with the given name is a direct child of the statemachine, and inherit StateBase
