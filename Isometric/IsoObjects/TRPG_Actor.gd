@@ -9,7 +9,7 @@ enum ALERATION_TYPE {
 	DEAD
 }
 
-onready var states_node = $States
+onready var statesmachine = $States
 onready var move_node = $States/Move
 onready var sfx_node = get_node_or_null("SFX")
 
@@ -45,6 +45,7 @@ var path := PoolVector3Array()
 signal changed_direction(dir)
 signal action_spent
 signal turn_finished
+signal movement_finished
 
 ### ACCESORS ###
 
@@ -99,9 +100,9 @@ func get_current_actions(): return current_actions
 func set_current_movements(value : int): current_movements = value
 func get_current_movements(): return current_movements
 
-func set_state(value : String): states_node.set_state(value)
-func get_state() -> Object: return states_node.get_state()
-func get_state_name() -> String: return states_node.get_state_name()
+func set_state(value : String): statesmachine.set_state(value)
+func get_state() -> Object: return statesmachine.get_state()
+func get_state_name() -> String: return statesmachine.get_state_name()
 
 func set_jump_max_height(value : int): jump_max_height = value
 func get_jump_max_height() -> int: return jump_max_height
@@ -172,6 +173,7 @@ func _init():
 func _ready():
 	var combat_node = get_tree().get_current_scene()
 	var _err = connect("action_spent", combat_node, "on_action_spent")
+	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	
 	set_current_actions(get_max_actions())
 	set_current_movements(get_max_movements())
@@ -203,6 +205,8 @@ func decrement_current_action(amount : int = 1):
 func move(move_path: PoolVector3Array) -> void:
 	path = move_path
 	set_state("Move")
+	yield(self, "movement_finished")
+	decrement_current_action()
 
 
 func wait() -> void:
@@ -316,3 +320,16 @@ func set_flip_h_SFX(value: bool):
 			if child.is_flipped_h() != value:
 				child.set_flip_h(value)
 				child.set_position(child.get_position() * Vector2(-1, 1))
+
+
+
+#### SIGNAL RESPONSES ####
+
+
+func _on_state_changed(_new_state_name: String):
+	var previous_state = statesmachine.previous_state
+	
+	if previous_state != null:
+		match(previous_state.name):
+			"Hurt": emit_signal("hurt_animation_finished")
+			"Move": emit_signal("movement_finished")

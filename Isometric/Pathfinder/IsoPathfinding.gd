@@ -116,6 +116,20 @@ func find_path(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	return cell_path
 
 
+# Find a path between the start_cell and the iso_object (Considering this object as passable)
+func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
+	var end_cell_id = compute_cell_index(end_cell)
+	astar_node.set_point_disabled(end_cell_id, false)
+	
+	var path = find_path(start_cell, end_cell)
+	astar_node.set_point_disabled(end_cell_id, true)
+	
+	if path != PoolVector3Array():
+		path.resize(path.size() - 1)
+	
+	return path
+
+
 # Find all the walkable cells and retrun their position
 func find_reachable_cells(actor_cell : Vector3, actor_movements : int) -> PoolVector3Array:
 	var reachable_cells : PoolVector3Array = [actor_cell]
@@ -184,4 +198,4 @@ func _on_iso_object_removed(iso_object: IsoObject):
 	if iso_object.is_class("Obstacle"):
 		var cell = iso_object.get_current_cell()
 		var cell_id = compute_cell_index(cell)
-		astar_node.set_point_disabled(cell_id, true)
+		astar_node.set_point_disabled(cell_id, false)

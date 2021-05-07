@@ -6,7 +6,3 @@ func enter_state():
 	yield(owner.tween, "flash_finished")
 	
 	states_machine.set_state("Idle")
-
-
-func exit_state():
-	owner.emit_signal("hurt_animation_finished")
