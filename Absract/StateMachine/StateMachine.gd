@@ -17,17 +17,12 @@ onready var previous_state : Object = null
 
 signal state_changed(state_name)
 
+#### BUILT-IN ####
 
 # Set the state to the first of the list
 func _ready():
 	yield(owner, "ready")
-	
-	var default = get("default_state") if get("default_state") != null else owner.get("default_state")
-	
-	if default != null && default != "":
-		set_state(default)
-	else:
-		set_state(get_child(0))
+	set_state_to_default()
 
 
 # Call for the current state process at every frame of the physic process
@@ -38,6 +33,8 @@ func _physics_process(delta):
 	if state_name:
 		set_state(get_node(state_name))
 
+
+#### LOGIC ####
 
 # Returns the current state
 func get_state() -> Object:
@@ -88,6 +85,17 @@ func set_state_by_id(state_id: int):
 			 + " does not inherit StateBase")
 	else:
 		set_state(state)
+
+
+# Set the state to the default one
+# If no default state is found in the instance or the owner, set the state to the first in the hierchy
+func set_state_to_default() -> void:
+	var default = get("default_state") if get("default_state") != null else owner.get("default_state")
+	
+	if default != null && default != "":
+		set_state(default)
+	else:
+		set_state_by_id(0)
 
 
 # Returns true if a state with the given name is a direct child of the statemachine, and inherit StateBase

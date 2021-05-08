@@ -45,7 +45,7 @@ var path := PoolVector3Array()
 signal changed_direction(dir)
 signal action_spent
 signal turn_finished
-signal movement_finished
+signal action_finished
 
 ### ACCESORS ###
 
@@ -159,7 +159,6 @@ func get_attack_aoe() -> Resource:
 
 
 func get_default_attack_aoe() -> Resource: return default_attack_aoe
-
 func get_default_attack_effect() -> Resource: return default_attack_effect
 
 #### BUILT-IN ####
@@ -173,8 +172,8 @@ func _init():
 func _ready():
 	var combat_node = get_tree().get_current_scene()
 	var _err = connect("action_spent", combat_node, "on_action_spent")
+	_err = connect("action_finished", self, "_on_action_finshed")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
-	
 	set_current_actions(get_max_actions())
 	set_current_movements(get_max_movements())
 	set_current_HP(get_max_HP())
@@ -205,7 +204,6 @@ func decrement_current_action(amount : int = 1):
 func move(move_path: PoolVector3Array) -> void:
 	path = move_path
 	set_state("Move")
-	yield(self, "movement_finished")
 	decrement_current_action()
 
 
@@ -229,7 +227,8 @@ func use_skill(skill: Skill, aoe_target: AOE_Target) -> void:
 	apply_combat_effect(skill.effect, aoe_target)
 
 
-func apply_combat_effect(effect: Effect, aoe_target: AOE_Target) -> void:
+func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: int = 1) -> void:
+	decrement_current_action(action_spent)
 	var cells_in_area = map.get_cells_in_area(aoe_target)
 	var targets_array = owner.map_node.get_objects_in_area(cells_in_area)
 
@@ -246,11 +245,6 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target) -> void:
 		var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
 		set_direction(dir)
 
-		if target != self:
-			yield(target, "hurt_animation_finished")
-	
-	decrement_current_action()
-	EVENTS.emit_signal("actor_action_animation_finished", self)
 
 
 # Move the active_actor along the path
@@ -259,21 +253,10 @@ func move_along_path(delta: float):
 		var target_point_world = map.cell_to_world(path[0])
 		
 		var future_cell = path[1] if path.size() > 1 else current_cell
-		var chara_iso_dir = IsoLogic.get_cell_direction(current_cell, future_cell)
-		
-		var is_moving_bottom = chara_iso_dir in [IsoLogic.DIRECTION.BOTTOM_LEFT, IsoLogic.DIRECTION.BOTTOM_RIGHT]
 		
 		var char_pos = get_global_position()
 		var spd = move_speed * delta
 		var velocity = (target_point_world - char_pos).normalized() * spd
-		
-		# Update actor's current_cell if the actor is moving in a bottom direction 
-		# (So the rendering order is correct)
-		if !is_moving_bottom:
-			var future_pos = char_pos + velocity
-			
-			if !map.is_world_pos_in_cell(future_pos, get_current_cell()) && path.size() > 0:
-				set_current_cell(path[0])
 		
 		# Move the actor
 		if char_pos.distance_to(target_point_world) <= spd:
@@ -287,18 +270,13 @@ func move_along_path(delta: float):
 		# remove this point from the path and take the next for destination
 		if arrived_to_next_point == true:
 			if path.size() > 1:
+				var chara_iso_dir = IsoLogic.get_cell_direction(current_cell, future_cell)
 				set_direction(chara_iso_dir)
-				
-				# Update actor's current_cell if the actor is moving in a top direction 
-				if is_moving_bottom:
-					set_current_cell(future_cell)
+				set_current_cell(future_cell)
 			
 			path.remove(0)
 	
-	if len(path) == 0:
-		set_state("Idle")
-		map.update_view_field(self)
-		EVENTS.emit_signal("actor_action_animation_finished", self)
+	return len(path) == 0
 
 
 func hurt(damage: int):
@@ -325,11 +303,20 @@ func set_flip_h_SFX(value: bool):
 
 #### SIGNAL RESPONSES ####
 
-
 func _on_state_changed(_new_state_name: String):
 	var previous_state = statesmachine.previous_state
 	
 	if previous_state != null:
-		match(previous_state.name):
-			"Hurt": emit_signal("hurt_animation_finished")
-			"Move": emit_signal("movement_finished")
+		if active:
+			if previous_state is TRPG_ActionState:
+				emit_signal("action_finished")
+		else:
+			if previous_state.name == "Hurt": 
+				emit_signal("hurt_animation_finished")
+
+
+func _on_action_finshed():
+	if get_current_actions() == 0:
+		emit_signal("turn_finished")
+	else:
+		EVENTS.emit_signal("actor_action_finished", self)

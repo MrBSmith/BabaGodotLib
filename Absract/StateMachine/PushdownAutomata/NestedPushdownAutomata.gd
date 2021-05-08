@@ -3,6 +3,8 @@ class_name NestedPushdownAutomata
 
 onready var states_machine = get_parent()
 
+# When this state is entered, if this bool is true, reset the child state to the default one
+export var reset_to_default : bool = false
 export var default_state = ""
 
 #### ACCESSORS ####
@@ -19,7 +21,11 @@ func _enter_tree() -> void:
 #### VIRTUALS ####
 
 func enter_state():
-	current_state.enter_state()
+	if reset_to_default:
+		set_state_to_default()
+	
+	if is_current_state():
+		current_state.enter_state()
 
 func exit_state():
 	current_state.exit_state()

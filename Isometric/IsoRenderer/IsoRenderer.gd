@@ -259,16 +259,16 @@ func xyz_sum_compare(a: RenderPart, b: RenderPart) -> bool:
 	# Then compare y, then x, then z
 	# If nothing worked, sort by type
 	if sum_a == sum_b:
-		if grid_pos_a.y == grid_pos_b.y:
-			if grid_pos_a.x == grid_pos_b.x:
-				if grid_pos_a.z == grid_pos_b.z:
+		if grid_pos_a.z == grid_pos_b.z:
+			if grid_pos_a.y == grid_pos_b.y:
+				if grid_pos_a.x == grid_pos_b.x:
 					return get_type_priority(a) < get_type_priority(b)
 				else:
-					return grid_pos_a.z < grid_pos_b.z
+					return grid_pos_a.x < grid_pos_b.x
 			else:
-				return grid_pos_a.x < grid_pos_b.x
+				return grid_pos_a.y < grid_pos_b.y
 		else:
-			return grid_pos_a.y < grid_pos_b.y
+			return grid_pos_a.z < grid_pos_b.z
 	else:
 		return sum_a < sum_b
 
