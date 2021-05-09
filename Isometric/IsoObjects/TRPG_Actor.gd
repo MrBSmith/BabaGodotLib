@@ -284,6 +284,11 @@ func hurt(damage: int):
 	set_state("Hurt")
 
 
+func can_see(obj: IsoObject) -> bool:
+	var obj_cell = obj.get_current_cell()
+	return obj_cell in view_field[0] or obj_cell in view_field[1]
+
+
 # Return the altitude of the current cell of the character
 func get_altitude() -> int:
 	return int(current_cell.z)
