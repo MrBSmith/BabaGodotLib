@@ -47,7 +47,7 @@ func get_visible_cells(origin: Vector3, h: int, ran: int, include_self_cell: boo
 	return visible_cells
 
 
-# Update the view field of the given actor by fetching every cells he can see and feed himù
+# Update the view field of the given actor by fetching every cells he can see and feed him
 func update_view_field(actor: IsoObject):
 	var view_range = actor.get_view_range()
 	var actor_cell = actor.get_current_cell()
@@ -89,29 +89,14 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 	return false
 
 
-### REFACTO THIS TO USE get_targatables_in_range().size()
-# Return the number of targets reachable by the active actor 
-func count_reachable_enemies(active_cell: Vector3 = owner.active_actor.get_current_cell()) -> int:
-	var actor_range = owner.active_actor.get_current_range()
-	var reachables = get_cells_in_circle(active_cell, actor_range)
-	var count : int = 0
-	
-	for cell in reachables:
-		var obj = get_object_on_cell(cell)
-		
-		if obj == null:
-			continue
-		
-		if obj.is_class("TRPG_Actor"):
-			if obj.is_in_group("Enemies"):
-				count += 1
-	return count
-
 
 # Get every TRPG_DamagableObject in range of the given actor that is not in same team
-func get_targetables_in_range(actor: TRPG_Actor, actor_range: int) -> Array:
+# You can pass a actor_cell as an argument if you whant to check the targetables the actor would have
+# If it was on the given cell, if nothing is passed, the function will use the current_cell of the actor
+func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell := Vector3.INF) -> Array:
 	var targetables = []
-	var reachables = get_cells_in_circle(actor.get_current_cell(), actor_range + 1, true)
+	if actor_cell == Vector3.INF: actor_cell = actor.get_current_cell()
+	var reachables = get_cells_in_circle(actor_cell, actor_range + 1, true)
 	
 	for cell in reachables:
 		var obj = get_object_on_cell(cell)
@@ -129,6 +114,14 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int) -> Array:
 	
 	return targetables
 
+
+# Return the number of targets reachable by the active actor if it was at the given cell
+# if no cell is passed, the function will use the current_cell of the given actor
+func count_reachable_enemies(actor: TRPG_Actor, cell:= Vector3.INF) -> int:
+	var actor_range = actor.get_current_range()
+	if cell == Vector3.INF: cell = actor.get_current_cell()
+	var targetables = get_targetables_in_range(actor, actor_range, cell)
+	return targetables.size()
 
 
 # Return every cells at the given dist or more from the origin in the given array
@@ -248,5 +241,5 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 
 
 func on_iso_object_cell_changed(iso_object: IsoObject):
-	if iso_object.is_class("Ally"):
+	if iso_object.is_in_group("Allies"):
 		update_view_field(iso_object)

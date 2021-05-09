@@ -120,7 +120,7 @@ func get_view_range() -> int: return MaxStats.get_view_range() + get_altitude() 
 func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
-		if self.is_class("Ally"):
+		if self.is_in_group("Allies"):
 			EVENTS.emit_signal("visible_cells_changed")
 
 func get_view_field() -> Array: return view_field
@@ -174,6 +174,7 @@ func _ready():
 	var _err = connect("action_spent", combat_node, "on_action_spent")
 	_err = connect("action_finished", self, "_on_action_finshed")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
+	
 	set_current_actions(get_max_actions())
 	set_current_movements(get_max_movements())
 	set_current_HP(get_max_HP())

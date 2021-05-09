@@ -36,6 +36,9 @@ func update_actor_animation(actor_dir: int):
 	var animation_name = name + sufix
 	if sprite_frames.has_animation(animation_name):
 		animated_sprite.play(animation_name)
+	else:
+		yield(get_tree().create_timer(1.0), "timeout")
+		_on_animation_finished()
 	
 	# Triggers the AnimationPlayer with the name of this state if one exists 
 	var animation_player : AnimationPlayer = owner.animation_player_node
