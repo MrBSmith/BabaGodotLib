@@ -170,14 +170,12 @@ func _init():
 
 # Set the current stats to the starting stats
 func _ready():
-	var combat_node = get_tree().get_current_scene()
-	var _err = connect("action_spent", combat_node, "on_action_spent")
+	var _err = connect("cell_changed", self, "_on_cell_changed")
 	_err = connect("action_finished", self, "_on_action_finshed")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	
 	set_current_actions(get_max_actions())
 	set_current_movements(get_max_movements())
-	set_current_HP(get_max_HP())
 	set_current_MP(get_max_MP())
 	update_equipment()
 
@@ -321,3 +319,6 @@ func _on_action_finshed():
 		emit_signal("turn_finished")
 	else:
 		EVENTS.emit_signal("actor_action_finished", self)
+
+func _on_cell_changed(_new_cell: Vector3):
+	EVENTS.emit_signal("actor_cell_changed", self)

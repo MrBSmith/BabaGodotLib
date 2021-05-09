@@ -56,7 +56,7 @@ func _ready():
 	var _err = connect("focused", owner, "on_object_focused")
 	_err = connect("unfocused", owner, "on_object_unfocused")
 	
-	current_HP = max_HP
+	set_current_HP(get_max_HP())
 	
 	generate_lifebar()
 	generate_clickable_area()
