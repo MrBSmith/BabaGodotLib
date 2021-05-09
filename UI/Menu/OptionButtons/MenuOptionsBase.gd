@@ -57,7 +57,8 @@ func _on_gui_input(event : InputEvent):
 	if event.is_action_pressed("ui_accept") && is_focused():
 		set_pressed(true)
 
-func _on_pressed(): emit_signal("option_chose", self)
+func _on_pressed(): 
+	emit_signal("option_chose", self)
 
 
 func _on_mouse_entered():

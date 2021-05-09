@@ -23,8 +23,7 @@ func _enter_tree() -> void:
 func enter_state():
 	if reset_to_default:
 		set_state_to_default()
-	
-	if is_current_state():
+	else:
 		current_state.enter_state()
 
 func exit_state():

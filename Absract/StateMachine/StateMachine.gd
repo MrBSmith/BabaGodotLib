@@ -17,12 +17,16 @@ onready var previous_state : Object = null
 
 signal state_changed(state_name)
 
+func is_class(value: String): return value == "StatesMachine" or .is_class(value)
+func get_class() -> String: return "StatesMachine"
+
 #### BUILT-IN ####
 
 # Set the state to the first of the list
 func _ready():
 	yield(owner, "ready")
-	set_state_to_default()
+	if !is_nested():
+		set_state_to_default()
 
 
 # Call for the current state process at every frame of the physic process
@@ -69,9 +73,9 @@ func set_state(new_state):
 	current_state = new_state
 	
 	# Use the enter_state function of the current state
-	current_state.enter_state()
-	
-	emit_signal("state_changed", current_state.name)
+	if !is_nested() or new_state.is_current_state():
+		current_state.enter_state()
+		emit_signal("state_changed", current_state.name)
 
 
 # Set the state based on the id of the state (id of the node, ie position in the hierachy)
@@ -105,6 +109,9 @@ func has_state(state_name: String) -> bool:
 			return true
 	return false
 
+
+func is_nested() -> bool:
+	return self.is_class("NestedPushdownAutomata") or self.is_class("NestedStatesMachine")
 
 # Set state by incrementing its id (id of the node, ie position in the hierachy)
 func increment_state(increment: int = 1, wrapping : bool = true):
