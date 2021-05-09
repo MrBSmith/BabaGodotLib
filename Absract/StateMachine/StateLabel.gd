@@ -17,5 +17,8 @@ func _ready():
 
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(state_name: String):
-	text = state_name
+func _on_state_changed(state: Object):
+	if state == null:
+		text = ""
+	else:
+		text = state.name

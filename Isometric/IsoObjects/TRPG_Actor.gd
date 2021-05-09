@@ -304,7 +304,7 @@ func set_flip_h_SFX(value: bool):
 
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(_new_state_name: String):
+func _on_state_changed(_new_state: Object):
 	var previous_state = statesmachine.previous_state
 	
 	if previous_state != null:
