@@ -5,7 +5,7 @@ class_name GameLoader
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node) -> void:
 	var config_file = load_save_config_file(save_dir_path, slot_id)
 	var input_mapper = InputMapper.new()
-	
+
 	for section in config_file.get_sections():
 		match(section):
 			"audio":
@@ -31,7 +31,7 @@ static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	if save_path == "":
 		push_error("There is no save with id " + String(slot_id))
 		return null
-	
+
 	return load_config_file(save_path)
 
 
@@ -81,11 +81,13 @@ static func find_first_save_file(dir_path: String, max_slots: int) -> int :
 			return i + 1
 	return -1
 
-
+# Get a save's specific property value according to a given property_name
+# Args : saves directory, property_name, save id
+# Output : return the value of the save's asked property
 static func get_save_property_value(dir: String, property_name : String, save_id : int):
 	var save_path : String
 	var config_file = ConfigFile.new()
-	
+
 	save_path = find_corresponding_save_file(dir, save_id)
 	var error = config_file.load(save_path)
 	if error == OK:
@@ -96,6 +98,7 @@ static func get_save_property_value(dir: String, property_name : String, save_id
 
 
 # Take a config file and returns the value of the given property_name
+# This method is not specific to any save, so that any configfile can be loaded
 # The config file have to be loaded before
 static func get_cfg_property_value(config_file: ConfigFile, property_name: String):
 	for section in config_file.get_sections():
