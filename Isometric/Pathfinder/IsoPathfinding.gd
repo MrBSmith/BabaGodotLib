@@ -66,7 +66,7 @@ func connect_walkable_cells(cells_array: PoolVector3Array, active_actor: TRPG_Ac
 
 		# Loop through the for relative points of the current cell
 		for cell_relative in cell_relative_array:
-			var cell_rel_z = map_node.get_cell_highest_layer(cell_relative)
+			var cell_rel_z = map_node.get_cell2D_highest_z(cell_relative)
 			var cell3D_rel = Vector3(cell_relative.x,
 								cell_relative.y, cell_rel_z)
 

@@ -79,7 +79,7 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 		if dist > attack_range:
 			continue
 		
-		var obj = get_object_on_cell(cell)
+		var obj = get_damagable_on_cell(cell)
 		if obj == null:
 			continue
 		
@@ -99,7 +99,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 	var reachables = get_cells_in_circle(actor_cell, actor_range + 1, true)
 	
 	for cell in reachables:
-		var obj = get_object_on_cell(cell)
+		var obj = get_damagable_on_cell(cell)
 		
 		if obj == null:
 			continue
@@ -200,7 +200,7 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 	for i in range(size):
 		for j in range(size):
 			var vec2 = Vector2(origin.x, origin.y) + Vector2(j, i) * square_dir
-			cells_in_square.append(Vector3(vec2.x, vec2.y, get_cell_highest_layer(vec2)))
+			cells_in_square.append(Vector3(vec2.x, vec2.y, get_cell2D_highest_z(vec2)))
 	
 	return cells_in_square
 
@@ -210,7 +210,7 @@ func get_damagable_in_area(aoe_target: AOE_Target) -> Array:
 	var targetables := Array()
 	var cells_array = get_cells_in_area(aoe_target)
 	for cell in cells_array:
-		var target = get_object_on_cell(cell)
+		var target = get_damagable_on_cell(cell)
 		if target != null:
 			targetables.append(target)
 	return targetables
@@ -241,7 +241,7 @@ func get_cells_in_area(aoe_target: AOE_Target) -> PoolVector3Array:
 func get_objects_in_area(area: PoolVector3Array) -> Array:
 	var objects_array = Array()
 	for cell in area:
-		var obj = get_object_on_cell(cell)
+		var obj = get_damagable_on_cell(cell)
 		if obj != null:
 			objects_array.append(obj)
 	

@@ -245,17 +245,24 @@ func cell_array_to_world(cell_array: PoolVector3Array) -> PoolVector2Array:
 
 # Return the highest layer where the given cell is used
 # If the given cell is nowhere: return -1
-func get_cell_highest_layer(cell : Vector2) -> int:
+func get_cell2D_highest_z(cell : Vector2) -> float:
 	for i in range(layers_array.size() - 1, -1, -1):
 		if cell in layers_array[i].get_used_cells():
-			return i
-	return -1
+			if get_cell_slope_type(Vector3(cell.x, cell.y, i)) != 0:
+				return i - 0.5
+			else:
+				return float(i)
+	return -1.0
 
 
 func get_cell_slope_type(cell: Vector3) -> int:
 	var layer : IsoMapLayer = get_layer(int(round(cell.z)))
 	var tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cell(int(cell.x), int(cell.y))
+	
+	if !(tile_id in tileset.get_tiles_ids()):
+		return SLOPE_TYPE.NONE
+	
 	var tile_name = tileset.tile_get_name(tile_id)
 		
 	if !"slope".is_subsequence_ofi(tile_name) && !"stair".is_subsequence_ofi(tile_name):
@@ -275,10 +282,14 @@ func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 	if highest_cell != Vector3.INF:
 		cell_stack.append(highest_cell)
 	
-	for z in range(highest_cell.z - 1, -1, -1):
+	for z in range(round(highest_cell.z) - 1, -1, -1):
 		var world_pos_adapted = Vector2(world_pos.x, world_pos.y + 16 * z)
 		var cell_2D = layers_array[z].world_to_map(world_pos_adapted)
 		var cell_3D = Vector3(cell_2D.x, cell_2D.y, z)
+		
+		if get_cell_slope_type(cell_3D) != 0:
+			cell_3D -= Vector3(0, 0, 0.5)
+		
 		if is_position_valid(cell_3D):
 			cell_stack.append(cell_3D)
 	
@@ -306,8 +317,12 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 		var current_cell_2D = ground_0_cell_2D + Vector2(i, i)
 		var current_cell_3D = Vector3(current_cell_2D.x, current_cell_2D.y, i)
 		
+		if get_cell_slope_type(current_cell_3D) != 0:
+			current_cell_3D -= Vector3(0, 0, 0.5)
+		
 		if current_cell_3D in grounds:
 			return current_cell_3D
+		
 	return Vector3.INF
 
 
