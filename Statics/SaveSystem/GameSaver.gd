@@ -3,12 +3,12 @@ class_name GameSaver
 
 # Update the settings dictionnary then
 # save settings into a config file at the given slot path, create the directory if it doesn't exist
-static func save_game(progression: Node, path : String, save_name : String, settings: Dictionary):
+static func save_game(progression: Node, path : String, save_name : String, slot_id : int, settings: Dictionary):
 	if !DirNavHelper.is_dir_existing(path):
 		var parent_path = path.replacen("/" + save_name, "")
 		DirNavHelper.create_dir(parent_path, save_name)
 	
-	_update_settings_dictionary(progression, settings, save_name)
+	_update_settings_dictionary(progression, settings, save_name, slot_id)
 	save_properties_in_cfg(path + "/settings.cfg", settings)
 
 
@@ -34,18 +34,19 @@ static func save_game_in_slot(progression: Node, save_dir_path: String, slot_id 
 	var slot_path = GameLoader.find_corresponding_save_file(save_dir_path, slot_id)
 	var slot_name = save_default_name + String(slot_id) if slot_path == "" else slot_path.split("/")[-2]
 	
-	save_game(progression, save_dir_path + "/" + slot_name, slot_name, settings)
+	save_game(progression, save_dir_path + "/" + slot_name, slot_name, slot_id, settings)
 
 
 # Get audio and controls project settings and set them into a dictionary.
 # This dictionary _settings will be used later to save and load anytime a user wishes to
 # The progression argument have to be a Node that a variable for each property in the progression section
 # of the .cfg files. The progression node is the one keeping the data of the games progression at runtime
-static func _update_settings_dictionary(progression: Node, settings_dictionary : Dictionary, save_name : String = ""):
+static func _update_settings_dictionary(progression: Node, settings_dictionary : Dictionary, save_name : String = "", slot_id : int = 0):
 	for section in settings_dictionary:
 			match(section):
 				"system":
 					settings_dictionary[section]["time"] = OS.get_datetime()
+					settings_dictionary[section]["slot_id"] = slot_id
 					settings_dictionary[section]["save_name"] = save_name
 				"audio":
 					for key in settings_dictionary[section]:

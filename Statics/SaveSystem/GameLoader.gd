@@ -81,7 +81,8 @@ static func find_first_save_file(dir_path: String, max_slots: int) -> int :
 			return i + 1
 	return -1
 
-
+#### Should be renamed ?
+#### Issue : Line 103 <static fun get_cfg_property_value> is repetitive.
 static func get_save_property_value(dir: String, property_name : String, save_id : int):
 	var save_path : String
 	var config_file = ConfigFile.new()
