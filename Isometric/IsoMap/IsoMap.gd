@@ -200,16 +200,15 @@ func world_to_ground_z(pos : Vector2, z : int = 0):
 
 # Return the actor or obstacle placed on the given cell
 # Return null if the cell is empty
-func get_object_on_cell(cell: Vector3) -> IsoObject:
-	var objects_array = get_tree().get_nodes_in_group("IsoObject")
+func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
+	var damagable_array = get_tree().get_nodes_in_group("IsoObject")
 	
-	for object in objects_array:
+	for object in damagable_array:
 		if not object is TRPG_DamagableObject:
 			continue
 		
 		if object.get_current_cell() == cell:
 			return object
-	
 	return null
 
 

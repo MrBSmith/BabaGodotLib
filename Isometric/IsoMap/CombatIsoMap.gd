@@ -205,6 +205,17 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 	return cells_in_square
 
 
+# Return every TRPG_DamagableObject in the given aoe_target
+func get_damagable_in_area(aoe_target: AOE_Target) -> Array:
+	var targetables := Array()
+	var cells_array = get_cells_in_area(aoe_target)
+	for cell in cells_array:
+		var target = get_object_on_cell(cell)
+		if target != null:
+			targetables.append(target)
+	return targetables
+
+
 # Get an PoolVector3Array of the cells in the given aoe
 func get_cells_in_area(aoe_target: AOE_Target) -> PoolVector3Array:
 	if aoe_target == null:

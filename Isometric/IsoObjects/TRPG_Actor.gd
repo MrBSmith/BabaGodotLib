@@ -16,8 +16,8 @@ onready var sfx_node = get_node_or_null("SFX")
 export var portrait : Texture
 export var timeline_port : Texture
 export var MaxStats : Resource
-export var default_attack_aoe : Resource = null setget , get_default_attack_aoe
-export var default_attack_effect : Resource = null setget , get_default_attack_effect
+export var default_attack_effect : Resource
+export var default_attack_aoe : Resource setget , get_default_attack_aoe
 
 export var weapon : Resource setget set_weapon, get_weapon
 export var skills := Array() setget set_skills, get_skills
@@ -150,16 +150,19 @@ func get_skills() -> Array: return skills
 
 func get_team() -> Node: return get_parent()
 
-func get_attack_aoe() -> Resource:
-	if weapon != null:
-		var weapon_aoe = weapon.aoe
-		if weapon_aoe != null:
-			return weapon_aoe
-	return default_attack_aoe
-
-
 func get_default_attack_aoe() -> Resource: return default_attack_aoe
-func get_default_attack_effect() -> Resource: return default_attack_effect
+
+func get_attack_aoe() -> Resource:
+	if weapon != null && weapon.aoe != null:
+		return weapon.aoe
+	else:
+		return get_default_attack_aoe()
+
+func get_current_attack_effect() -> Resource:
+	if weapon != null && weapon.attack_effect != null:
+		return weapon.attack_effect
+	else:
+		return default_attack_effect
 
 #### BUILT-IN ####
 
@@ -213,7 +216,7 @@ func wait() -> void:
 
 func attack(aoe_target: AOE_Target) -> void:
 	set_state("Attack")
-	apply_combat_effect(default_attack_effect, aoe_target)
+	apply_combat_effect(get_current_attack_effect(), aoe_target)
 
 
 func use_item(item: Item, aoe_target: AOE_Target) -> void:
