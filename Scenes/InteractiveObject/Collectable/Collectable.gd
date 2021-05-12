@@ -18,7 +18,7 @@ func is_class(value: String): return value == "Collectable" or .is_class(value)
 func get_class() -> String: return "Collectable"
 
 func set_state(state): state_machine.set_state(state)
-func get_state() -> StateBase: return state_machine.get_state(0)
+func get_state() -> Object: return state_machine.get_state()
 func get_state_name(): return state_machine.get_state_name()
 
 func set_collectable_name(value: String): collectable_name = value

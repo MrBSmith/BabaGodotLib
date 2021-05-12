@@ -85,7 +85,7 @@ func set_hidden(value: bool):
 func is_hidden() -> bool : return hidden
 
 func set_state(value): $StatesMachine.set_state(value)
-func get_state() -> StateBase: return $StatesMachine.get_state()
+func get_state() -> Object: return $StatesMachine.get_state()
 func get_state_name() -> String: return $StatesMachine.get_state_name()
 
 

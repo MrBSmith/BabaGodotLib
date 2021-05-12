@@ -30,7 +30,7 @@ func get_class() -> String: return "WorldMap"
 
 func _ready():
 	is_ready = true
-
+	init_cursor_position(null)
 
 #### VIRTUALS ####
 

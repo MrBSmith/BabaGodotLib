@@ -38,8 +38,9 @@ func _ready():
 	yield(owner, "ready")
 	
 	# Get the default_state
-	var owner_default_state = owner.get("default_state")
-	default_state = get_child(0) if owner_default_state == null else get_node_or_null(owner_default_state)
+	var owner_default_state_name = owner.get("default_state")
+	var owner_default_state = get_node_or_null(owner_default_state_name) if owner_default_state_name != null else null
+	default_state = get_child(0) if owner_default_state == null else owner_default_state
 	
 	# Set the state to be the default one, unless we are in a nested statesmachine
 	# Nested StatesMachines should'nt have a current_state if they are not the current_state of its parent
@@ -174,7 +175,7 @@ func is_current_state() -> bool:
 	if parent is StateBase or (parent.is_class("StatesMachine") && parent.is_nested()):
 		return parent.current_state == self && parent.is_current_state()
 	else:
-		return parent.current_state == self
+		return true
 
 
 #### SIGNAL RESPONSES ####
