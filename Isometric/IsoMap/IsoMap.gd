@@ -93,7 +93,7 @@ func _fetch_ground():
 			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell.x, cell.y, i)
 				
-				if get_cell_slope_type(current_cell) != 0:
+				if get_cell_slope_type(cell, i) != 0:
 					current_cell -= Vector3(0, 0, 0.5)
 				
 				feed_array.append(current_cell)
@@ -247,17 +247,18 @@ func cell_array_to_world(cell_array: PoolVector3Array) -> PoolVector2Array:
 func get_cell2D_highest_z(cell : Vector2) -> float:
 	for i in range(layers_array.size() - 1, -1, -1):
 		if cell in layers_array[i].get_used_cells():
-			if get_cell_slope_type(Vector3(cell.x, cell.y, i)) != 0:
+			if get_cell_slope_type(cell, i) != 0:
 				return i - 0.5
 			else:
 				return float(i)
 	return -1.0
 
 
-func get_cell_slope_type(cell: Vector3) -> int:
-	var layer : IsoMapLayer = get_layer(int(round(cell.z)))
+# Returns the slope type of the given cell2D in the given layer
+func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
+	var layer : IsoMapLayer = get_layer(layer_id)
 	var tileset : TileSet = layer.get_tileset()
-	var tile_id : int = layer.get_cell(int(cell.x), int(cell.y))
+	var tile_id : int = layer.get_cell(cell2D.x, cell2D.y)
 	
 	if !(tile_id in tileset.get_tiles_ids()):
 		return SLOPE_TYPE.NONE
@@ -272,6 +273,10 @@ func get_cell_slope_type(cell: Vector3) -> int:
 		else:
 			return SLOPE_TYPE.SLOPE_RIGHT 
 
+# Returns the cell type of the given cell3D
+func get_cell_slope_type_v3(cell: Vector3) -> int:
+	return get_cell_slope_type(Vector2(cell.x, cell.y), int(round(cell.z)))
+
 
 # Return an array of cells at the given world position 
 # (ie cells that would be displayed at the same position in the screen)
@@ -281,12 +286,12 @@ func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 	if highest_cell != Vector3.INF:
 		cell_stack.append(highest_cell)
 	
-	for z in range(round(highest_cell.z) - 1, -1, -1):
-		var world_pos_adapted = Vector2(world_pos.x, world_pos.y + 16 * z)
-		var cell_2D = layers_array[z].world_to_map(world_pos_adapted)
-		var cell_3D = Vector3(cell_2D.x, cell_2D.y, z)
+	for i in range(round(highest_cell.z) - 1, -1, -1):
+		var world_pos_adapted = Vector2(world_pos.x, world_pos.y + 16 * i)
+		var cell_2D = layers_array[i].world_to_map(world_pos_adapted)
+		var cell_3D = Vector3(cell_2D.x, cell_2D.y, i)
 		
-		if get_cell_slope_type(cell_3D) != 0:
+		if get_cell_slope_type(cell_2D, i) != 0:
 			cell_3D -= Vector3(0, 0, 0.5)
 		
 		if is_position_valid(cell_3D):
@@ -316,7 +321,7 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 		var current_cell_2D = ground_0_cell_2D + Vector2(i, i)
 		var current_cell_3D = Vector3(current_cell_2D.x, current_cell_2D.y, i)
 		
-		if get_cell_slope_type(current_cell_3D) != 0:
+		if get_cell_slope_type(current_cell_2D, i) != 0:
 			current_cell_3D -= Vector3(0, 0, 0.5)
 		
 		if current_cell_3D in grounds:
