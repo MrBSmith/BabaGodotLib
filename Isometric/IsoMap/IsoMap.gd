@@ -242,8 +242,8 @@ func cell_array_to_world(cell_array: PoolVector3Array) -> PoolVector2Array:
 	return pos_array
 
 
-# Return the highest layer where the given cell is used
-# If the given cell is nowhere: return -1
+# Return the highest altitude possible at the given 2D position
+# If the given cell doesn't exist, return -1
 func get_cell2D_highest_z(cell : Vector2) -> float:
 	for i in range(layers_array.size() - 1, -1, -1):
 		if cell in layers_array[i].get_used_cells():
