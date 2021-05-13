@@ -92,8 +92,10 @@ func _fetch_ground():
 		for cell in layers_array[i].get_used_cells():
 			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell.x, cell.y, i)
+				
 				if get_cell_slope_type(current_cell) != 0:
 					current_cell -= Vector3(0, 0, 0.5)
+				
 				feed_array.append(current_cell)
 	
 	# Handle bridges
@@ -135,13 +137,13 @@ func _init_object_grid_pos():
 
 
 # Return the layer at the given height
-func get_layer(height: int) -> IsoMapLayer:
-	return layers_array[height]
+func get_layer(height: float) -> IsoMapLayer:
+	return layers_array[round(height)]
 
 
 # Return the id of the layer at the given height
-func get_layer_id(height: int) -> int:
-	return get_layer(height).get_index()
+func get_layer_id(height: float) -> int:
+	return get_layer(round(height)).get_index()
 
 
 # Count the number of layers
@@ -189,13 +191,10 @@ func get_last_layer() -> IsoMapLayer:
 	return get_previous_layer(get_child_count())
 
 
-
-
-# Return the cell in the ground z grid pointed by the given position
-func world_to_ground_z(pos : Vector2, z : int = 0):
-	pos.y -= z * 16
-	return layers_array[z].world_to_map(pos)
-
+# Takes a world position and a layer id and return the corresponding 2D cell in the given layer
+func world_to_layer_2D_cell(pos : Vector2, layer_id : int = 0) -> Vector2:
+	pos.y -= layer_id * 16
+	return layers_array[layer_id].world_to_map(pos)
 
 
 # Return the actor or obstacle placed on the given cell
