@@ -48,7 +48,10 @@ func get_visible_cells(origin: Vector3, h: int, ran: int, include_self_cell: boo
 
 
 # Update the view field of the given actor by fetching every cells he can see and feed him
-func update_view_field(actor: IsoObject):
+func update_view_field(actor: IsoObject) -> void:
+	if !is_ready: 
+		return
+	
 	var view_range = actor.get_view_range()
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()

@@ -146,7 +146,7 @@ func find_reachable_cells(actor_cell : Vector3, actor_movements : int) -> PoolVe
 		# and if a path exist between the actor's position and it
 		for cell in relatives:
 			if map_node.is_position_valid(cell) && !(cell in reachable_cells):
-
+			
 				# Get the lenght of the path between the actor and the cursor
 				var path_len = len(find_path(actor_cell, cell))
 				if path_len > 0 && path_len - 1 <= actor_movements:
@@ -169,7 +169,7 @@ func find_relatives(point_array : PoolVector3Array, reachable_cells: PoolVector3
 
 		for relative in point_relative:
 			# If the current cell asn't been treated yet
-			var cell3D = map_node.find_2D_cell(relative)
+			var cell3D = map_node.find_2D_cell(relative, map_node.grounds)
 			if not cell3D in reachable_cells:
 				result_array.append(cell3D)
 
@@ -179,8 +179,6 @@ func find_relatives(point_array : PoolVector3Array, reachable_cells: PoolVector3
 # Return the cell index
 func compute_cell_index(cell: Vector3):
 	return abs(cell.x + map_node.grounds.size() * cell.y)
-
-
 
 
 #### SIGNAL RESPONSES ####

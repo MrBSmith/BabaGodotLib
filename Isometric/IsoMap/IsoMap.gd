@@ -16,7 +16,7 @@ onready var layer_0_node = $Layer
 
 var layers_array : Array setget , get_layers_array
 
-var grounds : PoolVector3Array = []
+var grounds := PoolVector3Array()
 var walkable_cells : PoolVector3Array = []
 var obstacles : Array = [] setget set_obstacles, get_obstacles
 
@@ -84,8 +84,7 @@ func _fetch_obstacles():
 	set_obstacles(unpassable_objects)
 
 
-# Get the highest cell of every cells in the 2D plan,
-# Returns a 3 dimentional coordinates array of cells
+# Fetch every accessible cells and store it in grounds
 func _fetch_ground():
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
@@ -211,13 +210,12 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 	return null
 
 
-
 # Take an array of 2D cells and convert it to 3D cells using the height IsoMap
 # Each cell returned in the array is the highest at the given 2D position
 func array2D_to_grid_cells(line2D: Array) -> PoolVector3Array:
 	var cell_array : PoolVector3Array = []
 	for point in line2D:
-		var cell = find_2D_cell(point)
+		var cell = find_2D_cell(point, grounds)
 		if cell != Vector3.INF:
 			cell_array.append(cell)
 	
@@ -258,7 +256,7 @@ func get_cell2D_highest_z(cell : Vector2) -> float:
 func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer : IsoMapLayer = get_layer(layer_id)
 	var tileset : TileSet = layer.get_tileset()
-	var tile_id : int = layer.get_cell(cell2D.x, cell2D.y)
+	var tile_id : int = layer.get_cellv(cell2D)
 	
 	if !(tile_id in tileset.get_tiles_ids()):
 		return SLOPE_TYPE.NONE
@@ -273,6 +271,7 @@ func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 		else:
 			return SLOPE_TYPE.SLOPE_RIGHT 
 
+
 # Returns the cell type of the given cell3D
 func get_cell_slope_type_v3(cell: Vector3) -> int:
 	return get_cell_slope_type(Vector2(cell.x, cell.y), int(round(cell.z)))
@@ -280,6 +279,7 @@ func get_cell_slope_type_v3(cell: Vector3) -> int:
 
 # Return an array of cells at the given world position 
 # (ie cells that would be displayed at the same position in the screen)
+# Not to be confused with a stack of tiles at a given 2D grid coordinates
 func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 	var cell_stack : PoolVector3Array = []
 	var highest_cell = get_pos_highest_cell(world_pos)
@@ -330,6 +330,7 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 	return Vector3.INF
 
 
+# Find if the given world position can be found in the given cell
 func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 	var cell_stack = get_cell_stack_at_pos(pos)
 	for c in cell_stack:
@@ -340,32 +341,21 @@ func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 
 # Check if a position is valid, return true if it is, false if it is not
 func is_position_valid(cell: Vector3) -> bool:
-	var no_obstacle : bool = !is_cell_in_obstacle(cell)
-	var inside_boundes : bool = !is_outside_map_bounds(cell)
-	var is_walkable : bool = cell in walkable_cells
-	var is_slope = int((cell.z) == cell.z)
-	
-	var is_valid = no_obstacle && inside_boundes && is_walkable
-	
-	if !is_slope && !is_valid:
-		return is_position_valid(cell - Vector3(0, 0, 0.5))
-	else:
-		return is_valid
+	return !is_cell_in_obstacle(cell) && is_cell_ground(cell)
 
 
-# Return true if the given cell is outside the IsoMap bounds
-func is_outside_map_bounds(cell: Vector3):
-	return !(cell in grounds)
+# Return true if the given cell exists in the map's accesible tiles
+func is_cell_ground(cell: Vector3) -> bool:
+	return cell in grounds
 
 
 # Find if a cell x and y is in the heightmap grid, and returns it
 # Return Vector3.INF if nothing was found
-static func find_2D_cell(cell : Vector2, grid: PoolVector3Array = grounds) -> Vector3:
+static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
 	for grid_cell in grid:
 		if (cell.x == grid_cell.x) && (cell.y == grid_cell.y):
 			return grid_cell
 	return Vector3.INF
-
 
 
 # Get the adjacent cells of the given one
@@ -379,7 +369,6 @@ func get_existing_adjacent_cells(cell: Vector3) -> PoolVector3Array:
 			adjacents.append(adj)
 	
 	return adjacents
-
 
 
 # Get the adjacents cells of the given one 
@@ -398,6 +387,7 @@ static func get_adjacent_cells(cell: Vector3) -> Array:
 
 func _on_iso_object_cell_changed(_iso_object: IsoObject):
 	pass
+
 
 func _on_iso_object_removed(iso_object: IsoObject):
 	if !iso_object.is_passable():

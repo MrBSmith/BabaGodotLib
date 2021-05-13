@@ -12,7 +12,6 @@ func _ready() -> void:
 		set_visible(false)
 
 
-
 #### SIGNAL RESPONSES ####
 
 func _on_hide_iso_objects_event(hide: bool):
