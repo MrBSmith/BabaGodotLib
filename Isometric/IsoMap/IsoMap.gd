@@ -217,7 +217,7 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 func array2D_to_grid_cells(line2D: Array) -> PoolVector3Array:
 	var cell_array : PoolVector3Array = []
 	for point in line2D:
-		var cell = find_2D_cell_in_grounds(point)
+		var cell = find_2D_cell(point)
 		if cell != Vector3.INF:
 			cell_array.append(cell)
 	
@@ -355,15 +355,12 @@ func is_outside_map_bounds(cell: Vector3):
 
 # Find if a cell x and y is in the heightmap grid, and returns it
 # Return Vector3.INF if nothing was found
-static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
+static func find_2D_cell(cell : Vector2, grid: PoolVector3Array = grounds) -> Vector3:
 	for grid_cell in grid:
 		if (cell.x == grid_cell.x) && (cell.y == grid_cell.y):
 			return grid_cell
 	return Vector3.INF
 
-
-func find_2D_cell_in_grounds(cell: Vector2) -> Vector3:
-	return find_2D_cell(cell, grounds)
 
 
 # Get the adjacent cells of the given one

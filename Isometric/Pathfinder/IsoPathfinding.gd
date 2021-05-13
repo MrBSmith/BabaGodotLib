@@ -169,7 +169,7 @@ func find_relatives(point_array : PoolVector3Array, reachable_cells: PoolVector3
 
 		for relative in point_relative:
 			# If the current cell asn't been treated yet
-			var cell3D = map_node.find_2D_cell_in_grounds(relative)
+			var cell3D = map_node.find_2D_cell(relative)
 			if not cell3D in reachable_cells:
 				result_array.append(cell3D)
 
