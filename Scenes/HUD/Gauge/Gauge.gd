@@ -35,14 +35,15 @@ var is_ready : bool = false
 func is_class(value: String): return value == "gauge" or .is_class(value)
 func get_class() -> String: return "gauge"
 
-func set_gauge_value(value: int, interpol: bool = true):
+func set_gauge_value(value: int, instantanious: bool = true):
 	if !is_ready:
 		yield(self, "ready")
 	
-	if interpol:
-		value_change_feedback(gauge_value, value)
-	else:
+	if instantanious:
 		gauge.set_value(value)
+		feedback_gauge.set_value(value)
+	else:
+		value_change_feedback(gauge_value, value)
 	
 	gauge_value = value
 

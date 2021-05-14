@@ -40,7 +40,6 @@ func _ready() -> void:
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
 	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
 	__ = EVENTS.connect("option_choice_state_entered", self, "_on_option_choice_state_entered")
-	__ = EVENTS.connect("combat_new_turn_started", self, "_on_combat_new_turn_started")
 	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	
 	timer_node = Timer.new()
@@ -108,10 +107,6 @@ func create_description_window(description_data) -> void:
 
 
 #### SIGNAL RESPONSES ####
-
-func _on_combat_new_turn_started(actor: TRPG_Actor):
-	var is_actor_ally = actor.is_team_side(ActorTeam.TEAM_TYPE.ALLY)
-	set_visible(is_actor_ally)
 
 
 func _on_update_unabled_actions(move: bool, attack: bool, item : bool, skill: bool, wait: bool):
