@@ -38,9 +38,10 @@ func _ready() -> void:
 	var __ = EVENTS.connect("update_unabled_actions", self, "_on_update_unabled_actions")
 	__ = EVENTS.connect("disable_actions", self, "_on_disable_actions_event")
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
-	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
 	__ = EVENTS.connect("option_choice_state_entered", self, "_on_option_choice_state_entered")
+	__ = EVENTS.connect("combat_new_turn_started", self, "_on_combat_new_turn_started")
+	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	
 	timer_node = Timer.new()
 	add_child(timer_node)
@@ -108,6 +109,11 @@ func create_description_window(description_data) -> void:
 
 #### SIGNAL RESPONSES ####
 
+func _on_combat_new_turn_started(actor: TRPG_Actor):
+	var is_actor_ally = actor.is_team_side(ActorTeam.TEAM_TYPE.ALLY)
+	set_visible(is_actor_ally)
+
+
 func _on_update_unabled_actions(move: bool, attack: bool, item : bool, skill: bool, wait: bool):
 	if current_menu == menu_root && are_all_columns_empty():
 		yield(self, "option_update_finished")
@@ -174,7 +180,6 @@ func _on_option_focus_changed(option: Control, focused: bool):
 		if obj_ref != null:
 			var descritpion_data = obj_ref.fetch_description_data()
 			create_description_window(descritpion_data)
-	
 	else:
 		if is_instance_valid(description_window):
 			description_window.queue_free()
