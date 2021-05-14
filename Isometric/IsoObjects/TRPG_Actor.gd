@@ -1,14 +1,6 @@
 extends TRPG_DamagableObject
 class_name TRPG_Actor
 
-enum ALERATION_TYPE {
-	SLEEP,
-	POISON,
-	FROZEN,
-	BURNING,
-	DEAD
-}
-
 onready var statesmachine = $States
 onready var move_node = $States/Move
 onready var sfx_node = get_node_or_null("SFX")
@@ -120,7 +112,7 @@ func get_view_range() -> int: return MaxStats.get_view_range() + get_altitude() 
 func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
-		if self.is_in_group("Allies"):
+		if is_team_side(0):
 			EVENTS.emit_signal("visible_cells_changed")
 
 func get_view_field() -> Array: return view_field
@@ -148,7 +140,26 @@ func set_skills(array: Array):
 
 func get_skills() -> Array: return skills
 
-func get_team() -> Node: return get_parent()
+func get_team() -> Node: 
+	var parent = get_parent()
+	if parent.is_class("ActorTeam"):
+		return parent
+	else:
+		return null
+
+func get_team_side():
+	var team = get_team()
+	if team != null:
+		return team.get_team_side()
+	else:
+		return -1
+
+func is_team_side(value: int) -> bool:
+	var team = get_team()
+	if team != null:
+		return team.is_team_side(value)
+	else:
+		return false
 
 func get_default_attack_aoe() -> Resource: return default_attack_aoe
 

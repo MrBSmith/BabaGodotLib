@@ -86,7 +86,8 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 		if obj == null:
 			continue
 		
-		if obj.is_in_group("Enemies") or obj.is_class("Obstacle"):
+		if (obj.is_class("TRPG_Actor") && actor.get_team_side() == obj.get_team_side())\
+			or obj.is_class("Obstacle"):
 			return true
 	
 	return false
@@ -108,8 +109,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 			continue
 		
 		if obj.is_class("TRPG_DamagableObject"):
-			if actor.is_in_group("Allies") && obj.is_in_group("Allies") or \
-				actor.is_in_group("Enemies") && obj.is_in_group("Enemies"):
+			if obj.is_class("TRPG_Actor") && actor.get_team() == obj.get_team():
 				continue
 			
 			if not obj in targetables:
@@ -255,5 +255,5 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 
 
 func on_iso_object_cell_changed(iso_object: IsoObject):
-	if iso_object.is_in_group("Allies"):
+	if iso_object.is_class("TRPG_Actor") && iso_object.is_team_side(ActorTeam.TEAM_TYPE.ALLY):
 		update_view_field(iso_object)
