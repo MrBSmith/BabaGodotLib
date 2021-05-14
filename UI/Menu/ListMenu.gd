@@ -76,7 +76,8 @@ func _ready() -> void:
 
 
 func _setup():
-	yield(self, "ready")
+	if !is_ready:
+		yield(self, "ready")
 	_update_whole_display()
 	
 	for column in column_container.get_children():
@@ -173,11 +174,14 @@ func _update_columns_size():
 		column.set_size(column_container.get_size() / Vector2(column_container.get_child_count(), 1))
 
 
-func instanciate_option(option_data_container: OptionDataContainer) -> Button:
+func instanciate_option(data_container: OptionDataContainer) -> Button:
 	var option = menu_option_scene.instance()
-	option.set_text(option_data_container.name)
+	option.set_text(data_container.name)
+	option.set_amount(data_container.amount)
+	option.set_icon_texture(data_container.icon_texture)
 	
 	return option
+
 
 func clear_options():
 	for column in column_container.get_children():
@@ -202,6 +206,22 @@ func find_option(opt_text: String) -> Button:
 			if option.get_text().capitalize() == opt_text.capitalize() or option.name == opt_text:
 				return option
 	return null
+
+
+func set_option_all_caps(value: bool):
+	for option in get_every_options():
+		option.set_all_caps(value)
+	
+	yield(get_tree(), "idle_frame")
+	
+	for column in column_container.get_children():
+		column.set_margin(MARGIN_LEFT, 0.0) 
+
+
+func disable_every_options(value: bool):
+	for column in column_container.get_children():
+		for option in column.get_children():
+			option.set_disabled(value)
 
 
 func find_sub_menu(menu_name: String) -> Node:

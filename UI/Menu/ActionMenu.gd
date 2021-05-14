@@ -1,8 +1,6 @@
 extends ListMenu
 class_name ActionMenu
 
-const list_menu_scene = preload("res://BabaGodotLib/UI/Menu/ListMenu.tscn") 
-
 onready var window_node = $ResizableWindow
 onready var initial_size = rect_size
 onready var submenu_size = rect_size * 1.5
@@ -11,7 +9,7 @@ export var window_texture : Texture = null setget set_window_texture
 export var options_appear_delay : float = 0.2
 
 var timer_node : Timer = null
-var description_instance : DescriptionWindow = null
+var description_window : DescriptionWindow = null
 
 var action_list : Array = [
 	"Move",
@@ -43,9 +41,9 @@ func _ready() -> void:
 	__ = window_node.connect("resize_animation_finished", self, "_on_window_resize_animation_finished")
 	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
 	__ = EVENTS.connect("option_choice_state_entered", self, "_on_option_choice_state_entered")
+	
 	timer_node = Timer.new()
 	add_child(timer_node)
-
 
 
 
@@ -56,6 +54,7 @@ func _setup():
 		return
 	
 	yield(self, "ready")
+	
 	var option_array = []
 	
 	for string in action_list:
@@ -63,10 +62,7 @@ func _setup():
 		option_array.append(option_data_container)
 	
 	add_sub_menu(option_array)
-	_update_whole_display()
-	
-	for column in column_container.get_children():
-		connect_menu_options(column, false)
+	._setup()
 	
 	for option in get_every_options():
 		option.set_visible(true)
@@ -93,40 +89,17 @@ func option_appear_animation():
 		option.appear()
 
 
-func instanciate_option(data_container: OptionDataContainer) -> Button:
-	var option = menu_option_scene.instance()
-	option.set_text(data_container.name)
-	option.set_amount(data_container.amount)
-	option.set_icon_texture(data_container.icon_texture)
+func create_description_window(description_data) -> void:
+	description_window = description_window_scene.instance()
+	add_child(description_window)
 	
-	return option
-
-
-func generate_submenu():
-	var new_menu = list_menu_scene.instance()
+	description_window.feed(description_data)
 	
-	add_child(new_menu)
-
-
-func set_option_all_caps(value: bool):
-	for option in get_every_options():
-		option.set_all_caps(value)
+	var window_size = initial_size * 2
+	var top_left_corner = $ResizableWindow.get_top_left_corner()
 	
-	yield(get_tree(), "idle_frame")
-	
-	for column in column_container.get_children():
-		column.set_margin(MARGIN_LEFT, 0.0) 
-
-
-func disable_every_actions(value: bool):
-	for option in column_container.get_child(0).get_children():
-		option.set_disabled(value)
-
-
-func destroy_description_window():
-	if description_instance != null:
-		description_instance.queue_free()
-		description_instance = null
+	description_window.set_size(window_size)
+	description_window.set_position(top_left_corner + Vector2(-window_size.x - 4, 0))
 
 
 #### INPUTS ####
@@ -157,7 +130,8 @@ func _on_menu_changed(menu):
 	
 	if menu == menu_root:
 		window_node.trigger_resize_animation(initial_size, CORNER_TOP_LEFT)
-		destroy_description_window()
+		if is_instance_valid(description_window):
+			description_window.queue_free()
 	else:
 		window_node.trigger_resize_animation(submenu_size, CORNER_TOP_LEFT)
 	
@@ -181,11 +155,10 @@ func _on_option_chose(option: MenuOptionsBase):
 		
 		var data_container_obj_ref = option_data_container.object_ref
 		if data_container_obj_ref == null:
-			push_error("The object referenced in the data container of " + option.name + " is null")
+			push_error("The object referenced in the data container of %s is null" % option.name )
 			return
 		
 		EVENTS.emit_signal("combat_effect_object_chosen", data_container_obj_ref)
-
 
 
 func _on_option_focus_changed(option: Control, focused: bool):
@@ -198,37 +171,29 @@ func _on_option_focus_changed(option: Control, focused: bool):
 			print("The given option: " + option.get_name() + " data container couldn't be found")
 		
 		var obj_ref = data_container.object_ref
-		
-		if obj_ref == null: return
-		
-		description_instance = description_window_scene.instance()
-		var descritpion_data = obj_ref.fetch_description_data()
-		
-		add_child(description_instance)
-		
-		description_instance.feed(descritpion_data)
-		
-		var window_size = initial_size * 2
-		var top_left_corner = $ResizableWindow.get_top_left_corner()
-		
-		description_instance.set_size(window_size)
-		description_instance.set_position(top_left_corner + Vector2(-window_size.x - 4, 0))
-		
+		if obj_ref != null:
+			var descritpion_data = obj_ref.fetch_description_data()
+			create_description_window(descritpion_data)
+	
 	else:
-		if description_instance != null:
-			description_instance.queue_free()
-			description_instance = null
+		if is_instance_valid(description_window):
+			description_window.queue_free()
 
 
 func _on_window_resize_animation_finished():
 	_update_columns_size()
 
+
 func _on_disable_actions_event():
-	disable_every_actions(true)
+	disable_every_options(true)
+
 
 func _on_option_choice_state_entered():
-	disable_every_actions(false)
+	disable_every_options(false)
+
 
 func _on_target_choice_state_entered():
-	disable_every_actions(true)
-	destroy_description_window()
+	disable_every_options(true)
+	
+	if is_instance_valid(description_window):
+		description_window.queue_free()
