@@ -55,13 +55,17 @@ func exit_state():
 #### SIGNAL RESPONSES #####
 
 func _on_animation_finished():
-	if states_machine.get_state() != self or !toggle_state_mode or animated_sprite == null:
+	if !is_current_state() or !toggle_state_mode or animated_sprite == null:
 		return
 
 	var sprite_frames = animated_sprite.get_sprite_frames()
-
-	if animated_sprite.get_animation() == "Start" + name:
+	var current_animation = animated_sprite.get_animation()
+	
+	if !name.is_subsequence_ofi(current_animation):
+		return
+	
+	if current_animation == "Start" + name:
 		if sprite_frames != null and sprite_frames.has_animation(name):
 			animated_sprite.play(name)
-	
-	states_machine.set_state(states_machine.previous_state)
+	else:
+		states_machine.set_state(states_machine.previous_state)

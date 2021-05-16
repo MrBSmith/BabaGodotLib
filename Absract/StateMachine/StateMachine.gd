@@ -25,6 +25,10 @@ var default_state : Object = null
 # When this state is entered, if this bool is true, reset the child state to the default one
 export var reset_to_default : bool = false
 
+# Called after the exit_state of the previous_state and before the enter_state of the current_state
+signal state_changing(from_state, to_state)
+
+# Called after the state have changed (After the enter_state callback)
 signal state_changed(state)
 signal substate_changed(state)
 
@@ -96,11 +100,13 @@ func set_state(new_state):
 	previous_state = current_state
 	current_state = new_state
 	
-	emit_signal("state_changed", current_state)
+	emit_signal("state_changing", previous_state, current_state)
 	
 	# Use the enter_state function of the current state
 	if new_state != null && (!is_nested() or new_state.is_current_state()):
 		current_state.enter_state()
+	
+	emit_signal("state_changed", current_state)
 
 
 # Set the state based on the id of the state (id of the node, ie position in the hierachy)

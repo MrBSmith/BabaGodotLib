@@ -38,7 +38,8 @@ func update_actor_animation(actor_dir: int):
 		animated_sprite.play(animation_name)
 	else:
 		yield(get_tree().create_timer(1.0), "timeout")
-		_on_animation_finished()
+		if is_current_state():
+			states_machine.set_state(states_machine.previous_state)
 	
 	# Triggers the AnimationPlayer with the name of this state if one exists 
 	var animation_player : AnimationPlayer = owner.animation_player_node
@@ -57,7 +58,7 @@ func update_actor_animation(actor_dir: int):
 #### SIGNAL RESPONSES ####
 
 func _on_actor_changed_direction(dir: int):
-	if states_machine.get_state() != self:
+	if !is_current_state():
 		 return
 	
 	update_actor_animation(dir)

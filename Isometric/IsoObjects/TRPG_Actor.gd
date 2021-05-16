@@ -231,7 +231,7 @@ func attack(aoe_target: AOE_Target) -> void:
 
 
 func use_item(item: Item, aoe_target: AOE_Target) -> void:
-	set_state("Skill")
+	set_state("Item")
 	apply_combat_effect(item.effect, aoe_target)
 
 
@@ -336,10 +336,8 @@ func _on_state_changed(_new_state: Object):
 
 
 func _on_action_finshed():
-	if get_current_actions() == 0:
-		emit_signal("turn_finished")
-	else:
-		EVENTS.emit_signal("actor_action_finished", self)
+	EVENTS.emit_signal("actor_action_finished", self)
+
 
 func _on_cell_changed(_new_cell: Vector3):
 	EVENTS.emit_signal("actor_cell_changed", self)
