@@ -167,7 +167,8 @@ func exit_state():
 
 
 func update_state(delta: float):
-	current_state.update_state(delta)
+	if current_state != null:
+		current_state.update_state(delta)
 
 
 func is_current_state() -> bool:
