@@ -3,9 +3,15 @@ class_name IsoAnimatedSprite
 
 # A base class for AnimatedSprite used to be rendered by the IsoRenderer
 
+# Make sure to use the property hidden if you want to change the 
+# visiblity of the sprite beeing rendered by the IsoRenderer and not the visible property
+# visible should basicly always be false in a context using the IsoRenderer
+
+export var hidden : bool = false setget set_hidden, is_hidden
+
 signal texture_changed(sprite)
 signal flip_changed(sprite, flipH, flipV)
-signal visible_changed(sprite, value)
+signal hidden_changed(sprite, value)
 
 #### ACCESSORS ####
 
@@ -22,9 +28,11 @@ func set_flip_v(value: bool):
 		.set_flip_v(value)
 		emit_signal("flip_changed", self, flip_h, flip_v)
 
-func set_visible(value: bool):
-	visible = value
-	emit_signal("visible_changed", self, visible)
+func set_hidden(value: bool):
+	hidden = value
+	emit_signal("hidden_changed", self, hidden)
+
+func is_hidden() -> bool: return hidden
 
 #### BUILT-IN ####
 

@@ -247,7 +247,9 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 
 	if targets_array == []:
 		return
-
+	
+	EVENTS.emit_signal("damagable_targeted", targets_array)
+	
 	# Trigger the attack
 	for target in targets_array:
 		var damage_array = CombatEffectHandler.compute_damage(effect, self, target)

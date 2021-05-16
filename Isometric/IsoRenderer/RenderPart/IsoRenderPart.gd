@@ -28,12 +28,12 @@ func _init(obj: Node, sprite_array: Array, cell: Vector3, world_pos: Vector2,
 			var _err = sprite.connect("sprite_texture_changed", self, "_on_sprite_texture_changed")
 		
 		var _err = sprite.connect("flip_changed", self, "_on_sprite_flip_changed")
-		_err = sprite.connect("visible_changed", self, "_on_sprite_visible_changed")
+		_err = sprite.connect("hidden_changed", self, "_on_sprite_hidden_changed")
 		
 		add_child(sprite_node, true)
 		sprite_node.set_name(sprite.name)
 		sprite_node.set_owner(self)
-		sprite_node.set_visible(sprite.is_visible())
+		sprite_node.set_visible(!sprite.is_hidden())
 		var part_texture = AtlasTexture.new()
 		sprite_node.set_texture(part_texture)
 		
@@ -133,6 +133,7 @@ func _on_sprite_texture_changed(sprite: IsoSprite):
 	sprite_node.set_region_rect(sprite.get_region_rect())
 	sprite_node.set_offset(sprite.get_offset())
 
-func _on_sprite_visible_changed(sprite: Node2D, value: bool):
+
+func _on_sprite_hidden_changed(sprite: Node2D, value: bool):
 	var sprite_node = get_node(sprite.name)
-	sprite_node.set_visible(value)
+	sprite_node.set_visible(!value)

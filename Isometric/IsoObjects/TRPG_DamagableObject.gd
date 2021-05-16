@@ -125,10 +125,9 @@ func generate_clickable_area():
 
 # Show the known actors infos
 func show_infos():
-	if is_in_view_field():
-		lifebar.update()
-		lifebar.set_visible(true)
-		emit_signal("focused", self)
+	lifebar.update()
+	lifebar.set_visible(true)
+	emit_signal("focused", self)
 
 # Hide the infos 
 func hide_infos():
@@ -157,7 +156,7 @@ func destroy():
 
 func _on_mouse_entered():
 	mouse_inside = true
-	if not self == owner.active_actor:
+	if not self == owner.active_actor && is_in_view_field():
 		show_infos()
 
 func _on_mouse_exited():

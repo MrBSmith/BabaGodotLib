@@ -104,8 +104,6 @@ func _ready():
 	add_to_group("IsoObject")
 	create()
 	
-	set_visible(false)
-	
 	is_ready = true
 
 
@@ -144,10 +142,18 @@ func trigger_targeted_feedback(positive: bool = false):
 	
 	emit_signal("targeted_feedback_loop_ended")
 
+
+func set_sprites_visible_recursive(value: bool, node: Node) -> void:
+	for child in node.get_children():
+		if child.is_class("IsoSprite") or child.is_class("IsoAnimatedSprite"):
+			child.set_visible(value)
+		
+		set_sprites_visible_recursive(value, child)
+
 #### SIGNAL RESPONSES ####
 
 func _on_hide_iso_objects_event(hide: bool):
-	set_visible(!hide)
+	set_sprites_visible_recursive(!hide, self)
 
 func _on_targeted_feedback_loop_ended():
 	if targeted:
