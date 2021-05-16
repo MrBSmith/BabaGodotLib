@@ -16,8 +16,6 @@ var lifebar : Control
 var clickable_area : Area2D
 var mouse_inside : bool = false
 
-signal focused
-signal unfocused
 signal hurt_animation_finished
 
 #### ACCESSORS ####
@@ -53,8 +51,7 @@ func set_visibility(value: int):
 func _ready():
 	yield(owner, "ready")
 	
-	var _err = connect("focused", owner, "on_object_focused")
-	_err = connect("unfocused", owner, "on_object_unfocused")
+	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
 	
 	set_current_HP(get_max_HP())
 	
@@ -127,12 +124,12 @@ func generate_clickable_area():
 func show_infos():
 	lifebar.update()
 	lifebar.set_visible(true)
-	emit_signal("focused", self)
+	EVENTS.emit_signal("iso_object_focused", self)
 
 # Hide the infos 
 func hide_infos():
 	lifebar.set_visible(false)
-	emit_signal("unfocused", self)
+	EVENTS.emit_signal("iso_object_unfocused", self)
 
 
 func hurt(damage: int):
@@ -146,8 +143,9 @@ func hurt(damage: int):
 	if get_current_HP() == 0:
 		destroy()
 
+
 func destroy():
-	emit_signal("unfocused", self)
+	EVENTS.emit_signal("iso_object_unfocused", self)
 	EVENTS.emit_signal("scatter_object", self, 16)
 	.destroy()
 
@@ -163,3 +161,6 @@ func _on_mouse_exited():
 	mouse_inside = false
 	if not self == owner.active_actor:
 		hide_infos()
+
+func _on_unfocus_all_iso_object_query():
+	hide_infos()
