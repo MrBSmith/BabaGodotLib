@@ -49,6 +49,7 @@ func _ready() -> void:
 	_err = EVENTS.connect("tiles_shake", self, "_on_tiles_shake")
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
+	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
 
 
 #### LOGIC ####
@@ -395,3 +396,7 @@ func _on_appear_transition():
 
 func _on_disappear_transition():
 	disappear_transition()
+
+
+func _on_update_rendered_visible_cells(view_field: Array) -> void:
+	set_visible_cells(view_field)

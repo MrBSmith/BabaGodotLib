@@ -113,7 +113,7 @@ func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
 		if is_team_side(0):
-			EVENTS.emit_signal("visible_cells_changed")
+			EVENTS.emit_signal("visible_cells_changed", self)
 
 func get_view_field() -> Array: return view_field
 func get_view_field_v3_array() -> PoolVector3Array: return PoolVector3Array(view_field[0] + view_field[1])
