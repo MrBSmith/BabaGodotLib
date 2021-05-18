@@ -47,7 +47,8 @@ func go_to_queued_state_by_index(id: int):
 	if id == state_index : return
 	
 	if id < 0 or id > state_queue.size() - 1:
-		print_debug("The given index: " + String(id) + "isn't inside the queue bouderies")
+		push_error("The given index: " + String(id) + "isn't inside the queue bouderies")
+		return
 	
 	state_index = id
 	.set_state(state_queue[id])
@@ -56,7 +57,7 @@ func go_to_queued_state_by_index(id: int):
 # Set the state to the previous one in the queue
 func go_to_previous_state():
 	if state_index == 0:
-		print_debug("There is no previous state - state_index is currently 0")
+		push_warning("There is no previous state - state_index is currently 0")
 		return
 	
 	go_to_queued_state_by_index(state_index - 1)
@@ -65,7 +66,7 @@ func go_to_previous_state():
 # Set the state to the next one in the queue
 func go_to_next_state():
 	if state_index == state_queue.size() - 1:
-		print_debug("There is no next state - the current index is the last of the queue")
+		push_warning("There is no next state - the current index is the last of the queue")
 		return
 	
 	go_to_queued_state_by_index(state_index + 1)
