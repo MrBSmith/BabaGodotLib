@@ -104,6 +104,7 @@ func _ready():
 	add_to_group("IsoObject")
 	create()
 	
+	set_sprites_visible_recursive(false, self)
 	is_ready = true
 
 
