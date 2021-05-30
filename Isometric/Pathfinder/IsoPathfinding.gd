@@ -193,7 +193,7 @@ func _on_actor_moved(_actor: TRPG_Actor, from: Vector3, to: Vector3):
 
 
 func _on_iso_object_removed(iso_object: IsoObject):
-	if iso_object.is_class("Obstacle"):
+	if iso_object.is_class("TRPG_DamagableObject"):
 		var cell = iso_object.get_current_cell()
 		var cell_id = compute_cell_index(cell)
 		astar_node.set_point_disabled(cell_id, false)

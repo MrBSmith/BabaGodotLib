@@ -85,6 +85,7 @@ func generate_lifebar():
 	
 	var sprite_height = texture.get_size().y
 	lifebar.set_position(Vector2(0, -sprite_height - 5))
+	lifebar.shake_feedback_on = true
 	lifebar.set_visible(false)
 	add_child(lifebar)
 
