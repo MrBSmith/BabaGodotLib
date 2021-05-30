@@ -137,7 +137,10 @@ func _init_object_grid_pos():
 
 # Return the layer at the given height
 func get_layer(height: float) -> IsoMapLayer:
-	return layers_array[round(height)]
+	if height >= layers_array.size():
+		return null
+	else:
+		return layers_array[round(height)]
 
 
 # Return the id of the layer at the given height
@@ -344,6 +347,10 @@ func is_cell_free(cell: Vector3) -> bool:
 func is_cell_tile(cell: Vector3) ->  bool:
 	var layer = get_layer(round(cell.z))
 	return layer != null && layer.get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
+
+
+func is_cell_above_ground(cell: Vector3):
+	return is_cell_ground(Vector3(cell.x, cell.y, round(cell.z - 1)))
 
 
 # Return true if the given cell exists in the map's accesible tiles
