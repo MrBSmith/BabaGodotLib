@@ -5,8 +5,7 @@ class_name GameSaver
 # save settings into a config file at the given slot path, create the directory if it doesn't exist
 static func save_game(progression: Node, path : String, save_name : String, slot_id : int, settings: Dictionary):
 	if !DirNavHelper.is_dir_existing(path):
-		var parent_path = path.replacen("/" + save_name, "")
-		DirNavHelper.create_dir(parent_path, save_name)
+		DirNavHelper.create_dir(path)
 	
 	_update_settings_dictionary(progression, settings, save_name, slot_id)
 	save_properties_in_cfg(path + "/settings.cfg", settings)

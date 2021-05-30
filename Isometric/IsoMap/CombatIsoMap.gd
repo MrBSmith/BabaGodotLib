@@ -24,7 +24,9 @@ func draw_movement_area():
 
 
 # Get the reachable cells in the given range. Returns a PoolVector3Array of visible & reachable cells
-func get_visible_cells(origin: Vector3, h: int, ran: int, include_self_cell: bool = false) -> PoolVector3Array:
+func get_visible_cells(origin: Vector3, h: int, ran: int, 
+			include_self_cell: bool = false, obj_ignored : Array = []) -> PoolVector3Array:
+	
 	var ranged_cells = get_cells_in_circle(origin, ran)
 
 	var visible_cells := PoolVector3Array()
@@ -33,16 +35,17 @@ func get_visible_cells(origin: Vector3, h: int, ran: int, include_self_cell: boo
 		visible_cells.append(origin)
 	
 	for i in range(ranged_cells.size()):
-		var cell = ranged_cells[-i - 1]
+		var cell = ranged_cells[-i - 1] + Vector3(0, 0, 1)
 		
 		if cell in visible_cells: continue
 		
-		var line = IsoRaycast.get_line(self, origin, cell.round())
-		var valid_cells = IsoRaycast.get_line_of_sight(self, h, line)
+		var valid_cells = IsoRaycast.get_line_of_sight(self, origin + Vector3(0, 0, h), cell.round(), obj_ignored)
 		
 		for c in valid_cells:
-			if (not c in visible_cells) && c in ranged_cells:
+			if is_cell_ground(c):
 				visible_cells.append(c)
+			elif is_cell_above_ground(c):
+				visible_cells.append(c - Vector3(0, 0, 1))
 	
 	return visible_cells
 
@@ -56,7 +59,7 @@ func update_view_field(actor: IsoObject) -> void:
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	
-	var visible_cells = Array(get_visible_cells(actor_cell, actor_height, view_range, true))
+	var visible_cells = Array(get_visible_cells(actor_cell, actor_height, view_range, true, [actor]))
 	var barely_visible_cells = Array()
 	
 	for cell in visible_cells:

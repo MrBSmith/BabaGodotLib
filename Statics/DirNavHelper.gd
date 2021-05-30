@@ -10,22 +10,25 @@ enum DIR_FETCH_MODE {
 }
 
 # Create the directories 
-static func create_dir(dir_path : String, dir_to_create : String):
+static func create_dir(dir_path : String):
 	var dir = Directory.new()
 	
-	if !is_dir_existing(dir_path):
-		dir.open("res://")
-		dir.make_dir(dir_path)
+	var dir_path_mod = dir_path.replacen("res://", "")
+	var splited_path : PoolStringArray = dir_path_mod.split("")
+	var dir_to_create = splited_path[-1]
+	splited_path.remove(splited_path.size() - 1)
+	var parent_path = "res://" + splited_path.join("/")
 	
-	if !is_dir_existing(dir_path + "/" + dir_to_create):
-		if debug:
-			print("DIRECTORY DOES NOT EXIST. Creating one in " + dir_path + "...")
+	if !is_dir_existing(parent_path):
+		dir.open("res://")
+		dir.make_dir(parent_path)
+	
+	if !is_dir_existing(dir_path):
 		dir.open(dir_path)
 		dir.make_dir(dir_to_create)
 		
-		var created_directory_path : String = dir_path + "/" + dir_to_create
 		if debug:
-			print("Done ! Directory can in be found in : " + created_directory_path)
+			print("Done ! Directory can in be found in : " + dir_path)
 
 
 # Check if the directory at the given path exists or not
