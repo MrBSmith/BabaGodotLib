@@ -197,6 +197,7 @@ func world_to_layer_2D_cell(pos : Vector2, layer_id : int = 0) -> Vector2:
 
 
 # Return the actor or obstacle placed on the given cell
+# Works also if the cell is one of the cell the body of the object is in
 # Return null if the cell is empty
 func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 	var damagable_array = get_tree().get_nodes_in_group("IsoObject")
@@ -205,7 +206,10 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 		if not object is TRPG_DamagableObject:
 			continue
 		
-		if object.get_current_cell() == cell:
+		var obj_cell = object.get_current_cell()
+		
+		if obj_cell.x == cell.x && obj_cell.y == cell.y && \
+		cell.z >= obj_cell.z && cell.z <= obj_cell.z + object.get_height():
 			return object
 	return null
 
@@ -330,6 +334,23 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 	return Vector3.INF
 
 
+# Check if the cell is empty (ie there is no tile nor obstacle on it)
+func is_cell_free(cell: Vector3) -> bool:
+	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null
+
+
+# Returns true is the given cell is one of the tile of one of the layers constiting the map
+# Unless is_cell_ground this function will return true even if the tile isn't an accecible one
+func is_cell_tile(cell: Vector3) ->  bool:
+	var layer = get_layer(round(cell.z))
+	return layer != null && layer.get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
+
+
+# Return true if the given cell exists in the map's accesible tiles
+func is_cell_ground(cell: Vector3) -> bool:
+	return cell in grounds
+
+
 # Find if the given world position can be found in the given cell
 func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 	var cell_stack = get_cell_stack_at_pos(pos)
@@ -343,10 +364,6 @@ func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 func is_position_valid(cell: Vector3) -> bool:
 	return !is_cell_in_obstacle(cell) && is_cell_ground(cell)
 
-
-# Return true if the given cell exists in the map's accesible tiles
-func is_cell_ground(cell: Vector3) -> bool:
-	return cell in grounds
 
 
 # Find if a cell x and y is in the heightmap grid, and returns it
