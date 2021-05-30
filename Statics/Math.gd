@@ -10,6 +10,7 @@ static func randi_range(min_value: int, max_value: int) -> int:
 	return randi() % ((max_value - min_value) + 1) + min_value
 
 
+
 #### VECTOR2 ####
 
 # Invert x and y members of the given Vector2

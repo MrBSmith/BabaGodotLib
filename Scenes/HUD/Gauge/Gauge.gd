@@ -50,6 +50,8 @@ func set_gauge_value(value: int, instantanious: bool = true):
 func get_gauge_value() -> int: return gauge_value
 
 func set_gauge_max_value(value: int): 
+	if !is_ready:
+		yield(self, "ready")
 	gauge_max_value = value
 	gauge.set_max(gauge_max_value)
 	feedback_gauge.set_max(gauge_max_value)

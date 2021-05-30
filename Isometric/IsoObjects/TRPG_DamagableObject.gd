@@ -6,7 +6,7 @@ onready var animated_sprite_node = get_node_or_null("AnimatedSprite")
 onready var animation_player_node = get_node_or_null("AnimationPlayer")
 onready var lifebar_scene = load(lifebar_scene_path)
 
-export var lifebar_scene_path = "res://Scenes/Combat/LifeBar/LifeBar.tscn"
+export var lifebar_scene_path = "res://Scenes/Actors/Gauge/DamagableSmallGauge.tscn"
 export var defense : int = 0 setget set_defense, get_defense
 
 export var max_HP : int = 0 setget set_max_HP, get_max_HP
@@ -17,6 +17,7 @@ var clickable_area : Area2D
 var mouse_inside : bool = false
 
 signal hurt_animation_finished
+signal hp_changed
 
 #### ACCESSORS ####
 
@@ -26,11 +27,17 @@ func get_class() -> String: return "TRPG_DamagableObject"
 func set_current_HP(value: int):
 	if value >= 0 && value <= get_max_HP() && value != current_HP:
 		current_HP = value
+		if !is_ready:
+			yield(self, "ready")
+		emit_signal("hp_changed", get_current_HP(), get_max_HP())
 
 func get_current_HP() -> int: return current_HP
 
 func set_max_HP(value: int):
 	max_HP = value
+	if !is_ready:
+		yield(self, "ready")
+	emit_signal("hp_changed", get_current_HP(), get_max_HP())
 
 func get_max_HP() -> int: return max_HP
 
@@ -133,7 +140,7 @@ func hide_infos():
 
 
 func hurt(damage: int):
-	set_current_HP(get_current_HP() - damage)
+	set_current_HP(Math.clampi(get_current_HP() - damage, 0, get_max_HP()))
 	$AnimationPlayer.play("RedFlash")
 	yield($AnimationPlayer, "animation_finished")
 	
