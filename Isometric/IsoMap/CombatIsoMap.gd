@@ -28,7 +28,10 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 			include_self_cell: bool = false, obj_ignored : Array = []) -> PoolVector3Array:
 	
 	var ranged_cells = get_cells_in_circle(origin, ran)
-
+	
+	if !owner.fog_of_war:
+		return ranged_cells
+	
 	var visible_cells := PoolVector3Array()
 	
 	if include_self_cell:
@@ -259,4 +262,5 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 
 func on_iso_object_cell_changed(iso_object: IsoObject):
 	if iso_object.is_class("TRPG_Actor") && iso_object.is_team_side(ActorTeam.TEAM_TYPE.ALLY):
-		update_view_field(iso_object)
+		if owner.fog_of_war:
+			update_view_field(iso_object)
