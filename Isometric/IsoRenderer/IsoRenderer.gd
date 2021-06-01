@@ -14,7 +14,7 @@ class_name IsoRenderer
 # the renderer is informed by the iso_object_cell_changed, iso_object_added & iso_object_removed signals. 
 # This is why it is mandatory to use IsoObject inherited objects for it to work with this renderer
 
-const TILE_SIZE = Vector2(32, 32)
+const TILE_SIZE = Vector2(32, 16)
 
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
@@ -91,9 +91,9 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * TILE_SIZE), TILE_SIZE))
 	
 	# Set the texture to the right position
-	var height_offset = Vector2(0, -16) * (round(height) - 1)
+	var height_offset = Vector2(0, -(TILE_SIZE.y / 2)) * (round(height) - 1)
 	var texture_offset = tileset.tile_get_texture_offset(tile_id)
-	var offset = height_offset + texture_offset
+	var offset = texture_offset + height_offset
 	var pos = tilemap.map_to_world(cell)
 	
 	var render_part = TileRenderPart.new(tilemap, atlas_texture, cell_3D, pos, 0, offset)
