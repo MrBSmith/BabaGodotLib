@@ -14,8 +14,6 @@ class_name IsoRenderer
 # the renderer is informed by the iso_object_cell_changed, iso_object_added & iso_object_removed signals. 
 # This is why it is mandatory to use IsoObject inherited objects for it to work with this renderer
 
-const TILE_SIZE = Vector2(32, 16)
-
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
 
@@ -79,6 +77,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 	var tile_region = tileset.tile_get_region(tile_id)
 	var tile_tileset_pos = tile_region.position
 	var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
+	var subtile_size = tileset.autotile_get_size(tile_id)
 	
 	# Get the texture
 	var tile_mode = tileset.tile_get_tile_mode(tile_id)
@@ -88,10 +87,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 	if tile_mode == tileset.SINGLE_TILE:
 		atlas_texture.set_region(tile_region)
 	else:
-		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * TILE_SIZE), TILE_SIZE))
+		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size), subtile_size))
 	
 	# Set the texture to the right position
-	var height_offset = Vector2(0, -(TILE_SIZE.y / 2)) * (round(height) - 1)
+	var height_offset = Vector2(0, -(subtile_size.y / 2)) * (round(height) - 1)
 	var texture_offset = tileset.tile_get_texture_offset(tile_id)
 	var offset = texture_offset + height_offset
 	var pos = tilemap.map_to_world(cell)
