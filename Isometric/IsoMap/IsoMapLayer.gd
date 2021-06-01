@@ -7,6 +7,8 @@ signal tile_removed(tile)
 
 const print_log : bool = true
 
+var tile_added_in_tick := false
+
 # A base class to represent a IsoMapLayer
 
 func _ready() -> void:
@@ -17,7 +19,7 @@ func _ready() -> void:
 	
 	var __ = connect("tile_added", self , "_on_tile_added")
 	__ = connect("tile_removed", self , "_on_tile_removed")
-
+	__ = get_tree().connect("idle_frame", self, "_on_idle_frame")
 
 # Built-in funciton_overide
 func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
@@ -34,6 +36,7 @@ func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
 			emit_signal("tile_removed", cell)
 	
 	.set_cell(x, y, tile_id, transpose, flip_h, flip_v, subtile_pos)
+	tile_added_in_tick = true
 
 
 #### LOGIC ####
@@ -78,6 +81,15 @@ func _update_walls(tile: Vector2) -> void:
 			print_debug("No corresponding wall tile was found")
 
 
+func _update_tile_neighbours(tile: Vector2) -> void:
+	for i in range(4):
+		var vertical = i % 2 == 0
+		var dir_sign = int(i <= 1) * 2 - 1
+		var dir = Vector2(int(!vertical), int(vertical)) * dir_sign
+		
+		if (tile + dir) in get_used_cells():
+			_update_walls(tile + dir)
+
 #### INPUTS ####
 
 
@@ -90,23 +102,26 @@ func _on_hide_iso_objects_event(hide: bool) -> void:
 func _on_tile_added(tile: Vector2) -> void:
 	if print_log:
 		print_debug("Tile added a cell %s" % String(tile))
-	_update_walls(tile)
 	
-	# Update neighbours
-	for i in range(4):
-		var vertical = i % 2 == 0
-		var dir_sign = int(i <= 1) * 2 - 1
-		var dir = Vector2(int(!vertical), int(vertical)) * dir_sign
-		
-		if (tile + dir) in get_used_cells():
-			_update_walls(tile + dir)
+	yield(get_tree(), "idle_frame")
+	
+	_update_walls(tile)
+	_update_tile_neighbours(tile)
+
 
 
 func _on_tile_removed(tile: Vector2) -> void:
 	if print_log:
 		print_debug("Tile removed a cell %s" % String(tile))
 	
+	yield(get_tree(), "idle_frame")
+	
 	for i in range(2):
 		var current_wall_tilemap = $WestWall if i == 0 else $EastWall
 		current_wall_tilemap.set_cell(tile.x, tile.y, -1,
 			false, false, false, Vector2.ZERO)
+	
+	_update_tile_neighbours(tile)
+
+func _on_idle_frame():
+	tile_added_in_tick = false
