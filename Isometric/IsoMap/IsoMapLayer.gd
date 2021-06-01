@@ -5,6 +5,8 @@ class_name IsoMapLayer
 signal tile_added(tile)
 signal tile_removed(tile)
 
+const print_log : bool = true
+
 # A base class to represent a IsoMapLayer
 
 func _ready() -> void:
@@ -25,7 +27,7 @@ func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
 	var cell = Vector2(x, y)
 	
 	if tile_id != -1:
-		if tile_id in get_tileset().get_tiles_ids():
+		if tile_id in get_tileset().get_tiles_ids() && not cell in get_used_cells():
 			emit_signal("tile_added", cell)
 	else:
 		if cell in get_used_cells():
@@ -47,7 +49,8 @@ func _update_walls(tile: Vector2) -> void:
 	var wall_tile_id = -1
 	for current_tile_id in tiles_id_array:
 		var current_tile_name = tileset.tile_get_name(current_tile_id)
-		if current_tile_name == tile_name + "Wall":
+		if "wall".is_subsequence_ofi(current_tile_name) \
+		&& tile_name.is_subsequence_ofi(current_tile_name):
 			wall_tile_id = current_tile_id
 			break
 	
@@ -64,6 +67,15 @@ func _update_walls(tile: Vector2) -> void:
 			
 			current_wall_tilemap.set_cell(tile.x, tile.y, tile_to_place,
 						false, false, false, subtile_pos)
+			
+			if print_log:
+				if current_wall_tilemap == $WestWall:
+					print("Added a west wall a cell %s" % String(tile))
+				elif current_wall_tilemap == $EastWall:
+					print("Added a east wall a cell %s" % String(tile))
+	else:
+		if print_log:
+			print_debug("No corresponding wall tile was found")
 
 
 #### INPUTS ####
@@ -76,9 +88,9 @@ func _on_hide_iso_objects_event(hide: bool) -> void:
 
 
 func _on_tile_added(tile: Vector2) -> void:
+	if print_log:
+		print_debug("Tile added a cell %s" % String(tile))
 	_update_walls(tile)
-	
-	yield(get_tree(), "idle_frame")
 	
 	# Update neighbours
 	for i in range(4):
@@ -91,6 +103,9 @@ func _on_tile_added(tile: Vector2) -> void:
 
 
 func _on_tile_removed(tile: Vector2) -> void:
+	if print_log:
+		print_debug("Tile removed a cell %s" % String(tile))
+	
 	for i in range(2):
 		var current_wall_tilemap = $WestWall if i == 0 else $EastWall
 		current_wall_tilemap.set_cell(tile.x, tile.y, -1,

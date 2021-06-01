@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://BabaGodotLib/Isometric/IsoMap/IsoMapLayer.gd" type="Script" id=1]
+[ext_resource path="res://Environement/TileSet/InsideTower.tres" type="TileSet" id=3]
+
+[node name="Layer" type="TileMap"]
+mode = 1
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 32, 16 )
+cell_tile_origin = 1
+format = 1
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="WestWall" type="TileMap" parent="."]
+z_index = -1
+mode = 1
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 32, 16 )
+format = 1
+
+[node name="EastWall" type="TileMap" parent="."]
+process_priority = -1
+mode = 1
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 32, 16 )
+format = 1
