@@ -70,7 +70,7 @@ static func vec2_to_dir(vec: Vector2) -> int:
 
 
 # Get every cells at the given distance in a 2D plane
-func get_cells_in_circle(origin: Vector3, radius: int) -> PoolVector3Array:
+static func get_cells_in_circle(origin: Vector3, radius: int) -> PoolVector3Array:
 	var cells_in_range := PoolVector3Array()
 	var top_left_corner = origin - Vector3(radius, radius, 0)
 	
@@ -85,7 +85,7 @@ func get_cells_in_circle(origin: Vector3, radius: int) -> PoolVector3Array:
 
 
 # Get every cells at the given distance in a 3D space
-func get_cells_in_sphere(origin: Vector3, radius: int) -> PoolVector3Array:
+static func get_cells_in_sphere(origin: Vector3, radius: int) -> PoolVector3Array:
 	var cells_in_range := PoolVector3Array()
 	var top_left_corner = origin - Vector3.ONE * radius
 	

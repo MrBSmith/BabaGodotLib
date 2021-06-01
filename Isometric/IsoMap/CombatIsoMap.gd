@@ -27,7 +27,7 @@ func draw_movement_area():
 func get_visible_cells(origin: Vector3, h: int, ran: int, 
 			include_self_cell: bool = false, obj_ignored : Array = []) -> PoolVector3Array:
 	
-	var ranged_cells = get_walkable_cells_in_circle(origin, ran)
+	var ranged_cells = IsoLogic.get_cells_in_sphere(origin, ran - 1)
 	
 	if !owner.fog_of_war:
 		return ranged_cells
@@ -38,17 +38,14 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 		visible_cells.append(origin)
 	
 	for i in range(ranged_cells.size()):
-		var cell = ranged_cells[-i - 1] + Vector3(0, 0, 1)
+		var cell = ranged_cells[-i - 1]
 		
 		if cell in visible_cells: continue
 		
 		var valid_cells = IsoRaycast.get_line_of_sight(self, origin + Vector3(0, 0, h), cell.round(), obj_ignored)
 		
 		for c in valid_cells:
-			if is_cell_ground(c):
-				visible_cells.append(c)
-			elif is_cell_above_ground(c):
-				visible_cells.append(c - Vector3(0, 0, 1))
+			visible_cells.append(c)
 	
 	return visible_cells
 
@@ -97,7 +94,6 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 			return true
 	
 	return false
-
 
 
 # Get every TRPG_DamagableObject in range of the given actor that is not in same team

@@ -137,7 +137,7 @@ func _init_object_grid_pos():
 
 # Return the layer at the given height
 func get_layer(height: float) -> IsoMapLayer:
-	if height >= layers_array.size():
+	if height >= layers_array.size() or height < 0:
 		return null
 	else:
 		return layers_array[round(height)]
