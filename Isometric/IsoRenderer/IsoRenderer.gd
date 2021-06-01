@@ -72,6 +72,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 	var tileset = tilemap.get_tileset()
 	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
+	var tile_size = tilemap.get_cell_size()
 	
 	var cell_offset = Vector3(int(east_wall), int(!east_wall), -int(is_wall)) if is_wall else Vector3.ZERO
 	var cell_3D = Vector3(cell.x, cell.y, height) + cell_offset
@@ -94,9 +95,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size), subtile_size))
 	
 	# Set the texture to the right position
-	var height_offset = Vector2(0, -(subtile_size.y / 2)) * (round(height) - 1)
+	var layer_offset = Vector2(0, -tile_size.y) * round(height) 
+	var height_offset = Vector2(0, round(subtile_size.y / 2))
 	var texture_offset = tileset.tile_get_texture_offset(tile_id)
-	var offset = texture_offset + height_offset
+	var offset = texture_offset + layer_offset + height_offset
 	var pos = tilemap.map_to_world(cell)
 	
 	var render_part = TileRenderPart.new(tilemap, atlas_texture, cell_3D, pos, 0, offset)

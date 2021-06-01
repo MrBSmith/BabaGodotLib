@@ -15,7 +15,7 @@ __meta__ = {
 }
 
 [node name="WestWall" type="TileMap" parent="."]
-z_index = -1
+show_behind_parent = true
 mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
@@ -23,6 +23,7 @@ format = 1
 
 [node name="EastWall" type="TileMap" parent="."]
 process_priority = -1
+show_behind_parent = true
 mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )

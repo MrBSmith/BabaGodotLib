@@ -36,6 +36,13 @@ func get_obstacles() -> Array: return obstacles
 
 func get_layers_array() -> Array: return layers_array
 
+func get_tilemaps_recursive(array: Array, node: Node) -> void:
+	for child in node.get_children():
+		if child is TileMap && not child in array:
+			array.append(child)
+			if child.get_child_count() > 0:
+				get_tilemaps_recursive(array, child)
+
 #### BUILT IN ####
 
 func _ready():
@@ -74,7 +81,7 @@ func _ready():
 #### LOGIC ####
 
 # Get every unpassable object form the IsoObject group 
-func _fetch_obstacles():
+func _fetch_obstacles() -> void:
 	var iso_object_array = get_tree().get_nodes_in_group("IsoObject")
 	var unpassable_objects : Array = []
 	for object in iso_object_array:
@@ -85,7 +92,7 @@ func _fetch_obstacles():
 
 
 # Fetch every accessible cells and store it in grounds
-func _fetch_ground():
+func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
 		for cell in layers_array[i].get_used_cells():
@@ -116,9 +123,9 @@ func _fetch_ground():
 	grounds = feed_array
 
 
-func _fetch_layers():
+func _fetch_layers() -> void:
 	for child in get_children():
-		if child is IsoMapLayer && not child in layers_array:
+		if child is IsoMapLayer:
 			layers_array.append(child)
 
 
