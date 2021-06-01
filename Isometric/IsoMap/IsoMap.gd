@@ -36,6 +36,13 @@ func get_obstacles() -> Array: return obstacles
 
 func get_layers_array() -> Array: return layers_array
 
+func get_tilemaps_recursive(array: Array, node: Node) -> void:
+	for child in node.get_children():
+		if child is TileMap && not child in array:
+			array.append(child)
+			if child.get_child_count() > 0:
+				get_tilemaps_recursive(array, child)
+
 #### BUILT IN ####
 
 func _ready():
@@ -74,7 +81,7 @@ func _ready():
 #### LOGIC ####
 
 # Get every unpassable object form the IsoObject group 
-func _fetch_obstacles():
+func _fetch_obstacles() -> void:
 	var iso_object_array = get_tree().get_nodes_in_group("IsoObject")
 	var unpassable_objects : Array = []
 	for object in iso_object_array:
@@ -85,7 +92,7 @@ func _fetch_obstacles():
 
 
 # Fetch every accessible cells and store it in grounds
-func _fetch_ground():
+func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
 		for cell in layers_array[i].get_used_cells():
@@ -116,9 +123,9 @@ func _fetch_ground():
 	grounds = feed_array
 
 
-func _fetch_layers():
+func _fetch_layers() -> void:
 	for child in get_children():
-		if child is IsoMapLayer && not child in layers_array:
+		if child is IsoMapLayer:
 			layers_array.append(child)
 
 
@@ -137,7 +144,7 @@ func _init_object_grid_pos():
 
 # Return the layer at the given height
 func get_layer(height: float) -> IsoMapLayer:
-	if height >= layers_array.size():
+	if height >= layers_array.size() or height < 0:
 		return null
 	else:
 		return layers_array[round(height)]
@@ -262,6 +269,9 @@ func get_cell2D_highest_z(cell : Vector2) -> float:
 # Returns the slope type of the given cell2D in the given layer
 func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer : IsoMapLayer = get_layer(layer_id)
+	if layer == null:
+		return SLOPE_TYPE.NONE
+	
 	var tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
@@ -405,6 +415,17 @@ static func get_adjacent_cells(cell: Vector3) -> Array:
 		Vector2(cell.x - 1, cell.y),
 		Vector2(cell.x, cell.y - 1)
 	]
+
+
+static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
+	var result_array := PoolVector3Array()
+	var v2_adjacent = get_adjacent_cells(cell)
+	
+	for adj in v2_adjacent:
+		var point = Vector3(adj.x, adj.y, cell.z)
+		result_array.append(point)
+	return result_array
+
 
 
 #### SIGNAL RESPONSES ####

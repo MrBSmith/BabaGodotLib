@@ -27,7 +27,7 @@ func draw_movement_area():
 func get_visible_cells(origin: Vector3, h: int, ran: int, 
 			include_self_cell: bool = false, obj_ignored : Array = []) -> PoolVector3Array:
 	
-	var ranged_cells = get_cells_in_circle(origin, ran)
+	var ranged_cells = IsoLogic.get_cells_in_sphere(origin, ran - 1)
 	
 	if !owner.fog_of_war:
 		return ranged_cells
@@ -38,17 +38,14 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 		visible_cells.append(origin)
 	
 	for i in range(ranged_cells.size()):
-		var cell = ranged_cells[-i - 1] + Vector3(0, 0, 1)
+		var cell = ranged_cells[-i - 1]
 		
 		if cell in visible_cells: continue
 		
 		var valid_cells = IsoRaycast.get_line_of_sight(self, origin + Vector3(0, 0, h), cell.round(), obj_ignored)
 		
 		for c in valid_cells:
-			if is_cell_ground(c):
-				visible_cells.append(c)
-			elif is_cell_above_ground(c):
-				visible_cells.append(c - Vector3(0, 0, 1))
+			visible_cells.append(c)
 	
 	return visible_cells
 
@@ -99,14 +96,13 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 	return false
 
 
-
 # Get every TRPG_DamagableObject in range of the given actor that is not in same team
 # You can pass a actor_cell as an argument if you whant to check the targetables the actor would have
 # If it was on the given cell, if nothing is passed, the function will use the current_cell of the actor
 func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell := Vector3.INF) -> Array:
 	var targetables = []
 	if actor_cell == Vector3.INF: actor_cell = actor.get_current_cell()
-	var reachables = get_cells_in_circle(actor_cell, actor_range + 1, true)
+	var reachables = get_walkable_cells_in_circle(actor_cell, actor_range + 1, true)
 	
 	for cell in reachables:
 		var obj = get_damagable_on_cell(cell)
@@ -134,7 +130,7 @@ func count_reachable_enemies(actor: TRPG_Actor, cell:= Vector3.INF) -> int:
 
 
 # Return every cells at the given dist or more from the origin in the given array
-func get_cells_in_circle(origin: Vector3, radius: int, ignore_origin: bool = false,
+func get_walkable_cells_in_circle(origin: Vector3, radius: int, ignore_origin: bool = false,
 		cells_array: PoolVector3Array = walkable_cells) -> PoolVector3Array:
 	var cells_at_dist = PoolVector3Array()
 	for cell in cells_array:
@@ -240,7 +236,7 @@ func get_cells_in_area(aoe_target: AOE_Target) -> PoolVector3Array:
 	match(aoe_target.aoe.area_type.name):
 		"LineForward": return get_cells_in_straight_line(origin_cell, aoe.area_size, dir)
 		"LnePerpendicular": return get_cell_in_perpendicular_line(origin_cell, aoe.area_size, dir)
-		"Circle": return get_cells_in_circle(target_cell, aoe.area_size)
+		"Circle": return get_walkable_cells_in_circle(target_cell, aoe.area_size)
 		"Square": return get_cells_in_square(target_cell, aoe.area_size, aoe_dir)
 	
 	return PoolVector3Array()
