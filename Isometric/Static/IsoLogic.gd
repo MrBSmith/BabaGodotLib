@@ -67,3 +67,34 @@ static func vec2_to_dir(vec: Vector2) -> int:
 		Vector2(0, -1): return DIRECTION.TOP_RIGHT
 		Vector2(-1, 0): return DIRECTION.TOP_LEFT 
 	return -1
+
+
+# Get every cells at the given distance in a 2D plane
+func get_cells_in_circle(origin: Vector3, radius: int) -> PoolVector3Array:
+	var cells_in_range := PoolVector3Array()
+	var top_left_corner = origin - Vector3(radius, radius, 0)
+	
+	for i in range(radius * 2 + 1):
+		for j in range (radius * 2 + 1):
+			var cell = top_left_corner + Vector3(i, j, 0)
+			var dist = iso_2D_dist(origin, cell)
+			if dist <= radius:
+				cells_in_range.append(cell)
+	
+	return cells_in_range
+
+
+# Get every cells at the given distance in a 3D space
+func get_cells_in_sphere(origin: Vector3, radius: int) -> PoolVector3Array:
+	var cells_in_range := PoolVector3Array()
+	var top_left_corner = origin - Vector3.ONE * radius
+	
+	for i in range(radius * 2 + 1):
+		for j in range(radius * 2 + 1):
+			for k in range(radius * 2 + 1):
+				var cell = top_left_corner + Vector3(i, j, k)
+				var dist = iso_3D_dist(origin, cell)
+				if dist <= radius:
+					cells_in_range.append(cell)
+	
+	return cells_in_range

@@ -262,6 +262,9 @@ func get_cell2D_highest_z(cell : Vector2) -> float:
 # Returns the slope type of the given cell2D in the given layer
 func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer : IsoMapLayer = get_layer(layer_id)
+	if layer == null:
+		return SLOPE_TYPE.NONE
+	
 	var tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
@@ -405,6 +408,17 @@ static func get_adjacent_cells(cell: Vector3) -> Array:
 		Vector2(cell.x - 1, cell.y),
 		Vector2(cell.x, cell.y - 1)
 	]
+
+
+static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
+	var result_array := PoolVector3Array()
+	var v2_adjacent = get_adjacent_cells(cell)
+	
+	for adj in v2_adjacent:
+		var point = Vector3(adj.x, adj.y, cell.z)
+		result_array.append(point)
+	return result_array
+
 
 
 #### SIGNAL RESPONSES ####
