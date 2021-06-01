@@ -71,7 +71,10 @@ func init_rendering_queue(layers_array: Array, objects_array: Array):
 func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 	var tileset = tilemap.get_tileset()
 	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
-	var cell_3D = Vector3(cell.x, cell.y, height - 1 * int(is_wall))
+	var east_wall = "East".is_subsequence_ofi(tilemap.name)
+	
+	var cell_offset = Vector3(int(east_wall), int(!east_wall), -int(is_wall)) if is_wall else Vector3.ZERO
+	var cell_3D = Vector3(cell.x, cell.y, height) + cell_offset
 	
 	# Get the tile id and the position of the cell in the autotile
 	var tile_id = tilemap.get_cellv(cell)
