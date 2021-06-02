@@ -59,16 +59,19 @@ func init_rendering_queue(layers_array: Array, objects_array: Array):
 			add_cell_to_queue(cell, layers_array[i], height)
 		
 		for child in layers_array[i].get_children():
+			var scatter = "obstacle".is_subsequence_ofi(child.name)
 			for cell in child.get_used_cells():
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
-				add_cell_to_queue(cell, child, height)
+				add_cell_to_queue(cell, child, height, scatter)
 	
 	for obj in objects_array:
 		add_iso_obj(obj)
 
 
 # Add the given cell to te rendering queue
-func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
+func add_cell_to_queue(cell: Vector2, tilemap: TileMap, 
+			height: float, scatter: bool = false) -> void:
+	
 	var tileset = tilemap.get_tileset()
 	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
@@ -79,31 +82,38 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
 	
 	# Get the tile id and the position of the cell in the autotile
 	var tile_id = tilemap.get_cellv(cell)
+	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var tile_region = tileset.tile_get_region(tile_id)
 	var tile_tileset_pos = tile_region.position
-	var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
-	var subtile_size = tileset.autotile_get_size(tile_id)
+	var subtile_size = tileset.autotile_get_size(tile_id) if tile_mode != TileSet.SINGLE_TILE else tile_size
+	var nb_parts = 1 if !scatter else int(round(subtile_size.y / tile_size.y))
 	
 	# Get the texture
-	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var stream_texture = tileset.tile_get_texture(tile_id)
-	var atlas_texture = AtlasTexture.new()
-	atlas_texture.set_atlas(stream_texture)
-	if tile_mode == tileset.SINGLE_TILE:
-		atlas_texture.set_region(tile_region)
-	else:
-		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size), subtile_size))
 	
-	# Set the texture to the right position
-	var layer_offset = Vector2(0, -tile_size.y) * round(height) 
-	var height_offset = Vector2(0, round(subtile_size.y / 2))
-	var texture_offset = tileset.tile_get_texture_offset(tile_id)
-	var offset = texture_offset + layer_offset + height_offset
-	var pos = tilemap.map_to_world(cell)
-	
-	var render_part = TileRenderPart.new(tilemap, atlas_texture, cell_3D, pos, 0, offset)
-	
-	add_iso_rendering_part(render_part, tilemap)
+	for i in range(nb_parts):
+		var part_offset = Vector2(0, tile_size.y) * (nb_parts - i - 1)
+		
+		var atlas_texture = AtlasTexture.new()
+		atlas_texture.set_atlas(stream_texture)
+		if tile_mode == tileset.SINGLE_TILE:
+			atlas_texture.set_region(Rect2(tile_tileset_pos + part_offset, subtile_size))
+		else:
+			var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
+			atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size) + part_offset
+						, subtile_size))
+		
+		# Set the texture to the right position
+		var layer_offset = Vector2(0, -tile_size.y) * round(height) 
+		var height_offset = Vector2(0, round(subtile_size.y / 2))
+		var texture_offset = tileset.tile_get_texture_offset(tile_id)
+		var offset = texture_offset + layer_offset + height_offset + part_offset
+		var pos = tilemap.map_to_world(cell)
+		
+		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
+				  cell_3D + Vector3(0, 0, i), pos, 0, offset)
+		
+		add_iso_rendering_part(render_part, tilemap)
 
 
 func is_cell_slope(cell: Vector2, tilemap: TileMap) -> bool:

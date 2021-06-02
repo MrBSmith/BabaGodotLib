@@ -58,14 +58,14 @@ func _update_walls(tile: Vector2) -> void:
 			break
 	
 	if wall_tile_id != -1:
-		var variation = randi() % 2
+		var variation = randi() % 3
 		
 		for i in range(2):
 			var current_wall_tilemap = $WestWall if i == 0 else $EastWall
 			var dir = Vector2.DOWN if i == 0 else Vector2.RIGHT
 			var has_neigbour = (tile + dir) in get_used_cells()
 			var tile_to_place = -1 if has_neigbour else wall_tile_id
-			var offset = 0 if i == 0 else 2
+			var offset = 0 if i == 0 else 3
 			var subtile_pos = Vector2(offset + variation, 0)
 			
 			current_wall_tilemap.set_cell(tile.x, tile.y, tile_to_place,
