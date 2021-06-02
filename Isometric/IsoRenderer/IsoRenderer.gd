@@ -77,6 +77,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
 	var tile_size = tilemap.get_cell_size()
 	
+	#### FACTOR THIS ####
 	var cell_offset = Vector3(int(east_wall), int(!east_wall), -int(is_wall)) if is_wall else Vector3.ZERO
 	var cell_3D = Vector3(cell.x, cell.y, height) + cell_offset
 	
@@ -85,7 +86,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var tile_region = tileset.tile_get_region(tile_id)
 	var tile_tileset_pos = tile_region.position
-	var subtile_size = tileset.autotile_get_size(tile_id) if tile_mode != TileSet.SINGLE_TILE else tile_size
+	var subtile_size = tileset.autotile_get_size(tile_id) if tile_mode != TileSet.SINGLE_TILE else tile_region.size
 	var nb_parts = 1 if !scatter else int(round(subtile_size.y / tile_size.y))
 	
 	# Get the texture
@@ -96,8 +97,9 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 		
 		var atlas_texture = AtlasTexture.new()
 		atlas_texture.set_atlas(stream_texture)
+		#### FACTOR THIS #### 
 		if tile_mode == tileset.SINGLE_TILE:
-			atlas_texture.set_region(Rect2(tile_tileset_pos + part_offset, subtile_size))
+			atlas_texture.set_region(Rect2(tile_tileset_pos + part_offset, tile_size))
 		else:
 			var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
 			atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size) + part_offset
@@ -105,9 +107,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 		
 		# Set the texture to the right position
 		var layer_offset = Vector2(0, -tile_size.y) * round(height) 
-		var height_offset = Vector2(0, round(subtile_size.y / 2))
+		#### FACTOR THIS #### 
+		var height_offset = Vector2(0, round(subtile_size.y / 2)) if !scatter else Vector2(0, round(tile_size.y / 2))
 		var texture_offset = tileset.tile_get_texture_offset(tile_id)
-		var offset = texture_offset + layer_offset + height_offset + part_offset
+		var offset = texture_offset + layer_offset + part_offset + height_offset
 		var pos = tilemap.map_to_world(cell)
 		
 		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
