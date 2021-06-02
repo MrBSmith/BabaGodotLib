@@ -95,14 +95,18 @@ func _fetch_obstacles() -> void:
 func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
-		for cell in layers_array[i].get_used_cells():
-			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
-				var current_cell = Vector3(cell.x, cell.y, i)
+		var current_layer = layers_array[i]
+		var layer_obstacles_tilemap = current_layer.get_node("Obstacles")
+		var layer_obstacles_cells = layer_obstacles_tilemap.get_used_cells()
+		
+		for cell2d in current_layer.get_used_cells():
+			if find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
+				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
-				if get_cell_slope_type(cell, i) != 0:
-					current_cell -= Vector3(0, 0, 0.5)
-				
-				feed_array.append(current_cell)
+				if not cell2d in layer_obstacles_cells:
+					if get_cell_slope_type(cell2d, i) != 0:
+						current_cell -= Vector3(0, 0, 0.5)
+					feed_array.append(current_cell)
 	
 	# Handle bridges
 	for i in range(layers_array.size()):

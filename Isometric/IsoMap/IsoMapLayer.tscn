@@ -35,6 +35,12 @@ tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 
+[node name="Decors" type="TileMap" parent="."]
+mode = 1
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 32, 16 )
+format = 1
+
 [node name="Slopes" type="TileMap" parent="."]
 mode = 1
 tile_set = ExtResource( 3 )
