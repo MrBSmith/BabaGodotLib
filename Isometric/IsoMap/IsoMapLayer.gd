@@ -20,7 +20,6 @@ func _ready() -> void:
 	var __ = connect("tile_added", self , "_on_tile_added")
 	__ = connect("tile_removed", self , "_on_tile_removed")
 	__ = connect("tile_replaced", self , "_on_tile_replaced")
-	__ = get_tree().connect("idle_frame", self, "_on_idle_frame")
 
 
 # Built-in funciton_overide
