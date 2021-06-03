@@ -76,8 +76,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
 	var tile_size = tilemap.get_cell_size()
+	var z_offset = 0 if tilemap is IsoMapLayer else 1
 	
-	#### FACTOR THIS ####
+	# In case of a tile wall (Walls bellow tiles), offset the cell of the render part
+	# So the wall's visibility is logical
 	var cell_offset = Vector3(int(east_wall), int(!east_wall), -int(is_wall)) if is_wall else Vector3.ZERO
 	var cell_3D = Vector3(cell.x, cell.y, height) + cell_offset
 	
@@ -94,27 +96,28 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 	
 	for i in range(nb_parts):
 		var part_offset = Vector2(0, tile_size.y) * (nb_parts - i - 1)
+		var part_size = subtile_size if !scatter else tile_size
 		
 		var atlas_texture = AtlasTexture.new()
 		atlas_texture.set_atlas(stream_texture)
-		#### FACTOR THIS #### 
-		if tile_mode == tileset.SINGLE_TILE:
-			atlas_texture.set_region(Rect2(tile_tileset_pos + part_offset, tile_size))
-		else:
+		
+		var region_pos = tile_tileset_pos + part_offset
+		
+		if tile_mode != tileset.SINGLE_TILE:
 			var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
-			atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * subtile_size) + part_offset
-						, subtile_size))
+			region_pos += autotile_coord * subtile_size
+		
+		atlas_texture.set_region(Rect2(region_pos, part_size))
 		
 		# Set the texture to the right position
 		var layer_offset = Vector2(0, -tile_size.y) * round(height) 
-		#### FACTOR THIS #### 
-		var height_offset = Vector2(0, round(subtile_size.y / 2)) if !scatter else Vector2(0, round(tile_size.y / 2))
+		var height_offset = Vector2(0, round(part_size.y / 2))
 		var texture_offset = tileset.tile_get_texture_offset(tile_id)
 		var offset = texture_offset + layer_offset + part_offset + height_offset
 		var pos = tilemap.map_to_world(cell)
 		
 		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
-				  cell_3D + Vector3(0, 0, i), pos, 0, offset)
+				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset)
 		
 		add_iso_rendering_part(render_part, tilemap)
 

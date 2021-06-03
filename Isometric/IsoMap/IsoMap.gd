@@ -97,13 +97,15 @@ func _fetch_ground() -> void:
 	for i in range(layers_array.size() - 1, -1, -1):
 		var current_layer = layers_array[i]
 		var layer_obstacles_tilemap = current_layer.get_node("Obstacles")
-		var layer_obstacles_cells = layer_obstacles_tilemap.get_used_cells()
+		var walls_tilemap = current_layer.get_node("Walls")
+		var obstacles_cells = layer_obstacles_tilemap.get_used_cells()
+		var walls_cells = walls_tilemap.get_used_cells()
 		
 		for cell2d in current_layer.get_used_cells():
 			if find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
-				if not cell2d in layer_obstacles_cells:
+				if not cell2d in obstacles_cells && not cell2d in walls_cells:
 					if get_cell_slope_type(cell2d, i) != 0:
 						current_cell -= Vector3(0, 0, 0.5)
 					feed_array.append(current_cell)
