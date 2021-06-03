@@ -2,14 +2,14 @@ tool
 extends TileMap
 class_name IsoMapLayer
 
-signal tile_added(tile)
-signal tile_removed(tile)
-
-const print_log : bool = true
-
-var tile_added_in_tick := false
-
 # A base class to represent a IsoMapLayer
+# Also carry a tool that place walls below a tile automaticly
+
+signal tile_added(cell)
+signal tile_removed(cell)
+
+const print_log : bool = false
+
 
 func _ready() -> void:
 	var _err = EVENTS.connect("hide_iso_objects", self, "_on_hide_iso_objects_event")
@@ -19,7 +19,9 @@ func _ready() -> void:
 	
 	var __ = connect("tile_added", self , "_on_tile_added")
 	__ = connect("tile_removed", self , "_on_tile_removed")
+	__ = connect("tile_replaced", self , "_on_tile_replaced")
 	__ = get_tree().connect("idle_frame", self, "_on_idle_frame")
+
 
 # Built-in funciton_overide
 func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
@@ -29,14 +31,15 @@ func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
 	var cell = Vector2(x, y)
 	
 	if tile_id != -1:
-		if tile_id in get_tileset().get_tiles_ids() && not cell in get_used_cells():
-			emit_signal("tile_added", cell)
+		if tile_id in get_tileset().get_tiles_ids():
+			if not cell in get_used_cells() or \
+			(cell in get_used_cells() && get_cellv(cell) != tile_id):
+				emit_signal("tile_added", cell)
 	else:
 		if cell in get_used_cells():
 			emit_signal("tile_removed", cell)
 	
 	.set_cell(x, y, tile_id, transpose, flip_h, flip_v, subtile_pos)
-	tile_added_in_tick = true
 
 
 #### LOGIC ####
@@ -99,29 +102,27 @@ func _on_hide_iso_objects_event(hide: bool) -> void:
 	set_visible(!hide)
 
 
-func _on_tile_added(tile: Vector2) -> void:
+func _on_tile_added(cell: Vector2) -> void:
 	if print_log:
-		print_debug("Tile added a cell %s" % String(tile))
+		print("Tile added a cell %s" % String(cell))
 	
 	yield(get_tree(), "idle_frame")
 	
-	_update_walls(tile)
-	_update_tile_neighbours(tile)
+	_update_walls(cell)
+	_update_tile_neighbours(cell)
 
 
 
-func _on_tile_removed(tile: Vector2) -> void:
+func _on_tile_removed(cell: Vector2) -> void:
 	if print_log:
-		print_debug("Tile removed a cell %s" % String(tile))
+		print("Tile removed a cell %s" % String(cell))
 	
 	yield(get_tree(), "idle_frame")
 	
 	for i in range(2):
 		var current_wall_tilemap = $WestWall if i == 0 else $EastWall
-		current_wall_tilemap.set_cell(tile.x, tile.y, -1,
+		current_wall_tilemap.set_cell(cell.x, cell.y, -1,
 			false, false, false, Vector2.ZERO)
 	
-	_update_tile_neighbours(tile)
+	_update_tile_neighbours(cell)
 
-func _on_idle_frame():
-	tile_added_in_tick = false
