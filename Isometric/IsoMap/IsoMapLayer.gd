@@ -19,7 +19,6 @@ func _ready() -> void:
 	
 	var __ = connect("tile_added", self , "_on_tile_added")
 	__ = connect("tile_removed", self , "_on_tile_removed")
-	__ = connect("tile_replaced", self , "_on_tile_replaced")
 
 
 # Built-in funciton_overide
