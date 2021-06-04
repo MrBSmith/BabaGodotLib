@@ -278,21 +278,17 @@ func xyz_sum_compare(a: RenderPart, b: RenderPart) -> bool:
 	var sum_b = grid_pos_b.x + grid_pos_b.y + grid_pos_b.z
 
 	# First compare the sum x + y + z
-	# Then compare y, then x, then z
-	# If nothing worked, sort by type
+	# Then sort by type 
+	# If the type are the same compare z, then y, then x
 	if sum_a == sum_b:
-		if grid_pos_a.z == grid_pos_b.z:
-			if grid_pos_a.y == grid_pos_b.y:
-				if grid_pos_a.x == grid_pos_b.x:
-					return get_type_priority(a) < get_type_priority(b)
-				else:
-					return grid_pos_a.x < grid_pos_b.x
-			else:
-				return grid_pos_a.y < grid_pos_b.y
-		else:
-			return grid_pos_a.z < grid_pos_b.z
-	else:
-		return sum_a < sum_b
+		if get_type_priority(a) == get_type_priority(b):
+			if grid_pos_a.z == grid_pos_b.z:
+				if grid_pos_a.y == grid_pos_b.y:
+					 return grid_pos_a.x < grid_pos_b.x
+				else: return grid_pos_a.y < grid_pos_b.y
+			else: return grid_pos_a.z < grid_pos_b.z
+		else: return get_type_priority(a) < get_type_priority(b)
+	else: return sum_a < sum_b
 
 
 # Returns the parts at the given 2D position
