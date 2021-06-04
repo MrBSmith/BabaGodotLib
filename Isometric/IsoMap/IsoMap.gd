@@ -350,7 +350,7 @@ func is_occupied_by_obstacle(cell: Vector3) -> bool:
 		var tile_size = Vector2.ZERO
 		
 		if tile_mode == TileSet.SINGLE_TILE:
-			tile_size = tileset.tile_get_texture(tile_id).get_size()
+			tile_size = tileset.tile_get_region(tile_id).size
 		else:
 			tile_size = tileset.autotile_get_tile_size(tile_id)
 		
