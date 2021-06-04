@@ -37,7 +37,7 @@ var path := PoolVector3Array()
 signal changed_direction(dir)
 signal action_spent
 signal turn_finished
-signal action_finished
+signal action_finished(action_name)
 
 ### ACCESORS ###
 
@@ -329,13 +329,19 @@ func _on_state_changed(_new_state: Object):
 	if previous_state != null:
 		if active:
 			if previous_state is TRPG_ActionState:
-				emit_signal("action_finished")
+				emit_signal("action_finished", previous_state.name)
 		else:
 			if previous_state.name == "Hurt": 
 				emit_signal("hurt_animation_finished")
 
 
-func _on_action_finshed():
+func _on_action_finshed(action_name: String):
+	# The combat loop needs this because the action counter 
+	# is decremented AFTER the action is triggered.
+	# So if there is no animation corresponding to the action, wait a tick to avoid a loop
+	if !$AnimatedSprite.get_sprite_frames().has_animation(action_name):
+		yield(get_tree(), "idle_frame")
+	
 	EVENTS.emit_signal("actor_action_finished", self)
 
 
