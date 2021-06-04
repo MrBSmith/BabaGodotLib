@@ -18,7 +18,7 @@ var layers_array : Array setget , get_layers_array
 
 var grounds := PoolVector3Array()
 var walkable_cells : PoolVector3Array = []
-var obstacles : Array = [] setget set_obstacles, get_obstacles
+var damagables : Array = [] setget set_damagables, get_damagables
 
 var is_ready : bool = false
 
@@ -26,13 +26,13 @@ signal map_generation_finished
 
 #### ACCESSORS ####
 
-func set_obstacles(array: Array):
-	if array != obstacles:
-		obstacles = array
+func set_damagables(array: Array):
+	if array != damagables:
+		damagables = array
 		walkable_cells = pathfinding.set_walkable_cells(grounds)
 		pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
 
-func get_obstacles() -> Array: return obstacles
+func get_damagables() -> Array: return damagables
 
 func get_layers_array() -> Array: return layers_array
 
@@ -53,7 +53,7 @@ func _ready():
 	_fetch_layers()
 	_init_object_grid_pos()
 	_fetch_ground()
-	_fetch_obstacles()
+	_fetch_damagables()
 	
 	yield(owner, "ready")
 	
@@ -81,14 +81,14 @@ func _ready():
 #### LOGIC ####
 
 # Get every unpassable object form the IsoObject group 
-func _fetch_obstacles() -> void:
+func _fetch_damagables() -> void:
 	var iso_object_array = get_tree().get_nodes_in_group("IsoObject")
 	var unpassable_objects : Array = []
 	for object in iso_object_array:
 		if !object.is_passable():
 			unpassable_objects.append(object)
 	
-	set_obstacles(unpassable_objects)
+	set_damagables(unpassable_objects)
 
 
 # Fetch every accessible cells and store it in grounds
@@ -324,9 +324,38 @@ func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 
 
 # Return true if the given cell is occupied by an obstacle
-func is_cell_in_obstacle(cell: Vector3) -> bool:
-	for obst in obstacles:
-		if cell == obst.get_current_cell():
+func is_damagable_on_cell(cell: Vector3) -> bool:
+	for obj in damagables:
+		if cell == obj.get_current_cell():
+			return true
+	return false
+
+
+
+# Check if the given cell is occupied by an obstacle 
+# (ie a tile of the obstacle tilmap, child of a layer)
+func is_occupied_by_obstacle(cell: Vector3) -> bool:
+	for i in range(layers_array.size()):
+		var layer = layers_array[i]
+		var cell2d = Vector2(cell.x, cell.y)
+		var obstacle_tilemap = layer.get_node("Obstacles")
+		var tile_id = obstacle_tilemap.get_cellv(cell2d)
+		
+		if tile_id == -1:
+			continue
+		
+		var cell_size = obstacle_tilemap.get_cell_size()
+		var tileset = obstacle_tilemap.get_tileset()
+		var tile_mode = tileset.tile_get_tile_mode(tile_id)
+		var tile_size = Vector2.ZERO
+		
+		if tile_mode == TileSet.SINGLE_TILE:
+			tile_size = tileset.tile_get_texture(tile_id).get_size()
+		else:
+			tile_size = tileset.autotile_get_tile_size(tile_id)
+		
+		var obst_height = round(tile_size.y / cell_size.y)
+		if i + obst_height > cell.z && i <= cell.z:
 			return true
 	return false
 
@@ -355,7 +384,7 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 
 # Check if the cell is empty (ie there is no tile nor obstacle on it)
 func is_cell_free(cell: Vector3) -> bool:
-	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null
+	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null && !is_occupied_by_obstacle(cell)
 
 
 # Returns true is the given cell is one of the tile of one of the layers constiting the map
@@ -385,7 +414,7 @@ func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 
 # Check if a position is valid, return true if it is, false if it is not
 func is_position_valid(cell: Vector3) -> bool:
-	return !is_cell_in_obstacle(cell) && is_cell_ground(cell)
+	return !is_damagable_on_cell(cell) && is_cell_ground(cell)
 
 
 
@@ -442,4 +471,4 @@ func _on_iso_object_cell_changed(_iso_object: IsoObject):
 
 func _on_iso_object_removed(iso_object: IsoObject):
 	if !iso_object.is_passable():
-		obstacles.erase(iso_object)
+		damagables.erase(iso_object)
