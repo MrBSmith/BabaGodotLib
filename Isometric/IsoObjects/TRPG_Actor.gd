@@ -34,6 +34,7 @@ var direction : int = IsoLogic.DIRECTION.BOTTOM_RIGHT setget set_direction, get_
 var view_field : Array = [[], []] setget set_view_field, get_view_field
 var path := PoolVector3Array()
 
+signal state_changed(state)
 signal changed_direction(dir)
 signal action_spent
 signal turn_finished
@@ -323,7 +324,9 @@ func set_flip_h_SFX(value: bool):
 
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(_new_state: Object):
+func _on_state_changed(new_state: Object):
+	emit_signal("state_changed", new_state)
+	
 	var previous_state = statesmachine.previous_state
 	
 	if previous_state != null:
