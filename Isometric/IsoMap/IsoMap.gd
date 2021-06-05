@@ -352,7 +352,7 @@ func is_occupied_by_obstacle(cell: Vector3) -> bool:
 		if tile_mode == TileSet.SINGLE_TILE:
 			tile_size = tileset.tile_get_region(tile_id).size
 		else:
-			tile_size = tileset.autotile_get_tile_size(tile_id)
+			tile_size = tileset.autotile_get_size(tile_id)
 		
 		var obst_height = round(tile_size.y / cell_size.y)
 		if i + obst_height > cell.z && i <= cell.z:

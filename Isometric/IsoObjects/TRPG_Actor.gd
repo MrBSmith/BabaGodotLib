@@ -299,6 +299,15 @@ func hurt(damage: int):
 	set_current_HP(int(clamp(get_current_HP() - damage, 0.0, get_max_HP())))
 	EVENTS.emit_signal("damage_inflicted", damage, self)
 	set_state("Hurt")
+	
+	if get_current_HP() == 0:
+		destroy()
+
+
+func destroy():
+	EVENTS.emit_signal("actor_died", self)
+	.destroy()
+
 
 
 func can_see(obj: IsoObject) -> bool:
