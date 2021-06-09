@@ -94,21 +94,14 @@ func get_sprite_texture(sprite: Node2D) -> Texture:
 func generate_clickable_area():
 	clickable_area = Area2D.new()
 	add_child(clickable_area)
-	
 	clickable_area.owner = self
-	
-	var sprite = sprite_node if sprite_node != null else animated_sprite_node
-	
-	clickable_area.set_position(sprite.get_position())
 
 	var collision_shape = CollisionShape2D.new()
 	
 	var rect_shape = RectangleShape2D.new()
-	var sprite_size = get_sprite_texture(sprite).get_size()
-	rect_shape.set_extents(sprite_size / 2)
+	rect_shape.set_extents((height * GAME.TILE_SIZE) / 2)
 	
 	collision_shape.set_shape(rect_shape)
-	
 	clickable_area.add_child(collision_shape)
 
 	var _err = clickable_area.connect("mouse_entered", self, "_on_mouse_entered")
