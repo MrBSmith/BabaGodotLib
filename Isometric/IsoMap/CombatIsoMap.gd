@@ -76,11 +76,17 @@ func update_view_field(actor: IsoObject) -> void:
 
 # Return true if at least one target is reachable by the active actor
 func has_target_reachable(actor: TRPG_Actor) -> bool:
-	var visibles_cells = actor.get_view_field_v3_array()
+	var reachable_cells = []
+	
+	if owner.fog_of_war:
+		reachable_cells = actor.get_view_field_v3_array()
+	else:
+		reachable_cells = IsoLogic.get_cells_in_sphere(actor.get_current_cell(), actor.get_current_range())
+	
 	var attack_range = actor.get_current_range()
 	var actor_cell = actor.get_current_cell()
 	
-	for cell in visibles_cells:
+	for cell in reachable_cells:
 		var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
 		if dist > attack_range:
 			continue
