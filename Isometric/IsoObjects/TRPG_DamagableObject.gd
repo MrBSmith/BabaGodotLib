@@ -70,21 +70,8 @@ func _ready():
 
 func generate_lifebar():
 	lifebar = lifebar_scene.instance()
-	var sprite = get_node_or_null("Sprite")
-	
-	if sprite == null:
-		sprite = get_node_or_null("AnimatedSprite")
-	
-	if !sprite:
-		return
-	
-	var texture = get_sprite_texture(sprite)
-	
-	if texture == null:
-		return
-	
-	var sprite_height = texture.get_size().y
-	lifebar.set_position(Vector2(0, -sprite_height - 5))
+	var y_offset = (get_height() + 1) * GAME.TILE_SIZE.y
+	lifebar.set_position(Vector2(0, -y_offset - 5))
 	lifebar.shake_feedback_on = true
 	lifebar.set_visible(false)
 	add_child(lifebar)
