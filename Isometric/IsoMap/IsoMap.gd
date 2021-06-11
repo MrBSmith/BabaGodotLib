@@ -18,7 +18,7 @@ var layers_array : Array setget , get_layers_array
 
 var grounds := PoolVector3Array()
 var walkable_cells : PoolVector3Array = []
-var obstacles : Array = [] setget set_obstacles, get_obstacles
+var damagables : Array = [] setget set_damagables, get_damagables
 
 var is_ready : bool = false
 
@@ -26,15 +26,22 @@ signal map_generation_finished
 
 #### ACCESSORS ####
 
-func set_obstacles(array: Array):
-	if array != obstacles:
-		obstacles = array
+func set_damagables(array: Array):
+	if array != damagables:
+		damagables = array
 		walkable_cells = pathfinding.set_walkable_cells(grounds)
 		pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
 
-func get_obstacles() -> Array: return obstacles
+func get_damagables() -> Array: return damagables
 
 func get_layers_array() -> Array: return layers_array
+
+func get_tilemaps_recursive(array: Array, node: Node) -> void:
+	for child in node.get_children():
+		if child is TileMap && not child in array:
+			array.append(child)
+			if child.get_child_count() > 0:
+				get_tilemaps_recursive(array, child)
 
 #### BUILT IN ####
 
@@ -46,7 +53,7 @@ func _ready():
 	_fetch_layers()
 	_init_object_grid_pos()
 	_fetch_ground()
-	_fetch_obstacles()
+	_fetch_damagables()
 	
 	yield(owner, "ready")
 	
@@ -74,28 +81,34 @@ func _ready():
 #### LOGIC ####
 
 # Get every unpassable object form the IsoObject group 
-func _fetch_obstacles():
+func _fetch_damagables() -> void:
 	var iso_object_array = get_tree().get_nodes_in_group("IsoObject")
 	var unpassable_objects : Array = []
 	for object in iso_object_array:
 		if !object.is_passable():
 			unpassable_objects.append(object)
 	
-	set_obstacles(unpassable_objects)
+	set_damagables(unpassable_objects)
 
 
 # Fetch every accessible cells and store it in grounds
-func _fetch_ground():
+func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
-		for cell in layers_array[i].get_used_cells():
-			if find_2D_cell(Vector2(cell.x, cell.y), feed_array) == Vector3.INF:
-				var current_cell = Vector3(cell.x, cell.y, i)
+		var current_layer = layers_array[i]
+		var layer_obstacles_tilemap = current_layer.get_node("Obstacles")
+		var walls_tilemap = current_layer.get_node("Walls")
+		var obstacles_cells = layer_obstacles_tilemap.get_used_cells()
+		var walls_cells = walls_tilemap.get_used_cells()
+		
+		for cell2d in current_layer.get_used_cells():
+			if find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
+				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
-				if get_cell_slope_type(cell, i) != 0:
-					current_cell -= Vector3(0, 0, 0.5)
-				
-				feed_array.append(current_cell)
+				if not cell2d in obstacles_cells && not cell2d in walls_cells:
+					if get_cell_slope_type(cell2d, i) != 0:
+						current_cell -= Vector3(0, 0, 0.5)
+					feed_array.append(current_cell)
 	
 	# Handle bridges
 	for i in range(layers_array.size()):
@@ -116,9 +129,9 @@ func _fetch_ground():
 	grounds = feed_array
 
 
-func _fetch_layers():
+func _fetch_layers() -> void:
 	for child in get_children():
-		if child is IsoMapLayer && not child in layers_array:
+		if child is IsoMapLayer:
 			layers_array.append(child)
 
 
@@ -137,7 +150,10 @@ func _init_object_grid_pos():
 
 # Return the layer at the given height
 func get_layer(height: float) -> IsoMapLayer:
-	return layers_array[round(height)]
+	if height >= layers_array.size() or height < 0:
+		return null
+	else:
+		return layers_array[round(height)]
 
 
 # Return the id of the layer at the given height
@@ -197,6 +213,7 @@ func world_to_layer_2D_cell(pos : Vector2, layer_id : int = 0) -> Vector2:
 
 
 # Return the actor or obstacle placed on the given cell
+# Works also if the cell is one of the cell the body of the object is in
 # Return null if the cell is empty
 func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 	var damagable_array = get_tree().get_nodes_in_group("IsoObject")
@@ -205,7 +222,10 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 		if not object is TRPG_DamagableObject:
 			continue
 		
-		if object.get_current_cell() == cell:
+		var obj_cell = object.get_current_cell()
+		
+		if obj_cell.x == cell.x && obj_cell.y == cell.y && \
+		cell.z >= obj_cell.z && cell.z <= obj_cell.z + object.get_height():
 			return object
 	return null
 
@@ -255,6 +275,9 @@ func get_cell2D_highest_z(cell : Vector2) -> float:
 # Returns the slope type of the given cell2D in the given layer
 func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer : IsoMapLayer = get_layer(layer_id)
+	if layer == null:
+		return SLOPE_TYPE.NONE
+	
 	var tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
@@ -301,9 +324,38 @@ func get_cell_stack_at_pos(world_pos: Vector2) -> PoolVector3Array:
 
 
 # Return true if the given cell is occupied by an obstacle
-func is_cell_in_obstacle(cell: Vector3) -> bool:
-	for obst in obstacles:
-		if cell == obst.get_current_cell():
+func is_damagable_on_cell(cell: Vector3) -> bool:
+	for obj in damagables:
+		if cell == obj.get_current_cell():
+			return true
+	return false
+
+
+
+# Check if the given cell is occupied by an obstacle 
+# (ie a tile of the obstacle tilmap, child of a layer)
+func is_occupied_by_obstacle(cell: Vector3) -> bool:
+	for i in range(layers_array.size()):
+		var layer = layers_array[i]
+		var cell2d = Vector2(cell.x, cell.y)
+		var obstacle_tilemap = layer.get_node("Obstacles")
+		var tile_id = obstacle_tilemap.get_cellv(cell2d)
+		
+		if tile_id == -1:
+			continue
+		
+		var cell_size = obstacle_tilemap.get_cell_size()
+		var tileset = obstacle_tilemap.get_tileset()
+		var tile_mode = tileset.tile_get_tile_mode(tile_id)
+		var tile_size = Vector2.ZERO
+		
+		if tile_mode == TileSet.SINGLE_TILE:
+			tile_size = tileset.tile_get_region(tile_id).size
+		else:
+			tile_size = tileset.autotile_get_size(tile_id)
+		
+		var obst_height = round(tile_size.y / cell_size.y)
+		if i + obst_height > cell.z && i <= cell.z:
 			return true
 	return false
 
@@ -330,6 +382,27 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 	return Vector3.INF
 
 
+# Check if the cell is empty (ie there is no tile nor obstacle on it)
+func is_cell_free(cell: Vector3) -> bool:
+	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null && !is_occupied_by_obstacle(cell)
+
+
+# Returns true is the given cell is one of the tile of one of the layers constiting the map
+# Unless is_cell_ground this function will return true even if the tile isn't an accecible one
+func is_cell_tile(cell: Vector3) ->  bool:
+	var layer = get_layer(round(cell.z))
+	return layer != null && layer.get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
+
+
+func is_cell_above_ground(cell: Vector3):
+	return is_cell_ground(Vector3(cell.x, cell.y, round(cell.z - 1)))
+
+
+# Return true if the given cell exists in the map's accesible tiles
+func is_cell_ground(cell: Vector3) -> bool:
+	return cell in grounds
+
+
 # Find if the given world position can be found in the given cell
 func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 	var cell_stack = get_cell_stack_at_pos(pos)
@@ -341,12 +414,8 @@ func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 
 # Check if a position is valid, return true if it is, false if it is not
 func is_position_valid(cell: Vector3) -> bool:
-	return !is_cell_in_obstacle(cell) && is_cell_ground(cell)
+	return !is_damagable_on_cell(cell) && is_cell_ground(cell)
 
-
-# Return true if the given cell exists in the map's accesible tiles
-func is_cell_ground(cell: Vector3) -> bool:
-	return cell in grounds
 
 
 # Find if a cell x and y is in the heightmap grid, and returns it
@@ -383,6 +452,17 @@ static func get_adjacent_cells(cell: Vector3) -> Array:
 	]
 
 
+static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
+	var result_array := PoolVector3Array()
+	var v2_adjacent = get_adjacent_cells(cell)
+	
+	for adj in v2_adjacent:
+		var point = Vector3(adj.x, adj.y, cell.z)
+		result_array.append(point)
+	return result_array
+
+
+
 #### SIGNAL RESPONSES ####
 
 func _on_iso_object_cell_changed(_iso_object: IsoObject):
@@ -391,4 +471,4 @@ func _on_iso_object_cell_changed(_iso_object: IsoObject):
 
 func _on_iso_object_removed(iso_object: IsoObject):
 	if !iso_object.is_passable():
-		obstacles.erase(iso_object)
+		damagables.erase(iso_object)

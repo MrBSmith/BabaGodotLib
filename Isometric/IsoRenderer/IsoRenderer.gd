@@ -14,8 +14,6 @@ class_name IsoRenderer
 # the renderer is informed by the iso_object_cell_changed, iso_object_added & iso_object_removed signals. 
 # This is why it is mandatory to use IsoObject inherited objects for it to work with this renderer
 
-const TILE_SIZE = Vector2(32, 32)
-
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
 
@@ -61,44 +59,67 @@ func init_rendering_queue(layers_array: Array, objects_array: Array):
 			add_cell_to_queue(cell, layers_array[i], height)
 		
 		for child in layers_array[i].get_children():
+			var scatter = "obstacle".is_subsequence_ofi(child.name)
 			for cell in child.get_used_cells():
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
-				add_cell_to_queue(cell, child, height)
+				add_cell_to_queue(cell, child, height, scatter)
 	
 	for obj in objects_array:
 		add_iso_obj(obj)
 
 
 # Add the given cell to te rendering queue
-func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float) -> void:
+func add_cell_to_queue(cell: Vector2, tilemap: TileMap, 
+			height: float, scatter: bool = false) -> void:
+	
 	var tileset = tilemap.get_tileset()
-	var cell_3D = Vector3(cell.x, cell.y, height)
+	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
+	var east_wall = "East".is_subsequence_ofi(tilemap.name)
+	var tile_size = tilemap.get_cell_size()
+	var z_offset = 0 if tilemap is IsoMapLayer else 1
+	
+	# In case of a tile wall (Walls bellow tiles), offset the cell of the render part
+	# So the wall's visibility is logical
+	var cell_offset = Vector3(int(east_wall), int(!east_wall), -int(is_wall)) if is_wall else Vector3.ZERO
+	var cell_3D = Vector3(cell.x, cell.y, height) + cell_offset
 	
 	# Get the tile id and the position of the cell in the autotile
 	var tile_id = tilemap.get_cellv(cell)
+	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var tile_region = tileset.tile_get_region(tile_id)
 	var tile_tileset_pos = tile_region.position
-	var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
+	var subtile_size = tileset.autotile_get_size(tile_id) if tile_mode != TileSet.SINGLE_TILE else tile_region.size
+	var nb_parts = 1 if !scatter else int(round(subtile_size.y / tile_size.y))
 	
 	# Get the texture
-	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var stream_texture = tileset.tile_get_texture(tile_id)
-	var atlas_texture = AtlasTexture.new()
-	atlas_texture.set_atlas(stream_texture)
-	if tile_mode == tileset.SINGLE_TILE:
-		atlas_texture.set_region(tile_region)
-	else:
-		atlas_texture.set_region(Rect2(tile_tileset_pos + (autotile_coord * TILE_SIZE), TILE_SIZE))
 	
-	# Set the texture to the right position
-	var height_offset = Vector2(0, -16) * (round(height) - 1)
-	var texture_offset = tileset.tile_get_texture_offset(tile_id)
-	var offset = height_offset + texture_offset
-	var pos = tilemap.map_to_world(cell)
-	
-	var render_part = TileRenderPart.new(tilemap, atlas_texture, cell_3D, pos, 0, offset)
-	
-	add_iso_rendering_part(render_part, tilemap)
+	for i in range(nb_parts):
+		var part_offset = Vector2(0, tile_size.y) * (nb_parts - i - 1)
+		var part_size = subtile_size if !scatter else tile_size
+		
+		var atlas_texture = AtlasTexture.new()
+		atlas_texture.set_atlas(stream_texture)
+		
+		var region_pos = tile_tileset_pos + part_offset
+		
+		if tile_mode != tileset.SINGLE_TILE:
+			var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
+			region_pos += autotile_coord * subtile_size
+		
+		atlas_texture.set_region(Rect2(region_pos, part_size))
+		
+		# Set the texture to the right position
+		var layer_offset = Vector2(0, -tile_size.y) * round(height) 
+		var height_offset = Vector2(0, round(part_size.y / 2))
+		var texture_offset = tileset.tile_get_texture_offset(tile_id)
+		var offset = texture_offset + layer_offset + part_offset + height_offset
+		var pos = tilemap.map_to_world(cell)
+		
+		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
+				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset)
+		
+		add_iso_rendering_part(render_part, tilemap)
 
 
 func is_cell_slope(cell: Vector2, tilemap: TileMap) -> bool:
@@ -257,21 +278,17 @@ func xyz_sum_compare(a: RenderPart, b: RenderPart) -> bool:
 	var sum_b = grid_pos_b.x + grid_pos_b.y + grid_pos_b.z
 
 	# First compare the sum x + y + z
-	# Then compare y, then x, then z
-	# If nothing worked, sort by type
+	# Then sort by type 
+	# If the type are the same compare z, then y, then x
 	if sum_a == sum_b:
-		if grid_pos_a.z == grid_pos_b.z:
-			if grid_pos_a.y == grid_pos_b.y:
-				if grid_pos_a.x == grid_pos_b.x:
-					return get_type_priority(a) < get_type_priority(b)
-				else:
-					return grid_pos_a.x < grid_pos_b.x
-			else:
-				return grid_pos_a.y < grid_pos_b.y
-		else:
-			return grid_pos_a.z < grid_pos_b.z
-	else:
-		return sum_a < sum_b
+		if get_type_priority(a) == get_type_priority(b):
+			if grid_pos_a.z == grid_pos_b.z:
+				if grid_pos_a.y == grid_pos_b.y:
+					 return grid_pos_a.x < grid_pos_b.x
+				else: return grid_pos_a.y < grid_pos_b.y
+			else: return grid_pos_a.z < grid_pos_b.z
+		else: return get_type_priority(a) < get_type_priority(b)
+	else: return sum_a < sum_b
 
 
 # Returns the parts at the given 2D position

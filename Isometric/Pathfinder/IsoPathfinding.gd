@@ -32,7 +32,7 @@ func set_walkable_cells(cell_array : PoolVector3Array):
 	var passable_cell_array : PoolVector3Array = []
 	astar_node.clear()
 
-	# Go through all the cells of the IsoMap, and check if they are in the obstacles array
+	# Go through all the cells of the IsoMap, and check if they are in the damagables array
 	for cell in cell_array:
 		# Add the last cell checked in the array of points we will create in the astar_node
 		passable_cell_array.append(cell)
@@ -42,7 +42,7 @@ func set_walkable_cells(cell_array : PoolVector3Array):
 		astar_node.add_point(cell_index, cell)
 
 		# Disable cell where there is an obstacle
-		if map_node.is_cell_in_obstacle(cell):
+		if map_node.is_damagable_on_cell(cell):
 			astar_node.set_point_disabled(cell_index, true)
 
 	return passable_cell_array
@@ -184,7 +184,7 @@ func compute_cell_index(cell: Vector3):
 #### SIGNAL RESPONSES ####
 
 func _on_actor_moved(_actor: TRPG_Actor, from: Vector3, to: Vector3):
-	if !map_node.is_cell_in_obstacle(from):
+	if !map_node.is_damagable_on_cell(from):
 		var id = compute_cell_index(from)
 		astar_node.set_point_disabled(id, false)
 
@@ -193,7 +193,7 @@ func _on_actor_moved(_actor: TRPG_Actor, from: Vector3, to: Vector3):
 
 
 func _on_iso_object_removed(iso_object: IsoObject):
-	if iso_object.is_class("Obstacle"):
+	if iso_object.is_class("TRPG_DamagableObject"):
 		var cell = iso_object.get_current_cell()
 		var cell_id = compute_cell_index(cell)
 		astar_node.set_point_disabled(cell_id, false)

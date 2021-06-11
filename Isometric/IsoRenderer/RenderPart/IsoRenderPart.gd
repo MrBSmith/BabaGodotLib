@@ -13,6 +13,7 @@ func get_class() -> String: return "IsoRenderPart"
 
 func _init(obj: Node, sprite_array: Array, cell: Vector3, world_pos: Vector2,
 		alt: int = 0, mod:= Color.white) -> void:
+	
 	set_current_cell(cell)
 	set_object_ref(obj)
 	set_modulate(mod)

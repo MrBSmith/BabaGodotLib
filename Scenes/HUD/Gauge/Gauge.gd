@@ -35,7 +35,7 @@ var is_ready : bool = false
 func is_class(value: String): return value == "gauge" or .is_class(value)
 func get_class() -> String: return "gauge"
 
-func set_gauge_value(value: int, instantanious: bool = true):
+func set_gauge_value(value: int, instantanious: bool = false):
 	if !is_ready:
 		yield(self, "ready")
 	
@@ -50,6 +50,8 @@ func set_gauge_value(value: int, instantanious: bool = true):
 func get_gauge_value() -> int: return gauge_value
 
 func set_gauge_max_value(value: int): 
+	if !is_ready:
+		yield(self, "ready")
 	gauge_max_value = value
 	gauge.set_max(gauge_max_value)
 	feedback_gauge.set_max(gauge_max_value)
@@ -117,7 +119,7 @@ func value_change_feedback(start_value: int, final_value: int):
 	
 	# Loss feedback
 	if value_lost && shake_feedback_on:
-		var magnitude = abs(change_ratio) * 5
+		var magnitude = abs(change_ratio) * 4
 		shake(magnitude)
 	
 	# Gauge movement
@@ -139,7 +141,7 @@ func shake(magnitude: float, duration : float = 0.25,
 	for i in nb_mov + 1:
 		var rdm_angle = rand_range(0.0, 360.0)
 		var dir = Vector2(cos(rdm_angle), sin(rdm_angle))
-		var dest = starting_position + dir * magnitude if i != nb_mov else starting_position
+		var dest = starting_position + dir * magnitude * rect_scale if i != nb_mov else starting_position
 		
 		tween_node.interpolate_property(self, "rect_position",
 			rect_position, dest, duration / (nb_mov + 1), 

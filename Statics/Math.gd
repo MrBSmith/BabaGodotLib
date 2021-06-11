@@ -9,6 +9,12 @@ static func is_even(value: int) -> bool:
 static func randi_range(min_value: int, max_value: int) -> int:
 	return randi() % ((max_value - min_value) + 1) + min_value
 
+static func rand_sign() -> int:
+	return randi() % 2 * 2 - 1
+
+static func clampi(initial_val: int, min_val: int, max_val: int) -> int:
+	return int(clamp(float(initial_val), float(min_val), float(max_val)))
+
 
 #### VECTOR2 ####
 
