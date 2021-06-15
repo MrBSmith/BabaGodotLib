@@ -185,7 +185,7 @@ func _init():
 # Set the current stats to the starting stats
 func _ready():
 	var _err = connect("cell_changed", self, "_on_cell_changed")
-	_err = connect("action_finished", self, "_on_action_finshed")
+	_err = connect("action_finished", self, "_on_action_finished")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	
 	set_current_actions(get_max_actions())
@@ -262,7 +262,6 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 		set_direction(dir)
 
 
-
 # Move the active_actor along the path
 func move_along_path(delta: float):
 	if path.size() > 0:
@@ -295,22 +294,16 @@ func move_along_path(delta: float):
 	return len(path) == 0
 
 
-func hurt(damage: int):
-	set_current_HP(int(clamp(get_current_HP() - damage, 0.0, get_max_HP())))
-	EVENTS.emit_signal("damage_inflicted", damage, self)
-	set_state("Hurt")
-	
-	if get_current_HP() == 0:
-		var state = yield(self, "state_changed")
-		while(not state is StateBase && state.name != "Idle"):
-			state = yield(self, "state_changed")
-	
-		destroy()
-
-
+# Function override
 func destroy() -> void:
 	EVENTS.emit_signal("actor_died", self)
+	.destroy()
+
+
+func trigger_destroy_animation():
 	set_state("Death")
+	# TO BE CHANGED : NEED TO REALY WAIT FOR THE ANIMATION TO FINISH
+	emit_signal("destroy_animation_finished")
 
 
 func can_see(obj: IsoObject) -> bool:
@@ -349,18 +342,11 @@ func _on_state_changed(new_state: Object):
 			if previous_state is TRPG_ActionState:
 				emit_signal("action_finished", previous_state.name)
 		else:
-			if previous_state.name == "Hurt": 
-				emit_signal("hurt_animation_finished")
+			if previous_state.name == "Hurt":
+				_on_hurt_animation_finished()
 
-
-func _on_action_finshed(action_name: String):
-	# The combat loop needs this because the action counter 
-	# is decremented AFTER the action is triggered.
-	# So if there is no animation corresponding to the action, wait a tick to avoid a loop
-	if !$AnimatedSprite.get_sprite_frames().has_animation(action_name):
-		yield(get_tree(), "idle_frame")
-	
-	EVENTS.emit_signal("actor_action_finished")
+func _on_action_finished(_action_name: String):
+	pass
 
 
 func _on_cell_changed(_new_cell: Vector3):

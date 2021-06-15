@@ -25,9 +25,6 @@ func _ready() -> void:
 
 #### VIRTUALS ####
 
-func update_state(_delta : float):
-	pass
-
 
 func enter_state():
 	if audio_stream_player != null:
