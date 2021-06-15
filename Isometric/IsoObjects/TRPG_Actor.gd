@@ -329,7 +329,6 @@ func set_flip_h_SFX(value: bool):
 				child.set_position(child.get_position() * Vector2(-1, 1))
 
 
-
 #### SIGNAL RESPONSES ####
 
 func _on_state_changed(new_state: Object):
@@ -344,6 +343,7 @@ func _on_state_changed(new_state: Object):
 		else:
 			if previous_state.name == "Hurt":
 				_on_hurt_animation_finished()
+
 
 func _on_action_finished(_action_name: String):
 	pass
