@@ -37,7 +37,6 @@ var path := PoolVector3Array()
 signal state_changed(state)
 signal changed_direction(dir)
 signal action_spent
-signal turn_finished
 signal action_finished(action_name)
 
 ### ACCESORS ###
@@ -201,13 +200,15 @@ func turn_start():
 	set_current_actions(get_max_actions() + action_modifier)
 	action_modifier = 0
 
+
 func turn_finish():
 	pass
+
 
 #### LOGIC ####
 
 
-func update_equipment():
+func update_equipment() -> void:
 	equipment = [weapon]
 
 
@@ -223,7 +224,6 @@ func move(move_path: PoolVector3Array) -> void:
 
 func wait() -> void:
 	set_action_modifier(1)
-	emit_signal("turn_finished")
 
 
 func attack(aoe_target: AOE_Target) -> void:
@@ -301,12 +301,16 @@ func hurt(damage: int):
 	set_state("Hurt")
 	
 	if get_current_HP() == 0:
+		var state = yield(self, "state_changed")
+		while(not state is StateBase && state.name != "Idle"):
+			state = yield(self, "state_changed")
+	
 		destroy()
 
 
-func destroy():
+func destroy() -> void:
 	EVENTS.emit_signal("actor_died", self)
-	.destroy()
+	set_state("Death")
 
 
 func can_see(obj: IsoObject) -> bool:
@@ -315,6 +319,7 @@ func can_see(obj: IsoObject) -> bool:
 	
 	var obj_cell = obj.get_current_cell()
 	return obj_cell in view_field[0] or obj_cell in view_field[1]
+
 
 # Return the altitude of the current cell of the character
 func get_altitude() -> int:
@@ -355,7 +360,7 @@ func _on_action_finshed(action_name: String):
 	if !$AnimatedSprite.get_sprite_frames().has_animation(action_name):
 		yield(get_tree(), "idle_frame")
 	
-	EVENTS.emit_signal("actor_action_finished", self)
+	EVENTS.emit_signal("actor_action_finished")
 
 
 func _on_cell_changed(_new_cell: Vector3):

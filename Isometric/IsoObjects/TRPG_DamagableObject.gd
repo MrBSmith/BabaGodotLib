@@ -16,6 +16,7 @@ var lifebar : Control
 var clickable_area : Area2D
 var mouse_inside : bool = false
 
+signal action_consequence_finished
 signal hurt_animation_finished
 signal hp_changed
 
@@ -130,6 +131,8 @@ func hurt(damage: int):
 	
 	if get_current_HP() == 0:
 		destroy()
+	else:
+		emit_signal("action_consequence_finished")
 
 
 func destroy():

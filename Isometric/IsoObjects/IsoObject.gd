@@ -123,6 +123,10 @@ func destroy():
 	if is_in_group("IsoObject"):
 		remove_from_group("IsoObject")
 	EVENTS.emit_signal("iso_object_removed", self)
+	
+	if has_signal("action_consequence_finished"): 
+		emit_signal("action_consequence_finished")
+	
 	queue_free()
 
 

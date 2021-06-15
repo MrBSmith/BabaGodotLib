@@ -120,7 +120,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 			if obj.is_class("TRPG_Actor") && actor.get_team() == obj.get_team():
 				continue
 			
-			if not obj in targetables:
+			if not obj in targetables && actor.can_see(obj):
 				targetables.append(obj)
 	
 	return targetables
