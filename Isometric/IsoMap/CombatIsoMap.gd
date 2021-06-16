@@ -18,11 +18,11 @@ func draw_movement_area(actor: TRPG_Actor) -> void:
 	var mov = actor.get_current_movements()
 	var current_cell = actor.get_current_cell()
 	var reachable_cells = pathfinding.find_reachable_cells(current_cell, mov)
-	draw_area(reachable_cells, "move")
+	draw_area(reachable_cells)
 
 
 # Draw the movement of the given character
-func draw_area(cells_array: PoolVector3Array, area_type: String) -> void:
+func draw_area(cells_array: PoolVector3Array, area_type: String = "Target") -> void:
 	for cell in cells_array:
 		var alt = round(cell.z)
 		var layer = get_layer(alt)

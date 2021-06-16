@@ -8,6 +8,8 @@ onready var audio_stream_player := get_node_or_null("AudioStreamPlayer")
 # previous one whenever the animation is finished
 export var toggle_state_mode : bool = false
 
+signal state_animation_finished()
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "AnimatedObjectStateBase" or .is_class(value)
@@ -52,13 +54,16 @@ func exit_state():
 #### SIGNAL RESPONSES #####
 
 func _on_animation_finished():
-	if !is_current_state() or !toggle_state_mode or animated_sprite == null:
+	if !is_current_state() or animated_sprite == null:
 		return
-
+	
 	var sprite_frames = animated_sprite.get_sprite_frames()
 	var current_animation = animated_sprite.get_animation()
 	
-	if !name.is_subsequence_ofi(current_animation):
+	if !"Start".is_subsequence_ofi(current_animation):
+		emit_signal("state_animation_finished")
+	
+	if !toggle_state_mode or !name.is_subsequence_ofi(current_animation):
 		return
 	
 	if current_animation == "Start" + name:

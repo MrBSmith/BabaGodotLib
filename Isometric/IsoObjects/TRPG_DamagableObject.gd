@@ -60,6 +60,7 @@ func _ready():
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
 	_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_animation_finished")
+	_err = connect("destroy_animation_finished", self, "_on_destroy_animation_finished")
 	
 	set_current_HP(get_max_HP())
 	
@@ -136,7 +137,7 @@ func hurt(damage: int) -> void:
 
 func destroy():
 	EVENTS.emit_signal("iso_object_unfocused", self)
-	.destroy()
+	emit_signal("action_consequence_finished")
 	trigger_destroy_animation()
 
 
@@ -163,3 +164,6 @@ func _on_unfocus_all_iso_object_query() -> void:
 func _on_hurt_animation_finished() -> void:
 	if get_current_HP() <= 0:
 		destroy()
+
+func _on_destroy_animation_finished() -> void:
+	queue_free()

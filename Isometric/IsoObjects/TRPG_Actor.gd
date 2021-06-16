@@ -302,8 +302,6 @@ func destroy() -> void:
 
 func trigger_destroy_animation():
 	set_state("Death")
-	# TO BE CHANGED : NEED TO REALY WAIT FOR THE ANIMATION TO FINISH
-	emit_signal("destroy_animation_finished")
 
 
 func can_see(obj: IsoObject) -> bool:
@@ -319,7 +317,7 @@ func get_altitude() -> int:
 	return int(current_cell.z)
 
 
-func set_flip_h_SFX(value: bool):
+func set_flip_h_SFX(value: bool) -> void:
 	if sfx_node == null: return
 	
 	for child in sfx_node.get_children():
@@ -331,7 +329,7 @@ func set_flip_h_SFX(value: bool):
 
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(new_state: Object):
+func _on_state_changed(new_state: Object) -> void:
 	emit_signal("state_changed", new_state)
 	
 	var previous_state = statesmachine.previous_state
@@ -345,9 +343,13 @@ func _on_state_changed(new_state: Object):
 				_on_hurt_animation_finished()
 
 
-func _on_action_finished(_action_name: String):
+func _on_action_finished(_action_name: String) -> void:
 	pass
 
 
-func _on_cell_changed(_new_cell: Vector3):
+func _on_cell_changed(_new_cell: Vector3) -> void:
 	EVENTS.emit_signal("actor_cell_changed", self)
+
+# Function override
+func _on_destroy_animation_finished() -> void:
+	pass
