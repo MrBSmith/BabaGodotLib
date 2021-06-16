@@ -4,7 +4,6 @@ class_name CombatIsoMap
 
 # A class to handle combat specific logic for IsoMap
 
-onready var area_node = $Interactives/Areas
 
 #### ACCESSORS ####
 
@@ -15,12 +14,36 @@ onready var area_node = $Interactives/Areas
 #### LOGIC ####
 
 
-# Draw the movement of the given character
-func draw_movement_area():
-	var mov = owner.active_actor.get_current_movements()
-	var current_cell = owner.active_actor.get_current_cell()
+func draw_movement_area(actor: TRPG_Actor) -> void:
+	var mov = actor.get_current_movements()
+	var current_cell = actor.get_current_cell()
 	var reachable_cells = pathfinding.find_reachable_cells(current_cell, mov)
-	area_node.draw_area(reachable_cells, "move")
+	draw_area(reachable_cells, "move")
+
+
+# Draw the movement of the given character
+func draw_area(cells_array: PoolVector3Array, area_type: String) -> void:
+	for cell in cells_array:
+		var alt = round(cell.z)
+		var layer = get_layer(alt)
+		var tilemap : TileMap = layer.get_node("Area")
+		var tileset : TileSet = tilemap.get_tileset()
+		var tile_id = tileset.find_tile_by_name(area_type.capitalize())
+		tilemap.set_cell(cell.x, cell.y, tile_id)
+	
+	for layer in layers_array:
+		var tilemap : TileMap = layer.get_node("Area")
+		tilemap.update_bitmask_region()
+	
+	EVENTS.emit_signal("area_added", self)
+
+
+func clear_area() -> void:
+	for layer in layers_array:
+		var tilemap : TileMap = layer.get_node("Area")
+		tilemap.clear()
+	
+	EVENTS.emit_signal("area_removed", self)
 
 
 # Get the reachable cells in the given range. Returns a PoolVector3Array of visible & reachable cells

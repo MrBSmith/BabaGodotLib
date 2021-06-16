@@ -34,7 +34,6 @@ func get_focus_array() -> Array: return focus_array
 func set_visible_cells(value: Array):
 	visible_cells = value
 	update_tiles_visibility()
-
 func get_visible_cells() -> Array: return visible_cells
 
 
@@ -44,6 +43,8 @@ func _ready() -> void:
 	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
 	_err = EVENTS.connect("iso_object_added", self, "_on_iso_object_added")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
+	_err = EVENTS.connect("area_added", self, "_on_area_added")
+	_err = EVENTS.connect("area_removed", self, "_on_area_removed")
 	_err = EVENTS.connect("tiles_shake", self, "_on_tiles_shake")
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
@@ -69,9 +70,7 @@ func init_rendering_queue(layers_array: Array, objects_array: Array):
 
 
 # Add the given cell to te rendering queue
-func add_cell_to_queue(cell: Vector2, tilemap: TileMap, 
-			height: float, scatter: bool = false) -> void:
-	
+func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: bool = false) -> void:
 	var tileset = tilemap.get_tileset()
 	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
@@ -90,6 +89,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 	var tile_tileset_pos = tile_region.position
 	var subtile_size = tileset.autotile_get_size(tile_id) if tile_mode != TileSet.SINGLE_TILE else tile_region.size
 	var nb_parts = 1 if !scatter else int(round(subtile_size.y / tile_size.y))
+	var mod = tilemap.get_modulate()
 	
 	# Get the texture
 	var stream_texture = tileset.tile_get_texture(tile_id)
@@ -117,7 +117,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap,
 		var pos = tilemap.map_to_world(cell)
 		
 		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
-				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset)
+				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset, mod)
 		
 		add_iso_rendering_part(render_part, tilemap)
 
@@ -172,7 +172,7 @@ func add_iso_obj(obj: IsoObject) -> void:
 
 
 # Remove the given object from the rendering queue
-func remove_iso_obj(obj: IsoObject):
+func remove_iso_obj(obj: Object):
 	for child in get_children():
 		if child.get_object_ref() == obj:
 			child.queue_free()
@@ -253,10 +253,11 @@ func is_obj_in_rendering_queue(obj: IsoObject):
 
 # Return the value of the drawing priority of the given object type
 func get_type_priority(thing) -> int:
-	if thing is Vector3:
-		return type_priority.TILE
-	elif thing.get_object_ref().is_class("TileArea"):
-		return type_priority.AREA
+	if thing.get_object_ref().is_class("TileMap"):
+		if thing.get_object_ref().name == "Area":
+			return type_priority.AREA
+		else:
+			return type_priority.TILE
 	elif thing.get_object_ref().is_class("MovementArrowSegment"):
 		return type_priority.MOVEMENT_ARROW
 	elif thing.get_object_ref().is_class("Cursor"):
@@ -354,7 +355,6 @@ func get_stack_by_2D_dist(corner := Vector2.DOWN) -> Array:
 
 #### ANIMATION ####
 
-
 # Apply a tile shake effect
 func shake(origin: Vector2, magnitude: int, wave: bool = true, duration: float = 1.0):
 	for part in get_children():
@@ -417,3 +417,20 @@ func _on_disappear_transition():
 
 func _on_update_rendered_visible_cells(view_field: Array) -> void:
 	set_visible_cells(view_field)
+
+
+func _on_area_added(map: IsoMap) -> void:
+	var layers_array = map.get_layers_array()
+	for i in range(layers_array.size()):
+		var layer = layers_array[i]
+		var area = layer.get_node("Area")
+		for cell in area.get_used_cells():
+			add_cell_to_queue(cell, area, i)
+
+
+func _on_area_removed(map: IsoMap) -> void:
+	var layers_array = map.get_layers_array()
+	for i in range(layers_array.size()):
+		var layer = layers_array[i]
+		var area = layer.get_node("Area")
+		remove_iso_obj(area)

@@ -91,6 +91,7 @@ func _update_tile_neighbours(tile: Vector2) -> void:
 		if (tile + dir) in get_used_cells():
 			_update_walls(tile + dir)
 
+
 #### INPUTS ####
 
 
@@ -108,7 +109,6 @@ func _on_tile_added(cell: Vector2) -> void:
 	
 	_update_walls(cell)
 	_update_tile_neighbours(cell)
-
 
 
 func _on_tile_removed(cell: Vector2) -> void:
