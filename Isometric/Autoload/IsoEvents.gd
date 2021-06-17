@@ -21,6 +21,8 @@ signal iso_object_unfocused(obj)
 
 signal actor_moved(actor, from_cell, to_cell)
 
+signal action_phase_finished()
+
 signal tiles_shake(origin, magnitude)
 
 signal unfocus_all_iso_object_query()

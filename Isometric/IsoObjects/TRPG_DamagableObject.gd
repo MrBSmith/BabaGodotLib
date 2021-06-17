@@ -16,7 +16,7 @@ var lifebar : Control
 var clickable_area : Area2D
 var mouse_inside : bool = false
 
-signal hurt_animation_finished
+signal action_consequence_finished
 signal hp_changed
 
 #### ACCESSORS ####
@@ -59,6 +59,8 @@ func _ready():
 	yield(owner, "ready")
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
+	_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_animation_finished")
+	_err = connect("destroy_animation_finished", self, "_on_destroy_animation_finished")
 	
 	set_current_HP(get_max_HP())
 	
@@ -120,35 +122,48 @@ func hide_infos():
 	EVENTS.emit_signal("iso_object_unfocused", self)
 
 
-func hurt(damage: int):
+func hurt(damage: int) -> void:
 	set_current_HP(Math.clampi(get_current_HP() - damage, 0, get_max_HP()))
-	$AnimationPlayer.play("RedFlash")
-	yield($AnimationPlayer, "animation_finished")
-	
 	EVENTS.emit_signal("damage_inflicted", damage, self)
-	emit_signal("hurt_animation_finished")
 	
-	if get_current_HP() == 0:
-		destroy()
+	if has_method("set_state"):
+		call("set_state", "Hurt")
+	else:
+		$AnimationPlayer.play("RedFlash")
+	
+	if get_current_HP() != 0:
+		emit_signal("action_consequence_finished")
 
 
 func destroy():
 	EVENTS.emit_signal("iso_object_unfocused", self)
+	emit_signal("action_consequence_finished")
+	trigger_destroy_animation()
+
+
+func trigger_destroy_animation():
 	EVENTS.emit_signal("scatter_object", self, 16)
-	.destroy()
+	emit_signal("destroy_animation_finished")
 
 
 #### SIGNAL RESPONSES ####
 
-func _on_mouse_entered():
+func _on_mouse_entered() -> void:
 	mouse_inside = true
 	if not self == owner.active_actor && is_in_view_field():
 		show_infos()
 
-func _on_mouse_exited():
+func _on_mouse_exited() -> void:
 	mouse_inside = false
 	if not self == owner.active_actor:
 		hide_infos()
 
-func _on_unfocus_all_iso_object_query():
+func _on_unfocus_all_iso_object_query() -> void:
 	hide_infos()
+
+func _on_hurt_animation_finished() -> void:
+	if get_current_HP() <= 0:
+		destroy()
+
+func _on_destroy_animation_finished() -> void:
+	queue_free()

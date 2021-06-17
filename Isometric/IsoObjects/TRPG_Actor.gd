@@ -37,7 +37,6 @@ var path := PoolVector3Array()
 signal state_changed(state)
 signal changed_direction(dir)
 signal action_spent
-signal turn_finished
 signal action_finished(action_name)
 
 ### ACCESORS ###
@@ -186,7 +185,7 @@ func _init():
 # Set the current stats to the starting stats
 func _ready():
 	var _err = connect("cell_changed", self, "_on_cell_changed")
-	_err = connect("action_finished", self, "_on_action_finshed")
+	_err = connect("action_finished", self, "_on_action_finished")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	
 	set_current_actions(get_max_actions())
@@ -201,13 +200,15 @@ func turn_start():
 	set_current_actions(get_max_actions() + action_modifier)
 	action_modifier = 0
 
+
 func turn_finish():
 	pass
+
 
 #### LOGIC ####
 
 
-func update_equipment():
+func update_equipment() -> void:
 	equipment = [weapon]
 
 
@@ -223,7 +224,6 @@ func move(move_path: PoolVector3Array) -> void:
 
 func wait() -> void:
 	set_action_modifier(1)
-	emit_signal("turn_finished")
 
 
 func attack(aoe_target: AOE_Target) -> void:
@@ -262,7 +262,6 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 		set_direction(dir)
 
 
-
 # Move the active_actor along the path
 func move_along_path(delta: float):
 	if path.size() > 0:
@@ -295,18 +294,14 @@ func move_along_path(delta: float):
 	return len(path) == 0
 
 
-func hurt(damage: int):
-	set_current_HP(int(clamp(get_current_HP() - damage, 0.0, get_max_HP())))
-	EVENTS.emit_signal("damage_inflicted", damage, self)
-	set_state("Hurt")
-	
-	if get_current_HP() == 0:
-		destroy()
-
-
-func destroy():
+# Function override
+func destroy() -> void:
 	EVENTS.emit_signal("actor_died", self)
 	.destroy()
+
+
+func trigger_destroy_animation():
+	set_state("Death")
 
 
 func can_see(obj: IsoObject) -> bool:
@@ -316,12 +311,13 @@ func can_see(obj: IsoObject) -> bool:
 	var obj_cell = obj.get_current_cell()
 	return obj_cell in view_field[0] or obj_cell in view_field[1]
 
+
 # Return the altitude of the current cell of the character
 func get_altitude() -> int:
 	return int(current_cell.z)
 
 
-func set_flip_h_SFX(value: bool):
+func set_flip_h_SFX(value: bool) -> void:
 	if sfx_node == null: return
 	
 	for child in sfx_node.get_children():
@@ -331,10 +327,9 @@ func set_flip_h_SFX(value: bool):
 				child.set_position(child.get_position() * Vector2(-1, 1))
 
 
-
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(new_state: Object):
+func _on_state_changed(new_state: Object) -> void:
 	emit_signal("state_changed", new_state)
 	
 	var previous_state = statesmachine.previous_state
@@ -344,19 +339,17 @@ func _on_state_changed(new_state: Object):
 			if previous_state is TRPG_ActionState:
 				emit_signal("action_finished", previous_state.name)
 		else:
-			if previous_state.name == "Hurt": 
-				emit_signal("hurt_animation_finished")
+			if previous_state.name == "Hurt":
+				_on_hurt_animation_finished()
 
 
-func _on_action_finshed(action_name: String):
-	# The combat loop needs this because the action counter 
-	# is decremented AFTER the action is triggered.
-	# So if there is no animation corresponding to the action, wait a tick to avoid a loop
-	if !$AnimatedSprite.get_sprite_frames().has_animation(action_name):
-		yield(get_tree(), "idle_frame")
-	
-	EVENTS.emit_signal("actor_action_finished", self)
+func _on_action_finished(_action_name: String) -> void:
+	pass
 
 
-func _on_cell_changed(_new_cell: Vector3):
+func _on_cell_changed(_new_cell: Vector3) -> void:
 	EVENTS.emit_signal("actor_cell_changed", self)
+
+# Function override
+func _on_destroy_animation_finished() -> void:
+	pass

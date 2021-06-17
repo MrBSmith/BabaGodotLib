@@ -36,6 +36,7 @@ signal modulate_changed(mod)
 signal cell_changed(cell)
 signal global_position_changed(world_pos)
 signal targeted_feedback_loop_ended()
+signal destroy_animation_finished()
 
 #### ACCESSORS ####
 
@@ -115,6 +116,7 @@ func _ready():
 func change_modulate_color(color: Color):
 	set_modulate(color)
 
+
 func create():
 	EVENTS.emit_signal("iso_object_added", self)
 
@@ -122,8 +124,22 @@ func create():
 func destroy():
 	if is_in_group("IsoObject"):
 		remove_from_group("IsoObject")
+	
 	EVENTS.emit_signal("iso_object_removed", self)
-	queue_free()
+	
+	if has_signal("action_consequence_finished"): 
+		emit_signal("action_consequence_finished")
+	
+	yield(self, "destroy_animation_finished")
+	
+	# Queue free this node only if the IsoObject doesn't have a state machines, 
+	# meaning it can't have a dead state
+	if !is_class("TRPG_Actor"):
+		queue_free()
+
+
+func trigger_destroy_animation() -> void:
+	emit_signal("destroy_animation_finished")
 
 
 func trigger_targeted_feedback(positive: bool = false):
