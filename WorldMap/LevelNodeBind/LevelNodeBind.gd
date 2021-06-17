@@ -23,6 +23,11 @@ var line_points_array = PoolVector2Array()
 
 var is_ready : bool = false
 
+var print_logs : bool = true
+
+
+signal level_node_added()
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "LevelNodeBind" or .is_class(value)
@@ -31,7 +36,18 @@ func get_class() -> String: return "LevelNodeBind"
 func set_origin(value: Node2D):
 	if origin == value: 
 		return
+	
+	if origin != null:
+		origin.disconnect("position_changed", self, "_on_level_node_position_changed")
+	
 	origin = value
+	set_origin_pos(origin.position)
+	var __ = origin.connect("position_changed", self, "_on_level_node_position_changed")
+	
+	if print_logs:
+		print("Origin added: %s" % origin.name)
+	
+	emit_signal("level_node_added")
 	if origin_node_path == "" && owner != null:
 		origin_node_path = owner.get_path_to(origin)
 	
@@ -43,24 +59,36 @@ func get_origin() -> Node2D: return origin
 func set_destination(value: Node2D): 
 	if destination == value: 
 		return
+	
+	if destination != null:
+		destination.disconnect("position_changed", self, "_on_level_node_position_changed")
+	
 	destination = value
+	set_dest_pos(destination.position)
+	var __ = destination.connect("position_changed", self, "_on_level_node_position_changed")
+	
+	if print_logs:
+		print("destination added: %s" % destination.name)
+	
+	emit_signal("level_node_added")
 	if destination_node_path == "" && owner != null:
 		destination_node_path = owner.get_path_to(destination)
 	
 	if destination == null:
 		dest_pos = Vector2.INF
-
 func get_destination() -> Node2D: return destination
 
-func set_origin_pos(value: Vector2): 
+func set_origin_pos(value: Vector2):
 	if value != origin_pos:
 		origin_pos = value
-		_update_line()
+		if print_logs:
+			print("origin_pos changed" + String(origin_pos))
 
-func set_dest_pos(value: Vector2): 
+func set_dest_pos(value: Vector2):
 	if value != dest_pos:
 		dest_pos = value
-		_update_line()
+		if print_logs:
+			print("dest_pos changed" + String(dest_pos))
 
 func get_point_path() -> PoolVector2Array: return point_path
 
@@ -92,23 +120,27 @@ func get_state_name() -> String: return $StatesMachine.get_state_name()
 #### BUILT-IN ####
 
 func _ready() -> void:
+	var __ = connect("level_node_added", self, "_on_level_node_added")
+	
 	if line == null:
 		line = Line2D.new()
 		add_child(line)
 	
 	set_curve(Curve2D.new())
 	
+	is_ready = true
+	
 	if owner != null && origin_node_path != "" && destination_node_path != "":
 		set_origin(owner.get_node(origin_node_path))
 		set_destination(owner.get_node(destination_node_path))
 	
-	is_ready = true
-
+	_update_line()
 
 func _process(_delta: float) -> void:
 	if origin != null && destination != null:
 		set_origin_pos(origin.get_global_position())
 		set_dest_pos(destination.get_global_position())
+
 
 #### VIRTUALS ####
 
@@ -117,8 +149,18 @@ func _process(_delta: float) -> void:
 #### LOGIC ####
 
 
+func _update() -> void:
+	if is_instance_valid(origin) && is_instance_valid(destination):
+		_update_line()
+		reroll_line_gen()
+		if print_logs:
+			print("The bind got its origin and dest: updating")
+
+
 func _update_line():
 	if Vector2.INF in [origin_pos, dest_pos]:
+		if print_logs:
+			print("Bind: The origin_pos and/or the dest_pos is not set: abort update")
 		return
 	
 	point_path = PoolVector2Array()
@@ -149,6 +191,7 @@ func _update_line():
 			dir = point_path[0].direction_to(point_path[1])
 			node_texture = origin.get_texture()
 			node_scale = origin.get_scale()
+		
 		if i == point_path.size() - 1:
 			dir = point_path[i].direction_to(point_path[i - 1])
 			node_texture = destination.get_texture()
@@ -170,7 +213,13 @@ func _update_line():
 		line.set_end_cap_node(destination)
 		line.set_start_cap_node(origin)
 	
+	if print_logs:
+		print("The bind got %d points" % line_points_array.size())
+	
 	line.set_points(line_points_array)
+	
+	if print_logs:
+		print("Bind update finished")
 
 
 func reroll_line_gen():
@@ -196,9 +245,19 @@ func get_path_direction_form_node(level_node: LevelNode) -> Vector2:
 		return point_dir
 
 
-
 #### INPUTS ####
 
 
 
 #### SIGNAL RESPONSES ####
+
+
+func _on_level_node_added() -> void:
+	_update()
+
+
+func _on_level_node_position_changed() -> void:
+	if print_logs:
+		print("Level node dropped")
+	
+	_update()
