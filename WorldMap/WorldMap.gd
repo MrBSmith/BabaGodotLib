@@ -182,9 +182,9 @@ func _on_add_bind_query(origin: LevelNode, dest: LevelNode):
 	bind.set_destination(dest)
 
 
-func _on_remove_all_binds_query(origin: LevelNode):
+func _on_remove_all_binds_query(node: LevelNode):
 	for bind in binds_container.get_children():
-		if bind.get_origin() == origin:
+		if bind.get_origin() == node or bind.get_destination() == node:
 			bind.queue_free()
 
 
