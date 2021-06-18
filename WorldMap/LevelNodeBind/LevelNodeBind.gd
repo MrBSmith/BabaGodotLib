@@ -22,9 +22,7 @@ var point_path := PoolVector2Array() setget , get_point_path
 var line_points_array = PoolVector2Array()
 
 var is_ready : bool = false
-
-var print_logs : bool = true
-
+var print_logs : bool = false
 
 signal level_node_added()
 
@@ -152,7 +150,6 @@ func _process(_delta: float) -> void:
 func _update() -> void:
 	if is_instance_valid(origin) && is_instance_valid(destination):
 		_update_line()
-		reroll_line_gen()
 		if print_logs:
 			print("The bind got its origin and dest: updating")
 

@@ -28,6 +28,7 @@ signal add_bind_query(origin, dest)
 signal remove_all_binds_query(origin)
 signal hidden_changed(level_node, hidden_value)
 signal level_visited(level_node)
+# warning-ignore:unused_signal
 signal position_changed()
 
 #### ACCESSORS ####
