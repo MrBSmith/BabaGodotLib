@@ -134,7 +134,7 @@ func get_bind(origin: LevelNode, dest: LevelNode) -> LevelNodeBind:
 # Trigger the scene change to enter the level
 func enter_current_level():
 	var current_cursor_level = cursor.get_current_level()
-	if current_cursor_level != null && !current_cursor_level.is_visited():
+	if current_cursor_level != null:
 		var current_level_path = current_cursor_level.get_level_scene_path()
 		
 		if current_level_path == "":
@@ -165,7 +165,7 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_accept"):
 		var cursor_level_node = cursor.get_current_level()
 		
-		if !characters_container.is_moving() && !cursor_level_node.visited:
+		if !characters_container.is_moving():
 			enter_current_level()
 
 
