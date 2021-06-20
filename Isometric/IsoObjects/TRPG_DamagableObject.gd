@@ -24,13 +24,15 @@ signal hp_changed
 func is_class(value: String): return value == "TRPG_DamagableObject" or .is_class(value)
 func get_class() -> String: return "TRPG_DamagableObject"
 
+# Must be overriden
+func is_dead() -> bool: return false
+
 func set_current_HP(value: int):
 	if value >= 0 && value <= get_max_HP() && value != current_HP:
 		current_HP = value
 		if !is_ready:
 			yield(self, "ready")
 		emit_signal("hp_changed", get_current_HP(), get_max_HP())
-
 func get_current_HP() -> int: return current_HP
 
 func set_max_HP(value: int):
@@ -38,12 +40,10 @@ func set_max_HP(value: int):
 	if !is_ready:
 		yield(self, "ready")
 	emit_signal("hp_changed", get_current_HP(), get_max_HP())
-
 func get_max_HP() -> int: return max_HP
 
 func set_defense(value: int):
 	defense = value
-
 func get_defense() -> int:
 	return defense
 
@@ -55,7 +55,7 @@ func set_visibility(value: int):
 
 #### BUILT-IN FUNCTIONS ####
 
-func _ready():
+func _ready() -> void:
 	yield(owner, "ready")
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
@@ -70,7 +70,7 @@ func _ready():
 
 #### LOGIC ####
 
-func generate_lifebar():
+func generate_lifebar() -> void:
 	lifebar = lifebar_scene.instance()
 	var y_offset = (get_height() + 1) * GAME.TILE_SIZE.y
 	lifebar.set_position(Vector2(0, -y_offset - 5))
@@ -93,7 +93,7 @@ func get_sprite_texture(sprite: Node2D) -> Texture:
 
 
 # Generate the area that will detect the mouse going over the sprite
-func generate_clickable_area():
+func generate_clickable_area() -> void:
 	clickable_area = Area2D.new()
 	add_child(clickable_area)
 	clickable_area.owner = self
@@ -111,13 +111,13 @@ func generate_clickable_area():
 
 
 # Show the known actors infos
-func show_infos():
+func show_infos() -> void:
 	lifebar.update()
 	lifebar.set_visible(true)
 	EVENTS.emit_signal("iso_object_focused", self)
 
 # Hide the infos 
-func hide_infos():
+func hide_infos() -> void:
 	lifebar.set_visible(false)
 	EVENTS.emit_signal("iso_object_unfocused", self)
 
@@ -135,13 +135,14 @@ func hurt(damage: int) -> void:
 		emit_signal("action_consequence_finished")
 
 
-func destroy():
+# Function override
+func destroy() -> void:
 	EVENTS.emit_signal("iso_object_unfocused", self)
 	emit_signal("action_consequence_finished")
 	trigger_destroy_animation()
 
 
-func trigger_destroy_animation():
+func trigger_destroy_animation() -> void:
 	EVENTS.emit_signal("scatter_object", self, 16)
 	emit_signal("destroy_animation_finished")
 
@@ -150,20 +151,24 @@ func trigger_destroy_animation():
 
 func _on_mouse_entered() -> void:
 	mouse_inside = true
-	if not self == owner.active_actor && is_in_view_field():
+	if self != owner.active_actor && is_in_view_field() && !is_dead():
 		show_infos()
+
 
 func _on_mouse_exited() -> void:
 	mouse_inside = false
 	if not self == owner.active_actor:
 		hide_infos()
 
+
 func _on_unfocus_all_iso_object_query() -> void:
 	hide_infos()
+
 
 func _on_hurt_animation_finished() -> void:
 	if get_current_HP() <= 0:
 		destroy()
+
 
 func _on_destroy_animation_finished() -> void:
 	queue_free()

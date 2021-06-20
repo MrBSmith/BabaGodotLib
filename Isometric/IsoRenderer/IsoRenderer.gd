@@ -44,7 +44,8 @@ func _ready() -> void:
 	_err = EVENTS.connect("iso_object_added", self, "_on_iso_object_added")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
 	_err = EVENTS.connect("area_added", self, "_on_area_added")
-	_err = EVENTS.connect("area_removed", self, "_on_area_removed")
+	_err = EVENTS.connect("area_cleared", self, "_on_area_cleared")
+	_err = EVENTS.connect("area_cell_removed", self, "_on_area_cell_removed")
 	_err = EVENTS.connect("tiles_shake", self, "_on_tiles_shake")
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
@@ -207,6 +208,15 @@ func get_obj_parts(obj: IsoObject) -> Array:
 		if child.get_object_ref() == obj:
 			part_array.append(child)
 	return part_array
+
+
+func remove_part_at_cell(cell: Vector3, obj: Node = null) -> void:
+	for child in get_children():
+		if obj != null && child.get_object_ref() != obj:
+			continue
+		
+		if child.current_cell.x == cell.x && child.current_cell.y == cell.y:
+			child.queue_free()
 
 
 # Scatters a texture in the given number of smaller height, then returns it in an array
@@ -419,16 +429,21 @@ func _on_update_rendered_visible_cells(view_field: Array) -> void:
 	set_visible_cells(view_field)
 
 
-func _on_area_added(map: IsoMap) -> void:
+func _on_area_added(map: IsoMap, cell_array: PoolVector3Array) -> void:
 	var layers_array = map.get_layers_array()
-	for i in range(layers_array.size()):
-		var layer = layers_array[i]
+	
+	for cell in cell_array:
+		var height = round(cell.z)
+		var layer = layers_array[height]
 		var area = layer.get_node("Area")
-		for cell in area.get_used_cells():
-			add_cell_to_queue(cell, area, i)
+		add_cell_to_queue(Vector2(cell.x, cell.y), area, height)
 
 
-func _on_area_removed(map: IsoMap) -> void:
+func _on_area_cell_removed(tilemap: TileMap, cell: Vector3) -> void:
+	remove_part_at_cell(cell, tilemap)
+
+
+func _on_area_cleared(map: IsoMap) -> void:
 	var layers_array = map.get_layers_array()
 	for i in range(layers_array.size()):
 		var layer = layers_array[i]

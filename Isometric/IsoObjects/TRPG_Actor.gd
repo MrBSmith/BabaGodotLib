@@ -86,7 +86,6 @@ func set_current_actions(value : int):
 	current_actions = value
 	if callback:
 		emit_signal("action_spent")
-
 func get_current_actions(): return current_actions
 
 func set_current_movements(value : int): current_movements = value
@@ -108,7 +107,6 @@ func get_weapon() -> Resource: return weapon
 func get_defense() -> int: return MaxStats.get_defense()
 
 func get_view_range() -> int: return MaxStats.get_view_range() + get_altitude() * 2
-
 func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
@@ -129,7 +127,6 @@ func set_direction(value: int):
 	else:
 		direction = value
 		emit_signal("changed_direction", direction)
-
 func get_direction() -> int: return direction 
 
 func set_skills(array: Array):
@@ -137,7 +134,6 @@ func set_skills(array: Array):
 		if not value.is_class("Skill"):
 			return
 	skills = array
-
 func get_skills() -> Array: return skills
 
 func get_team() -> Node: 
@@ -153,7 +149,6 @@ func get_team_side():
 		return team.get_team_side()
 	else:
 		return -1
-
 func is_team_side(value: int) -> bool:
 	var team = get_team()
 	if team != null:
@@ -174,6 +169,10 @@ func get_current_attack_effect() -> Resource:
 		return weapon.attack_effect
 	else:
 		return default_attack_effect
+
+# Function override
+func is_dead() -> bool: return get_state() == $States/Death
+
 
 #### BUILT-IN ####
 

@@ -23,27 +23,39 @@ func draw_movement_area(actor: TRPG_Actor) -> void:
 
 # Draw the movement of the given character
 func draw_area(cells_array: PoolVector3Array, area_type: String = "Target") -> void:
+	var cell_added = []
+	
 	for cell in cells_array:
 		var alt = round(cell.z)
 		var layer = get_layer(alt)
 		var tilemap : TileMap = layer.get_node("Area")
 		var tileset : TileSet = tilemap.get_tileset()
 		var tile_id = tileset.find_tile_by_name(area_type.capitalize())
-		tilemap.set_cell(cell.x, cell.y, tile_id)
+		if tilemap.get_cell(cell.x, cell.y) != tile_id:
+			tilemap.set_cell(cell.x, cell.y, tile_id)
+			cell_added.append(cell)
 	
 	for layer in layers_array:
 		var tilemap : TileMap = layer.get_node("Area")
 		tilemap.update_bitmask_region()
 	
-	EVENTS.emit_signal("area_added", self)
+	EVENTS.emit_signal("area_added", self, cell_added)
 
 
-func clear_area() -> void:
+func clear_area(area_type : String = "") -> void:
 	for layer in layers_array:
 		var tilemap : TileMap = layer.get_node("Area")
-		tilemap.clear()
-	
-	EVENTS.emit_signal("area_removed", self)
+		if area_type == "":
+			tilemap.clear()
+			EVENTS.emit_signal("area_cleared", self)
+		else:
+			var area_type_id = tilemap.get_tileset().find_tile_by_name(area_type)
+			
+			for cell in tilemap.get_used_cells():
+				var tile_id = tilemap.get_cellv(cell)
+				if area_type_id == tile_id:
+					tilemap.set_cellv(cell, -1)
+					EVENTS.emit_signal("area_cell_removed", tilemap, Vector3(cell.x, cell.y, layer.get_index()))
 
 
 # Get the reachable cells in the given range. Returns a PoolVector3Array of visible & reachable cells
@@ -100,25 +112,26 @@ func update_view_field(actor: IsoObject) -> void:
 # Return true if at least one target is reachable by the active actor
 func has_target_reachable(actor: TRPG_Actor) -> bool:
 	var reachable_cells = []
+	var attack_range = actor.get_current_range()
+	var actor_cell = actor.get_current_cell()
 	
 	if owner.fog_of_war:
 		reachable_cells = actor.get_view_field_v3_array()
 	else:
-		reachable_cells = IsoLogic.get_cells_in_sphere(actor.get_current_cell(), actor.get_current_range())
-	
-	var attack_range = actor.get_current_range()
-	var actor_cell = actor.get_current_cell()
+		reachable_cells = IsoLogic.get_cells_in_sphere(actor_cell, attack_range + 1)
 	
 	for cell in reachable_cells:
-		var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
-		if dist > attack_range:
-			continue
-		
+		# Remove cells in view_field but too far away to be reached
+		if owner.fog_of_war:
+			var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
+			if dist > attack_range:
+				continue
+
 		var obj = get_damagable_on_cell(cell)
-		if obj == null:
+		if obj == null or obj == actor:
 			continue
 		
-		if (obj.is_class("TRPG_Actor") && actor.get_team_side() == obj.get_team_side())\
+		if (obj.is_class("TRPG_Actor") && actor.get_team_side() != obj.get_team_side())\
 			or obj.is_class("Obstacle"):
 			return true
 	

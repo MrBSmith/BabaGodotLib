@@ -222,6 +222,9 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 		if not object is TRPG_DamagableObject:
 			continue
 		
+		if object.is_dead():
+			continue
+		
 		var obj_cell = object.get_current_cell()
 		
 		if obj_cell.x == cell.x && obj_cell.y == cell.y && \
