@@ -14,7 +14,7 @@ static func create_dir(dir_path : String):
 	var dir = Directory.new()
 	
 	var dir_path_mod = dir_path.replacen("res://", "")
-	var splited_path : PoolStringArray = dir_path_mod.split("")
+	var splited_path : PoolStringArray = dir_path_mod.split("/")
 	var dir_to_create = splited_path[-1]
 	splited_path.remove(splited_path.size() - 1)
 	var parent_path = "res://" + splited_path.join("/")
@@ -24,7 +24,7 @@ static func create_dir(dir_path : String):
 		dir.make_dir(parent_path)
 	
 	if !is_dir_existing(dir_path):
-		dir.open(dir_path)
+		dir.open(parent_path)
 		dir.make_dir(dir_to_create)
 		
 		if debug:
