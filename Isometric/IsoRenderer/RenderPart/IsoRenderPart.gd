@@ -21,7 +21,7 @@ func _init(obj: Node, sprite_array: Array, cell: Vector3, world_pos: Vector2,
 	set_altitude(alt)
 	
 	for sprite in sprite_array:
-		sprite_node = Sprite.new()
+		var sprite_node = Sprite.new()
 		
 		if sprite is IsoAnimatedSprite:
 			var _err = sprite.connect("texture_changed", self, "_on_animated_sprite_texture_changed")
@@ -116,6 +116,7 @@ func _on_object_global_position_changed(world_pos: Vector2):
 
 func _on_object_modulate_changed(mod: Color):
 	set_modulate(mod)
+
 
 func _on_sprite_flip_changed(obj_sprite, flip_h: bool, flip_v: bool):
 	var sprite_node = get_node(obj_sprite.name)

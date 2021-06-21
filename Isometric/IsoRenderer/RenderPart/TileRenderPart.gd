@@ -2,6 +2,8 @@ extends RenderPart
 class_name TileRenderPart
 
 var visibility : int = IsoObject.VISIBILITY.VISIBLE setget set_visibility, get_visibility
+var outline_shader_material = "" 
+
 
 #### ACCESSORS ####
 
@@ -17,19 +19,17 @@ func get_visibility() -> int: return visibility
 
 #### BUILT-IN ####
 
-func _init(obj: Node, texture: AtlasTexture, cell: Vector3, world_pos: Vector2, alt: int = 0,
+func _init(obj: Node, tex: AtlasTexture, cell: Vector3, world_pos: Vector2, alt: int = 0,
 		offset := Vector2.ZERO, mod:= Color.white) -> void:
+	
 	set_current_cell(cell)
 	set_object_ref(obj)
 	set_modulate(mod)
 	set_global_position(world_pos)
 	set_altitude(alt)
-	
-	sprite_node = Sprite.new()
-	sprite_node.set_texture(texture)
-	sprite_node.set_offset(offset)
-	add_child(sprite_node, true)
-	sprite_node.set_owner(self)
+
+	set_texture(tex)
+	set_offset(offset)
 
 
 #### VIRTUALS ####

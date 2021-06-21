@@ -1,4 +1,4 @@
-extends Node2D
+extends Sprite
 class_name RenderPart
 
 var altitude : int setget set_altitude, get_altitude
@@ -6,10 +6,7 @@ var altitude : int setget set_altitude, get_altitude
 var current_cell : Vector3 setget set_current_cell, get_current_cell
 var object_ref : Node = null setget set_object_ref, get_object_ref 
 
-var sprite_node = null
-
 signal cell_changed(part, cell)
-
 
 #### ACCESSORS ####
 

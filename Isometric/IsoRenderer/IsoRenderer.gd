@@ -1,6 +1,9 @@
 extends Node2D
 class_name IsoRenderer
 
+var outline_shader = preload("res://BabaGodotLib/Shaders/IsoInnerOutline/IsoInnerOutline.tres")
+
+
 # A Base class to render an IsoMap with multiple layers of height and its IsoObject in it
 # Feed the renderer by giving it every layers of your map and every objects
 # using the init_rendering_queue method
@@ -73,8 +76,11 @@ func init_rendering_queue(layers_array: Array, objects_array: Array):
 # Add the given cell to te rendering queue
 func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: bool = false) -> void:
 	var tileset = tilemap.get_tileset()
-	var is_wall = "Wall".is_subsequence_ofi(tilemap.name)
+	var is_wall = "Wall".is_subsequence_ofi(tilemap.name) && tilemap.name != "Walls"
 	var east_wall = "East".is_subsequence_ofi(tilemap.name)
+	var is_ground = "Layer".is_subsequence_ofi(tilemap.name)
+	var is_slope = "Slopes".is_subsequence_ofi(tilemap.name)
+	
 	var tile_size = tilemap.get_cell_size()
 	var z_offset = 0 if tilemap is IsoMapLayer else 1
 	
@@ -92,7 +98,6 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 	var nb_parts = 1 if !scatter else int(round(subtile_size.y / tile_size.y))
 	var mod = tilemap.get_modulate()
 	
-	# Get the texture
 	var stream_texture = tileset.tile_get_texture(tile_id)
 	
 	for i in range(nb_parts):
@@ -103,10 +108,12 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 		atlas_texture.set_atlas(stream_texture)
 		
 		var region_pos = tile_tileset_pos + part_offset
+		var bitmask = 0
 		
 		if tile_mode != tileset.SINGLE_TILE:
 			var autotile_coord = tilemap.get_cell_autotile_coord(int(cell.x), int(cell.y))
 			region_pos += autotile_coord * subtile_size
+			bitmask = tileset.autotile_get_bitmask(tile_id, autotile_coord)
 		
 		atlas_texture.set_region(Rect2(region_pos, part_size))
 		
@@ -120,6 +127,33 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
 				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset, mod)
 		
+		# Dynamic outline
+		if height != 0 && (is_ground or is_wall or is_slope):
+			var has_right_neighbour = tilemap.get_cellv(cell + Vector2(0, -1)) != -1
+			var has_left_neighbour = tilemap.get_cellv(cell + Vector2(-1, 0)) != -1
+			
+			if !has_right_neighbour or !has_left_neighbour or is_wall or is_slope:
+				
+				if (is_wall && !east_wall && !has_left_neighbour) or \
+					(east_wall && !has_right_neighbour) or !is_wall:
+					
+					render_part.set_material(outline_shader.duplicate())
+					var region_size = tile_size + Vector2(0, tile_size.y - 8) * int(is_wall or is_slope)
+					
+					var mater = render_part.get_material()
+					mater.set_shader_param("region_pos", region_pos)
+					mater.set_shader_param("region_size", region_size)
+					
+					var shader_width = 1.0 if !has_left_neighbour && !has_right_neighbour && !east_wall else 0.5
+					if is_wall: shader_width = 0.031
+					
+					var shader_height = 1.0 if bitmask == 0 else 0.5
+					var shader_offset = 0.5 if (!has_right_neighbour && has_left_neighbour) else 0.0
+					if east_wall: shader_offset = 0.969
+					
+					mater.set_shader_param("uv_part_size", Vector2(shader_width, shader_height))
+					mater.set_shader_param("uv_origin", Vector2(shader_offset, 0.0))
+			
 		add_iso_rendering_part(render_part, tilemap)
 
 
