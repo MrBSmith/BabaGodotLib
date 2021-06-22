@@ -126,43 +126,42 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 		
 		var render_part = TileRenderPart.new(tilemap, atlas_texture, 
 				  cell_3D + Vector3(0, 0, i + z_offset), pos, 0, offset, mod)
-#
-#		# Dynamic outline
-#		if height != 0 && (is_ground or is_wall or is_slope):
-#			var has_right_neighbour = tilemap.get_cellv(cell + Vector2(0, -1)) != -1
-#			var has_left_neighbour = tilemap.get_cellv(cell + Vector2(-1, 0)) != -1
-#			var wall_corner = false 
-#
-#			# Check for an inner corner situation in case of a wall
-#			if is_wall:
-#				var parent_tilemap = tilemap.get_parent()
-#				var cell_to_check = Vector2(1, -1) if east_wall else Vector2(-1, 1)
-#				wall_corner = parent_tilemap.get_cellv(cell + cell_to_check) != -1
-#
-#			if wall_corner:
-#				print("Wall corner")
-#
-#			if !has_right_neighbour or !has_left_neighbour:
-#
-#				if (is_wall && !east_wall && !has_left_neighbour && !wall_corner) or \
-#					(east_wall && !has_right_neighbour && !wall_corner) or !is_wall:
-#
-#					render_part.set_material(outline_shader.duplicate())
-#					var region_size = tile_size + Vector2(0, tile_size.y - 8) * int(is_wall or is_slope)
-#
-#					var mater = render_part.get_material()
-#					mater.set_shader_param("region_pos", region_pos)
-#					mater.set_shader_param("region_size", region_size)
-#
-#					var shader_width = 1.0 if !has_left_neighbour && !has_right_neighbour && !is_wall && !is_slope else 0.5
-#					if is_wall: shader_width = 0.031
-#
-#					var shader_height = 1.0 if bitmask == 0 else 0.5
-#					var shader_offset = 0.5 if (!has_right_neighbour && has_left_neighbour) else 0.0
-#					if east_wall: shader_offset = 0.969
-#
-#					mater.set_shader_param("uv_part_size", Vector2(shader_width, shader_height))
-#					mater.set_shader_param("uv_origin", Vector2(shader_offset, 0.0))
+		
+		# Dynamic outline
+		if height > 0 && (is_ground or is_wall or is_slope):
+			var has_right_neighbour = tilemap.get_cellv(cell + Vector2(0, -1)) != -1
+			var has_left_neighbour = tilemap.get_cellv(cell + Vector2(-1, 0)) != -1
+			var wall_corner = false 
+			
+			# Check for an inner corner situation in case of a wall
+			if is_wall:
+				var parent_tilemap = tilemap.get_parent()
+				var cell_to_check = Vector2(1, -1) if east_wall else Vector2(-1, 1)
+				wall_corner = parent_tilemap.get_cellv(cell + cell_to_check) != -1
+			
+			var needs_outline = !has_right_neighbour or !has_left_neighbour
+			var is_outlined_left_wall : bool = is_wall && !east_wall && !has_left_neighbour && !wall_corner
+			var is_outlined_right_wall : bool = east_wall && !has_right_neighbour && !wall_corner
+			var no_neighbours : bool = !has_left_neighbour && !has_right_neighbour 
+			
+			if needs_outline && (!is_wall or is_outlined_left_wall or is_outlined_right_wall):
+				
+					render_part.set_material(outline_shader.duplicate())
+					var region_size = tile_size + Vector2(0, tile_size.y - 8) * int(is_wall or is_slope)
+					
+					var mater = render_part.get_material()
+					mater.set_shader_param("region_pos", region_pos)
+					mater.set_shader_param("region_size", region_size)
+					
+					var shader_width = 1.0 if no_neighbours && is_ground else 0.5
+					if is_wall: shader_width = 0.031
+					
+					var shader_height = 1.0 if bitmask == 0 else 0.5
+					var shader_offset = 0.5 if (!has_right_neighbour && has_left_neighbour) else 0.0
+					if east_wall: shader_offset = 0.969
+					
+					mater.set_shader_param("uv_part_size", Vector2(shader_width, shader_height))
+					mater.set_shader_param("uv_origin", Vector2(shader_offset, 0.0))
 			
 		add_iso_rendering_part(render_part, tilemap)
 
