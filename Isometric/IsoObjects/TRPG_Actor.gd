@@ -73,12 +73,7 @@ func set_default_range(value: int): default_range = value
 func get_default_range() -> int: return default_range
 
 func get_current_range() -> int: 
-	var current_range = get_default_range() if weapon == null else 0
-	if !weapon: return current_range
-	
-	for item in equipment:
-		if item.has_method("get_attack_range"):
-			current_range += item.get_attack_range()
+	var current_range = get_default_range() if weapon == null else weapon.aoe.range_size
 	return current_range
 
 func set_current_actions(value : int):

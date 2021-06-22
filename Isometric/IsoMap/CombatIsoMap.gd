@@ -162,6 +162,16 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 	return targetables
 
 
+# Find the targets that are targetables (ie a path of the given lenght exists) among the given target_array
+func get_reachable_targets(actor: TRPG_Actor, actor_range: int, target_array: Array) -> Array:
+	var targetables = []
+	for target in target_array:
+		var path = pathfinding.find_path_to_reach(actor.get_current_cell(), target.get_current_cell())
+		if path.size() <= actor_range && path.size() != 0:
+			targetables.append(target)
+	return targetables
+
+
 # Return the number of targets reachable by the active actor if it was at the given cell
 # if no cell is passed, the function will use the current_cell of the given actor
 func count_reachable_enemies(actor: TRPG_Actor, cell:= Vector3.INF) -> int:
