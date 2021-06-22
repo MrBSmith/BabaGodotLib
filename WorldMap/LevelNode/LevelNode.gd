@@ -15,7 +15,7 @@ export var level_scene_path : String = "" setget , get_level_scene_path
 export var level_name : String = "" setget set_level_name, get_level_name
 
 export var hidden : bool = false setget set_hidden, is_hidden
-export var accessible : bool = true
+export var accessible : bool = true setget set_accessible, is_accessible
 export var visited : bool = false setget set_visited, is_visited
 
 var editor_select_state : int = EDITOR_SELECTED.UNSELECTED setget set_editor_select_state, get_editor_select_state
@@ -55,6 +55,14 @@ func set_visited(value: bool):
 	else: set_modulate(Color.white)
 
 func is_visited() -> bool: return visited
+
+func set_accessible(value : bool):
+	accessible = value
+	if !accessible:
+		set_modulate(Color.firebrick)
+	else: set_modulate(Color.white)
+
+func is_accessible() -> bool: return accessible
 
 func set_hidden(value: bool): 
 	if !is_ready:
