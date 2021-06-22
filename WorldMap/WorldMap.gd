@@ -134,17 +134,21 @@ func get_bind(origin: LevelNode, dest: LevelNode) -> LevelNodeBind:
 # Trigger the scene change to enter the level
 func enter_current_level():
 	var current_cursor_level = cursor.get_current_level()
-	var is_cursor_level_accessible = current_cursor_level.is_accessible()
+	GAME.goto_level_by_path(current_cursor_level.get_level_scene_path())
 	
-	if current_cursor_level != null:
-		var current_level_path = current_cursor_level.get_level_scene_path()
+#	if current_cursor_level != null:
+#		var current_level_path = current_cursor_level.get_level_scene_path()
 		
-		if current_level_path == "":
-			push_error("The LevelNode " + current_cursor_level.name + " doesn't have any scene path")
+#		if current_level_path == "":
+#			push_error("The LevelNode " + current_cursor_level.name + " doesn't have any scene path")
 		
-		GAME.goto_level_by_path(current_level_path)
+#		GAME.goto_level_by_path(current_level_path)
 
-
+func is_level_valid(level : LevelNode):
+	return level != null and \
+	level.is_accessible() and \
+	level.get_level_scene_path() != "" and \
+	!characters_container.is_moving()
 
 #### INPUTS ####
 
@@ -167,7 +171,10 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_accept"):
 		var cursor_level_node = cursor.get_current_level()
 		
-		if !characters_container.is_moving() and cursor_level_node.is_accessible():
+#		if !characters_container.is_moving() and cursor_level_node.is_accessible():
+#			enter_current_level()
+			
+		if is_level_valid(cursor_level_node):
 			enter_current_level()
 
 
