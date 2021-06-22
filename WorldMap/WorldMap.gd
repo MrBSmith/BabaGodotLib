@@ -135,14 +135,6 @@ func get_bind(origin: LevelNode, dest: LevelNode) -> LevelNodeBind:
 func enter_current_level():
 	var current_cursor_level = cursor.get_current_level()
 	GAME.goto_level_by_path(current_cursor_level.get_level_scene_path())
-	
-#	if current_cursor_level != null:
-#		var current_level_path = current_cursor_level.get_level_scene_path()
-		
-#		if current_level_path == "":
-#			push_error("The LevelNode " + current_cursor_level.name + " doesn't have any scene path")
-		
-#		GAME.goto_level_by_path(current_level_path)
 
 func is_level_valid(level : LevelNode):
 	return level != null and \
@@ -170,9 +162,7 @@ func _input(_event: InputEvent) -> void:
 	
 	if Input.is_action_just_pressed("ui_accept"):
 		var cursor_level_node = cursor.get_current_level()
-		
-#		if !characters_container.is_moving() and cursor_level_node.is_accessible():
-#			enter_current_level()
+
 			
 		if is_level_valid(cursor_level_node):
 			enter_current_level()
