@@ -1,7 +1,6 @@
 extends RenderPart
 class_name IsoRenderPart
 
-onready var renderer = get_parent()
 
 #### ACCESSORS ####
 

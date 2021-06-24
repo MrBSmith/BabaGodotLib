@@ -8,7 +8,6 @@ class_name IsoPathfinder
 # You can then call find_path to find a path between two cells
 # You can also call find_reachable_cells to get a PoolVector3Array of reachable cells
 
-
 onready var astar_node = AStar.new()
 onready var map_node = get_parent()
 
@@ -116,13 +115,20 @@ func find_path(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	return cell_path
 
 
-# Find a path between the start_cell and the iso_object (Considering this object as passable)
+# Find a path between the start_cell and the end_cell (Considering the start_cell as passable)
 func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
+	var start_cell_id = compute_cell_index(start_cell)
 	var end_cell_id = compute_cell_index(end_cell)
+	
+	var start_cell_state = astar_node.is_point_disabled(start_cell_id)
+	var end_cell_state = astar_node.is_point_disabled(end_cell_id)
+	
 	astar_node.set_point_disabled(end_cell_id, false)
+	astar_node.set_point_disabled(start_cell_id, false)
 	
 	var path = find_path(start_cell, end_cell)
-	astar_node.set_point_disabled(end_cell_id, true)
+	astar_node.set_point_disabled(start_cell_id, start_cell_state)
+	astar_node.set_point_disabled(end_cell_id, end_cell_state)
 	
 	if path != PoolVector3Array():
 		path.resize(path.size() - 1)
@@ -132,7 +138,7 @@ func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Ar
 
 # Find all the walkable cells and retrun their position
 func find_reachable_cells(actor_cell : Vector3, actor_movements : int) -> PoolVector3Array:
-	var reachable_cells : PoolVector3Array = [actor_cell]
+	var reachable_cells : PoolVector3Array = []
 	var relatives : PoolVector3Array
 
 	for i in range(1, actor_movements + 1):
@@ -149,7 +155,7 @@ func find_reachable_cells(actor_cell : Vector3, actor_movements : int) -> PoolVe
 			
 				# Get the lenght of the path between the actor and the cursor
 				var path_len = len(find_path(actor_cell, cell))
-				if path_len > 0 && path_len - 1 <= actor_movements:
+				if path_len > 0 && path_len - 1 <= actor_movements && cell != actor_cell:
 					reachable_cells.append(cell)
 
 	return reachable_cells

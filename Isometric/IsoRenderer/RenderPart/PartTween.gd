@@ -1,28 +1,21 @@
 extends Tween
-class_name PartTween
+class_name IsoRendererTween
 
 var base_dist = GAME.TILE_SIZE.y / 2
 
-var target_node : Node = null
-
 var dir := Vector2.DOWN
-var total_time : float = 0.0
-var magnitude : float = 0.0
-
-var nb_movements : int = 0
-var movement_counter : int = 0
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "PartTween" or .is_class(value)
-func get_class() -> String: return "PartTween"
+func is_class(value: String): return value == "IsoRendererTween" or .is_class(value)
+func get_class() -> String: return "IsoRendererTween"
 
 
 #### BUILT-IN ####
 
 
 func _ready() -> void:
-	var _err = connect("tween_all_completed", self, "_on_tween_all_completed")
+	var _err = connect("tween_completed", self, "_on_tween_completed")
 
 
 #### VIRTUALS ####
@@ -31,39 +24,39 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func appear(duration: float):
-	var __ = interpolate_property(target_node, "position",
+func appear(part: RenderPart, duration: float, delay: float = 0.0):
+	var __ = interpolate_property(part, "position",
 		Vector2(0, -GAME.SCREEN_SIZE.y), Vector2.ZERO, duration,
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
+		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT, delay)
 	
 	__ = start()
 
 
-func disapear(duration: float):
-	var __ = interpolate_property(target_node, "position",
+func disapear(part: RenderPart, duration: float, delay: float = 0.0):
+	var __ = interpolate_property(part, "position",
 		Vector2.ZERO, Vector2(0, GAME.SCREEN_SIZE.y), duration,
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
+		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT, delay)
 	
 	__ = start()
 
 
-func start_sin_move(node: Node, magn: int, duration: float = 0.7, nb_vawes : int = 1):
-	target_node = node
-	magnitude = magn
-	total_time = duration
-	nb_movements = nb_vawes * 2
-	movement_counter = nb_movements
+func start_sin_move(part: RenderPart, magn: int, duration: float = 0.7, 
+		nb_vawes : int = 1, delay: float = 0.0) -> void:
 	
-	start_wave_interpolation()
+	part.sin_mov_magnitude = magn
+	part.sin_nb_movements = nb_vawes * 2
+	part.sin_mov_duration = duration
+	part.sin_mov_origin = part.get_position()
+	
+	start_wave_interpolation(part, false, delay)
 
 
-func start_wave_interpolation(to_origin : bool = false):
-	var dest = dir * base_dist * magnitude if !to_origin else Vector2.ZERO
-	var duration = total_time / (nb_movements + 1)
+func start_wave_interpolation(part: RenderPart, to_origin : bool = false, delay: float = 0.0) -> void:
+	var dest = part.sin_mov_origin + dir * base_dist * part.sin_mov_magnitude if !to_origin else part.sin_mov_origin
+	var duration = part.sin_mov_duration / (part.sin_nb_movements + 1)
 	
-	var __ = interpolate_property(target_node, "position",
-		target_node.position, dest, duration,
-		Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
+	var __ = interpolate_property(part, "position", part.position, dest, duration,
+		TRANS_LINEAR, EASE_IN_OUT, delay)
 	
 	__ = start()
 
@@ -74,11 +67,11 @@ func start_wave_interpolation(to_origin : bool = false):
 
 #### SIGNAL RESPONSES ####
 
-func _on_tween_all_completed():
-	if movement_counter == 0:
+func _on_tween_completed(obj: Object, _key: NodePath):
+	if obj.sin_nb_movements == 0:
 		return
 	
-	movement_counter -= 1
-	dir = -dir
+	obj.sin_nb_movements -= 1
+	obj.sin_movement_dir = -obj.sin_movement_dir
 	
-	start_wave_interpolation(movement_counter == 0)
+	start_wave_interpolation(obj, obj.sin_nb_movements == 0)

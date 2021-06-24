@@ -8,8 +8,11 @@ class_name IsoEvents
 signal appear_transition()
 signal disappear_transition()
 
+signal click_at_cell(cell)
+
 signal cursor_world_pos_changed(cursor)
 signal cursor_cell_changed(cursor, cell)
+
 signal iso_object_cell_changed(iso_object)
 signal iso_object_world_pos_changed(iso_object)
 

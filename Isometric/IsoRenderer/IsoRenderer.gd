@@ -3,7 +3,6 @@ class_name IsoRenderer
 
 var outline_shader = preload("res://BabaGodotLib/Shaders/IsoInnerOutline/IsoInnerOutline.tres")
 
-
 # A Base class to render an IsoMap with multiple layers of height and its IsoObject in it
 # Feed the renderer by giving it every layers of your map and every objects
 # using the init_rendering_queue method
@@ -16,6 +15,9 @@ var outline_shader = preload("res://BabaGodotLib/Shaders/IsoInnerOutline/IsoInne
 # Each time an object change cell, or an object is added or removed, 
 # the renderer is informed by the iso_object_cell_changed, iso_object_added & iso_object_removed signals. 
 # This is why it is mandatory to use IsoObject inherited objects for it to work with this renderer
+
+onready var tween = $Tween
+onready var rendering_queue = $RenderingQueue
 
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
@@ -55,9 +57,10 @@ func _ready() -> void:
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
 
 
+
 #### LOGIC ####
 
-func init_rendering_queue(layers_array: Array, objects_array: Array):
+func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
 	for i in range(layers_array.size()):
 		for cell in layers_array[i].get_used_cells():
 			var height = i - int(is_cell_slope(cell, layers_array[i])) * 0.5
@@ -175,28 +178,29 @@ func is_cell_slope(cell: Vector2, tilemap: TileMap) -> bool:
 
 
 # Add the given part in the rendering queue
-func add_iso_rendering_part(part: RenderPart, obj: Node):
-	if get_child_count() == 0:
+func add_iso_rendering_part(part: RenderPart, obj: Node) -> void:
+	if rendering_queue.get_child_count() == 0:
 		add_part(part, obj)
 	else:
-		var children = get_children()
+		var children = rendering_queue.get_children()
 		for i in range(children.size()):
 			if xyz_sum_compare(part, children[i]):
 				add_part(part, obj)
-				move_child(part, i)
+				rendering_queue.move_child(part, i)
 				break
 
 
 # Add the given part to the render queue
-func add_part(part: RenderPart, obj: Node):
+func add_part(part: RenderPart, obj: Node) -> void:
 	part.set_name(obj.name)
-	add_child(part, true)
+	part.renderer = self
+	rendering_queue.add_child(part, true)
 	part.set_owner(self)
 
 
 # Update the tile visibility based on the visibles cells
-func update_tiles_visibility():
-	for child in get_children():
+func update_tiles_visibility() -> void:
+	for child in rendering_queue.get_children():
 		if child is TileRenderPart:
 			var part_cell = child.get_current_cell()
 			if part_cell in visible_cells[IsoObject.VISIBILITY.BARELY_VISIBLE]:
@@ -216,21 +220,21 @@ func add_iso_obj(obj: IsoObject) -> void:
 
 
 # Remove the given object from the rendering queue
-func remove_iso_obj(obj: Object):
-	for child in get_children():
+func remove_iso_obj(obj: Object) -> void:
+	for child in rendering_queue.get_children():
 		if child.get_object_ref() == obj:
 			child.queue_free()
 
 
 # Replace the given obj at the right position in the rendering queue
-func reorder_iso_obj(obj: IsoObject):
+func reorder_iso_obj(obj: IsoObject) -> void:
 	for part in get_obj_parts(obj):
 		reorder_part(part)
 
 
 # Replace the given part at the right position in the rendering queue
-func reorder_part(part: RenderPart):
-	var children = get_children()
+func reorder_part(part: RenderPart) -> void:
+	var children = rendering_queue.get_children()
 	var part_obj = part.get_object_ref()
 	for i in range(children.size()):
 		var child = children[i]
@@ -238,23 +242,23 @@ func reorder_part(part: RenderPart):
 		if xyz_sum_compare(part, child):
 			var part_id = part.get_index()
 			if part_id < i:
-				move_child(part, i - 1)
+				rendering_queue.move_child(part, i - 1)
 			else:
-				move_child(part, i)
+				rendering_queue.move_child(part, i)
 			break
 
 
 # Returns every parts in the render queue that references the given object
 func get_obj_parts(obj: IsoObject) -> Array:
 	var part_array := Array()
-	for child in get_children():
+	for child in rendering_queue.get_children():
 		if child.get_object_ref() == obj:
 			part_array.append(child)
 	return part_array
 
 
 func remove_part_at_cell(cell: Vector3, obj: Node = null) -> void:
-	for child in get_children():
+	for child in rendering_queue.get_children():
 		if obj != null && child.get_object_ref() != obj:
 			continue
 		
@@ -297,8 +301,8 @@ func get_every_iso_sprites(obj: Node, array: Array) -> void:
 
 
 # Check if the given object have at least one part of it in the rendering queue
-func is_obj_in_rendering_queue(obj: IsoObject):
-	for child in get_children():
+func is_obj_in_rendering_queue(obj: IsoObject) -> bool:
+	for child in rendering_queue.get_children():
 		if child.get_object_ref() == obj:
 			return true
 	return false 
@@ -348,7 +352,7 @@ func xyz_sum_compare(a: RenderPart, b: RenderPart) -> bool:
 # Returns the parts at the given 2D position
 func get_parts_at_2D_pos(pos: Vector2) -> Array:
 	var part_array = Array()
-	for child in get_children():
+	for child in rendering_queue.get_children():
 		var child_cell = child.get_current_cell()
 		if child_cell.x == pos.x && child_cell.y == pos.y:
 			part_array.append(child)
@@ -357,10 +361,10 @@ func get_parts_at_2D_pos(pos: Vector2) -> Array:
 
 # Returns an array of stacks ordered by x and y
 func get_parts_stack_by_2D_order() -> Array:
-	var top_most_part = get_child(0)
+	var top_most_part = rendering_queue.get_child(0)
 	var top_most_cell = top_most_part.get_current_cell()
 	
-	var bottom_most_part = get_child(get_child_count() - 1)
+	var bottom_most_part = rendering_queue.get_child(rendering_queue.get_child_count() - 1)
 	var bottom_most_cell = bottom_most_part.get_current_cell()
 	var parts_stack_array := Array()
 	
@@ -376,10 +380,10 @@ func get_parts_stack_by_2D_order() -> Array:
 func get_stack_by_2D_dist(corner := Vector2.DOWN) -> Array:
 	var parts_stack_array := Array()
 	
-	var top_most_part = get_child(0)
+	var top_most_part = rendering_queue.get_child(0)
 	var top_most_cell = top_most_part.get_current_cell()
 	
-	var bottom_most_part = get_child(get_child_count() - 1)
+	var bottom_most_part = rendering_queue.get_child(rendering_queue.get_child_count() - 1)
 	var bottom_most_cell = bottom_most_part.get_current_cell()
 	var max_dist = abs(top_most_cell.x + bottom_most_cell.x) + abs(top_most_cell.y + bottom_most_cell.y)
 	
@@ -409,17 +413,17 @@ func get_stack_by_2D_dist(corner := Vector2.DOWN) -> Array:
 #### ANIMATION ####
 
 # Apply a tile shake effect
-func shake(origin: Vector2, magnitude: int, wave: bool = true, duration: float = 1.0):
-	for part in get_children():
+func shake(origin: Vector2, magnitude: int, duration: float = 1.0) -> void:
+	for part in rendering_queue.get_children():
 		var part_cell = part.get_current_cell()
 		var dist_to_origin = abs(part_cell.x - origin.x) + abs(part_cell.y - origin.y)
 		if dist_to_origin <= magnitude:
 			var mag = int(clamp(magnitude - dist_to_origin, 0, magnitude))
 			var delay = (duration / 3) * (dist_to_origin / 2)
-			part.start_sin_move(wave, mag, delay)
+			tween.start_sin_move(part, mag, duration, 1, delay)
 
 
-func appear_transition(total_time: float = 4.0, tile_order := Vector2.DOWN):
+func appear_transition(total_time: float = 4.0, tile_order := Vector2.DOWN) -> void:
 	var stack_array = get_stack_by_2D_dist(tile_order)
 	var appear_delay = total_time / stack_array.size()
 	
@@ -428,7 +432,7 @@ func appear_transition(total_time: float = 4.0, tile_order := Vector2.DOWN):
 			stack_array[i][j].appear((i + j * 2) * appear_delay)
 
 
-func disappear_transition(total_time: float = 4.0):
+func disappear_transition(total_time: float = 4.0) -> void:
 	var stack_array = get_stack_by_2D_dist()
 	var appear_delay = total_time / stack_array.size()
 	
@@ -439,32 +443,32 @@ func disappear_transition(total_time: float = 4.0):
 
 #### SIGNAL RESPONSES ####
 
-func _on_iso_object_cell_changed(obj: IsoObject):
+func _on_iso_object_cell_changed(obj: IsoObject) -> void:
 	if !is_obj_in_rendering_queue(obj):
 		add_iso_obj(obj)
 
 
-func _on_iso_object_added(obj: IsoObject):
+func _on_iso_object_added(obj: IsoObject) -> void:
 	add_iso_obj(obj)
 
 
-func _on_iso_object_removed(obj: IsoObject):
+func _on_iso_object_removed(obj: IsoObject) -> void:
 	remove_iso_obj(obj)
 
 
-func _on_part_cell_changed(part: IsoRenderPart, _cell: Vector3):
+func _on_part_cell_changed(part: IsoRenderPart, _cell: Vector3) -> void:
 	reorder_part(part)
 
 
-func _on_tiles_shake(origin: Vector2, magnitude: int):
+func _on_tiles_shake(origin: Vector2, magnitude: int) -> void:
 	shake(origin, magnitude)
 
 
-func _on_appear_transition():
+func _on_appear_transition() -> void:
 	appear_transition()
 
 
-func _on_disappear_transition():
+func _on_disappear_transition() -> void:
 	disappear_transition()
 
 
@@ -492,3 +496,7 @@ func _on_area_cleared(map: IsoMap) -> void:
 		var layer = layers_array[i]
 		var area = layer.get_node("Area")
 		remove_iso_obj(area)
+
+
+func _on_click_at_cell_event(cell: Vector3) -> void:
+	shake(Vector2(cell.x, cell.y), 3, 0.2)

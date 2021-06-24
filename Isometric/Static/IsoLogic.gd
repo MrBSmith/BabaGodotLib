@@ -98,3 +98,16 @@ static func get_cells_in_sphere(origin: Vector3, radius: int) -> PoolVector3Arra
 					cells_in_range.append(cell)
 	
 	return cells_in_range
+
+
+static func sort_cells_by_dist(origin: Vector3, cells_array: Array) -> Dictionary:
+	var output_dict = Dictionary()
+	
+	for cell in cells_array:
+		var dist = iso_3D_dist(origin, cell)
+		if output_dict.has(dist):
+			output_dict[dist].append(cell)
+		else:
+			output_dict[dist] = [cell]
+	
+	return output_dict

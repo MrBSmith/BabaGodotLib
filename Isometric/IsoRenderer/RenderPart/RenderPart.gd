@@ -1,6 +1,14 @@
 extends Sprite
 class_name RenderPart
 
+var renderer
+
+var sin_movement_dir : int = 0
+var sin_nb_movements : int = 0
+var sin_mov_magnitude : float = 0.0
+var sin_mov_duration : float = 0.0
+var sin_mov_origin := Vector2.ZERO
+
 var altitude : int setget set_altitude, get_altitude
 
 var current_cell : Vector3 setget set_current_cell, get_current_cell
