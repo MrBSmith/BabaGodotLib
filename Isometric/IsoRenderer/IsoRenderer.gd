@@ -165,7 +165,7 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 					
 					mater.set_shader_param("uv_part_size", Vector2(shader_width, shader_height))
 					mater.set_shader_param("uv_origin", Vector2(shader_offset, 0.0))
-			
+		
 		add_iso_rendering_part(render_part, tilemap)
 
 
@@ -194,7 +194,7 @@ func add_iso_rendering_part(part: RenderPart, obj: Node) -> void:
 func add_part(part: RenderPart, obj: Node) -> void:
 	part.set_name(obj.name)
 	part.renderer = self
-	rendering_queue.add_child(part, true)
+	rendering_queue.add_child(part)
 	part.set_owner(self)
 
 
@@ -410,6 +410,16 @@ func get_stack_by_2D_dist(corner := Vector2.DOWN) -> Array:
 	return parts_stack_array
 
 
+func add_area(map: IsoMap, cell_array: PoolVector3Array) -> void:
+	var layers_array = map.get_layers_array()
+	
+	for cell in cell_array:
+		var height = round(cell.z)
+		var layer = layers_array[height]
+		var area = layer.get_node("Area")
+		add_cell_to_queue(Vector2(cell.x, cell.y), area, height)
+
+
 #### ANIMATION ####
 
 # Apply a tile shake effect
@@ -477,13 +487,7 @@ func _on_update_rendered_visible_cells(view_field: Array) -> void:
 
 
 func _on_area_added(map: IsoMap, cell_array: PoolVector3Array) -> void:
-	var layers_array = map.get_layers_array()
-	
-	for cell in cell_array:
-		var height = round(cell.z)
-		var layer = layers_array[height]
-		var area = layer.get_node("Area")
-		add_cell_to_queue(Vector2(cell.x, cell.y), area, height)
+	add_area(map, cell_array)
 
 
 func _on_area_cell_removed(tilemap: TileMap, cell: Vector3) -> void:

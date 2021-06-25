@@ -112,7 +112,8 @@ static func get_cells_in_sphere(origin: Vector3, radius: int) -> PoolVector3Arra
 	return cells_in_range
 
 
-static func sort_cells_by_dist(origin: Vector3, cells_array: Array) -> Dictionary:
+# Returns an 2Darray of cells, each element represent a level of distance from the origin
+static func sort_cells_by_dist(origin: Vector3, cells_array: PoolVector3Array) -> Array:
 	var output_dict = Dictionary()
 	
 	for cell in cells_array:
@@ -122,4 +123,4 @@ static func sort_cells_by_dist(origin: Vector3, cells_array: Array) -> Dictionar
 		else:
 			output_dict[dist] = [cell]
 	
-	return output_dict
+	return output_dict.values()

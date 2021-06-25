@@ -281,6 +281,12 @@ func get_cell2D_highest_z(cell : Vector2) -> float:
 	return -1.0
 
 
+func cell_2D_to_3D(cell: Vector2) -> Vector3:
+	var z = get_cell2D_highest_z(cell)
+	if z == -1.0: return Vector3.INF
+	return Vector3(cell.x, cell.y, z)
+
+
 # Returns the slope type of the given cell2D in the given layer
 func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer : IsoMapLayer = get_layer(layer_id)
@@ -340,7 +346,6 @@ func is_damagable_on_cell(cell: Vector3) -> bool:
 	return false
 
 
-
 # Check if the given cell is occupied by an obstacle 
 # (ie a tile of the obstacle tilmap, child of a layer)
 func is_occupied_by_obstacle(cell: Vector3) -> bool:
@@ -393,7 +398,7 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 
 # Check if the cell is empty (ie there is no tile nor obstacle on it)
 func is_cell_free(cell: Vector3) -> bool:
-	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null && !is_occupied_by_obstacle(cell)
+	return !is_cell_tile(cell) && !is_cell_wall(cell) && get_damagable_on_cell(cell) == null && !is_occupied_by_obstacle(cell)
 
 
 func has_2D_cell(cell: Vector2) -> bool:
@@ -407,6 +412,12 @@ func has_2D_cell(cell: Vector2) -> bool:
 func is_cell_tile(cell: Vector3) ->  bool:
 	var layer = get_layer(round(cell.z))
 	return layer != null && layer.get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
+
+
+func is_cell_wall(cell: Vector3) -> bool:
+	var layer = get_layer(round(cell.z))
+	return layer != null && layer.get_node("Walls").get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
+
 
 
 func is_cell_above_ground(cell: Vector3):
@@ -430,7 +441,6 @@ func is_world_pos_in_cell(pos: Vector2, cell: Vector3) -> bool:
 # Check if a position is valid, return true if it is, false if it is not
 func is_position_valid(cell: Vector3) -> bool:
 	return !is_damagable_on_cell(cell) && is_cell_ground(cell)
-
 
 
 # Find if a cell x and y is in the heightmap grid, and returns it

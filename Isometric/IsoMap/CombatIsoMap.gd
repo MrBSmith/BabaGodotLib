@@ -75,12 +75,14 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 	for i in range(ranged_cells.size()):
 		var cell = ranged_cells[-i - 1]
 		
-		if cell in visible_cells: continue
+		if cell in visible_cells or is_cell_free(cell): 
+			continue
 		
 		var valid_cells = IsoRaycast.get_line_of_sight(self, origin + Vector3(0, 0, h), cell.round(), obj_ignored)
 		
 		for c in valid_cells:
-			visible_cells.append(c)
+			if not c in visible_cells:
+				visible_cells.append(c)
 	
 	return visible_cells
 

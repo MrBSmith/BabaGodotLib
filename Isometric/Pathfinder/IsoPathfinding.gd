@@ -95,19 +95,16 @@ func connect_walkable_cells(cells_array: PoolVector3Array, active_actor: TRPG_Ac
 						cell_rel_index, false)
 
 
-
 # Retrun the shortest path between two points, or an empty path if there is no path to take to get there
 func find_path(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	var cell_path : PoolVector3Array = []
 
-	# Check if the given start and end points are valid, retrun an empty array if not
-	if start_cell == Vector3.INF or end_cell == Vector3.INF:
-		cell_path = []
-		return PoolVector3Array()
-
 	# Calculate the start and the end cell index
 	var start_cell_index = compute_cell_index(start_cell)
 	var end_cell_index = compute_cell_index(end_cell)
+
+	if !astar_node.has_point(start_cell_index) or !astar_node.has_point(end_cell_index):
+		return PoolVector3Array()
 
 	# Find a path between this two points, and store it into cell_path
 	cell_path = astar_node.get_point_path(start_cell_index, end_cell_index)
@@ -136,29 +133,27 @@ func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Ar
 	return path
 
 
-# Find all the walkable cells and retrun their position
-func find_reachable_cells(actor_cell : Vector3, actor_movements : int) -> PoolVector3Array:
-	var reachable_cells : PoolVector3Array = []
-	var relatives : PoolVector3Array
+func find_reachable_cells(origin: Vector3, radius: int) -> PoolVector3Array:
+	var cells_in_circle = IsoLogic.get_cells_in_circle(origin, radius)
+	var sorted_cells = IsoLogic.sort_cells_by_dist(origin, cells_in_circle)
+	var reachables := PoolVector3Array() 
 
-	for i in range(1, actor_movements + 1):
-		# Find the adjacents cells of the current cell
-		if i == 1:
-			relatives = find_relatives([actor_cell], reachable_cells)
-		else:
-			relatives = find_relatives(relatives, reachable_cells)
+	for i in range(sorted_cells.size()):
+		var dist_cell_array = sorted_cells[i]
+		for c in dist_cell_array:
+			var cell = map_node.cell_2D_to_3D(Vector2(c.x, c.y))
+			if cell in reachables:
+				continue
 
-		# Check for every points if it is valid, not already treated
-		# and if a path exist between the actor's position and it
-		for cell in relatives:
-			if map_node.is_position_valid(cell) && !(cell in reachable_cells):
+			var path = find_path(origin, cell)
+			if path.size() - 1 > radius:
+				continue
 			
-				# Get the lenght of the path between the actor and the cursor
-				var path_len = len(find_path(actor_cell, cell))
-				if path_len > 0 && path_len - 1 <= actor_movements && cell != actor_cell:
-					reachable_cells.append(cell)
+			for path_cell in path:
+				if not path_cell in reachables:
+					reachables.append(path_cell)
 
-	return reachable_cells
+	return reachables
 
 
 # Find all the relatives to an array of points, checking if they haven't been treated before,

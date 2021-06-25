@@ -11,7 +11,7 @@ static func get_line_of_sight(map: IsoMap, origin: Vector3, dest: Vector3, obj_i
 		if cell == line[0]: continue
 		
 		if !map.is_cell_free(cell):
-			if map.is_cell_tile(cell) or map.is_occupied_by_obstacle(cell):
+			if map.is_cell_tile(cell) or map.is_cell_wall(cell) or map.is_occupied_by_obstacle(cell):
 				line_of_sight.append(cell)
 				break
 			else:
@@ -24,7 +24,6 @@ static func get_line_of_sight(map: IsoMap, origin: Vector3, dest: Vector3, obj_i
 			line_of_sight.append(cell)
 	
 	return line_of_sight
-
 
 
 static func bresenham3D(origin: Vector3, dest: Vector3) -> PoolVector3Array:
