@@ -5,6 +5,8 @@ class_name IsoMap
 # A base class to handle an iso IsoMap
 # An iso IsoMap must be the parent of as many IsoMapLayer as your IsoMap has grounds (altitude levels)
 
+const MAP_SEGMENT_SIZE = 6
+
 enum SLOPE_TYPE {
 	NONE,
 	SLOPE_LEFT,
@@ -77,7 +79,6 @@ func _ready():
 	emit_signal("map_generation_finished")
 
 
-
 #### LOGIC ####
 
 # Get every unpassable object form the IsoObject group 
@@ -146,6 +147,11 @@ func _init_object_grid_pos():
 
 
 #### LAYERS ####
+
+
+func get_map_rect() -> Rect2:
+	var layer_0 = get_layer(0)
+	return layer_0.get_used_rect()
 
 
 # Return the layer at the given height
@@ -390,6 +396,12 @@ func is_cell_free(cell: Vector3) -> bool:
 	return !is_cell_tile(cell) && get_damagable_on_cell(cell) == null && !is_occupied_by_obstacle(cell)
 
 
+func has_2D_cell(cell: Vector2) -> bool:
+	for layer in get_layers_array():
+		if layer.get_cellv(cell) != TileMap.INVALID_CELL:
+			return true
+	return false
+
 # Returns true is the given cell is one of the tile of one of the layers constiting the map
 # Unless is_cell_ground this function will return true even if the tile isn't an accecible one
 func is_cell_tile(cell: Vector3) ->  bool:
@@ -433,7 +445,7 @@ static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
 # Get the adjacent cells of the given one
 func get_existing_adjacent_cells(cell: Vector3) -> PoolVector3Array:
 	var adjacents : PoolVector3Array = []
-	var relatives = get_adjacent_cells(cell)
+	var relatives = IsoLogic.get_adjacent_cells(Vector2(cell.x, cell.y))
 	
 	for relative_cell in relatives:
 		var adj = find_2D_cell(relative_cell, grounds)
@@ -443,27 +455,89 @@ func get_existing_adjacent_cells(cell: Vector3) -> PoolVector3Array:
 	return adjacents
 
 
-# Get the adjacents cells of the given one 
-# This method DOSEN'T check if the cells exists. If you need to do so, 
-# use get_existing_adjacent_cells instead
-static func get_adjacent_cells(cell: Vector3) -> Array:
-	return [ 
-		Vector2(cell.x + 1, cell.y),
-		Vector2(cell.x, cell.y + 1),
-		Vector2(cell.x - 1, cell.y),
-		Vector2(cell.x, cell.y - 1)
-	]
-
-
 static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
 	var result_array := PoolVector3Array()
-	var v2_adjacent = get_adjacent_cells(cell)
+	var v2_adjacent = IsoLogic.get_adjacent_cells(Vector2(cell.x, cell.y))
 	
 	for adj in v2_adjacent:
 		var point = Vector3(adj.x, adj.y, cell.z)
 		result_array.append(point)
 	return result_array
 
+
+func get_nb_segments() -> Vector2:
+	var map_rect = get_map_rect()
+	var map_size = map_rect.size
+	
+	return (map_size / MAP_SEGMENT_SIZE).round()
+
+
+func segment_get_pos(segment_id: int) -> Vector2:
+	var map_size = get_nb_segments()
+	var segment_col = segment_id % int(map_size.x) if segment_id != 0 else 0
+	var segment_line = int(float(segment_id) / map_size.y) if segment_id != 0 else 0
+	var segment_map_pos = Vector2(segment_col, segment_line)
+	
+	return segment_map_pos
+
+
+func segment_get_origin(segment_id: int) -> Vector2:
+	var map_rect = get_map_rect()
+	return map_rect.position + segment_get_pos(segment_id) * MAP_SEGMENT_SIZE
+
+
+func segment_get_rect(segment_id: int) -> Rect2:
+	return Rect2(segment_get_origin(segment_id), Vector2.ONE * MAP_SEGMENT_SIZE)
+
+
+func segment_get_nb_tiles(segment_id: int) -> int:
+	var origin = segment_get_origin(segment_id)
+	var nb_tiles = 0
+	
+	for i in range(MAP_SEGMENT_SIZE):
+		for j in range(MAP_SEGMENT_SIZE):
+			var cell = origin + Vector2(j, i)
+			if has_2D_cell(cell):
+				nb_tiles += 1
+	return nb_tiles
+
+
+func segment_get_center(segment_id: int) -> Vector3:
+	var origin = segment_get_origin(segment_id)
+	var center = origin + ((Vector2.ONE * MAP_SEGMENT_SIZE) / 2).round()
+	
+	var i = 0
+	while(!has_2D_cell(center)):
+		center = origin + Vector2(wrapi(i, 0, MAP_SEGMENT_SIZE), int(i / MAP_SEGMENT_SIZE))  
+		i += 1
+	
+	return find_2D_cell(center, walkable_cells)
+
+
+func cell_get_segment(cell: Vector3) -> int:
+	var cell_2D = Vector2(cell.x, cell.y)
+	var nb_segments = get_nb_segments()
+	
+	for i in range(nb_segments.x * nb_segments.y):
+		var segment_rect = segment_get_rect(i)
+		if segment_rect.has_point(cell_2D):
+			return i
+	return -1
+
+
+func get_segment_id(segment_pos: Vector2) -> int:
+	return int(segment_pos.y) * int(get_nb_segments().x) + int(segment_pos.x)
+
+
+func segment_exists(segment_id: int) -> bool:
+	return segment_get_nb_tiles(segment_id) > 0
+
+
+func segment_exists_v(seg_pos: Vector2) -> bool:
+	var nb_seg_v = get_nb_segments()
+	var nb_seg_rect = Rect2(Vector2.ZERO, nb_seg_v)
+	
+	return nb_seg_rect.has_point(seg_pos)
 
 
 #### SIGNAL RESPONSES ####

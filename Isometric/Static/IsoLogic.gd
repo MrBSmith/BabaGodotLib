@@ -49,6 +49,18 @@ static func iso_3D_dist(from: Vector3, to: Vector3) -> int:
 	return int(x_dist + y_dist + z_dist)
 
 
+# Get the adjacents cells of the given one 
+# This method DOSEN'T check if the cells exists. If you need to do so, 
+# use get_existing_adjacent_cells instead
+static func get_adjacent_cells(cell: Vector2) -> Array:
+	return [ 
+		Vector2(cell.x + 1, cell.y),
+		Vector2(cell.x, cell.y + 1),
+		Vector2(cell.x - 1, cell.y),
+		Vector2(cell.x, cell.y - 1)
+	]
+
+
 # Convert from a DIRECTION value to a direction expressed as a Vector2
 static func dir_to_vec2(dir: int) -> Vector2:
 	match(dir):
