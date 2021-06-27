@@ -183,11 +183,28 @@ func add_iso_rendering_part(part: RenderPart, obj: Node) -> void:
 		add_part(part, obj)
 	else:
 		var children = rendering_queue.get_children()
-		for i in range(children.size()):
-			if xyz_sum_compare(part, children[i]):
-				add_part(part, obj)
-				rendering_queue.move_child(part, i)
+		var correct_id = binary_search_id(children, part)
+		add_part(part, obj)
+		rendering_queue.move_child(part, correct_id)
+
+
+# Use the binary search algorithm to find the position the given part should have in the rendering queue
+func binary_search_id(queue: Array, part: RenderPart) -> int:
+	var id = -1
+	var min_id = 0
+	var max_id = queue.size() - 1
+	
+	while(min_id <= max_id):
+		id = int((min_id + max_id) / 2)
+		
+		if xyz_sum_compare(part, queue[id]):
+			if id == 0 or id == max_id:
 				break
+			max_id = id
+		else: 
+			min_id = id + 1
+	
+	return id
 
 
 # Add the given part to the render queue
@@ -196,6 +213,7 @@ func add_part(part: RenderPart, obj: Node) -> void:
 	part.renderer = self
 	rendering_queue.add_child(part)
 	part.set_owner(self)
+	obj.render_parts.append(part)
 
 
 # Update the tile visibility based on the visibles cells
@@ -221,40 +239,28 @@ func add_iso_obj(obj: IsoObject) -> void:
 
 # Remove the given object from the rendering queue
 func remove_iso_obj(obj: Object) -> void:
-	for child in rendering_queue.get_children():
-		if child.get_object_ref() == obj:
-			child.queue_free()
+	for part in obj.render_parts:
+		part.queue_free()
+	
+	obj.render_parts = []
 
 
 # Replace the given obj at the right position in the rendering queue
 func reorder_iso_obj(obj: IsoObject) -> void:
-	for part in get_obj_parts(obj):
+	for part in obj.render_parts:
 		reorder_part(part)
 
 
 # Replace the given part at the right position in the rendering queue
 func reorder_part(part: RenderPart) -> void:
-	var children = rendering_queue.get_children()
-	var part_obj = part.get_object_ref()
-	for i in range(children.size()):
-		var child = children[i]
-		if child.get_object_ref() == part_obj: continue
-		if xyz_sum_compare(part, child):
-			var part_id = part.get_index()
-			if part_id < i:
-				rendering_queue.move_child(part, i - 1)
-			else:
-				rendering_queue.move_child(part, i)
-			break
-
-
-# Returns every parts in the render queue that references the given object
-func get_obj_parts(obj: IsoObject) -> Array:
-	var part_array := Array()
-	for child in rendering_queue.get_children():
-		if child.get_object_ref() == obj:
-			part_array.append(child)
-	return part_array
+	var queue = rendering_queue.get_children()
+	queue.erase(part)
+	var dest_id = binary_search_id(queue, part)
+	
+	if dest_id > part.get_index():
+		dest_id += 1
+	
+	rendering_queue.move_child(part, dest_id)
 
 
 func remove_part_at_cell(cell: Vector3, obj: Node = null) -> void:

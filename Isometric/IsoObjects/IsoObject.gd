@@ -18,6 +18,8 @@ const COLOR_SCHEME = {
 	VISIBILITY.HIDDEN : Color.transparent
 }
 
+var render_parts := Array() 
+
 var map = null
 onready var tween : Tween = get_node_or_null("Tween")
 

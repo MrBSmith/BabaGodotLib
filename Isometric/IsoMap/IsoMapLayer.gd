@@ -1,5 +1,5 @@
 tool
-extends TileMap
+extends IsoTileMap
 class_name IsoMapLayer
 
 # A base class to represent a IsoMapLayer

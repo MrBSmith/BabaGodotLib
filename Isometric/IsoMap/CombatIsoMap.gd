@@ -14,11 +14,13 @@ class_name CombatIsoMap
 #### LOGIC ####
 
 
-func draw_movement_area(actor: TRPG_Actor) -> void:
+func draw_movement_area(actor: TRPG_Actor) -> PoolVector3Array:
 	var mov = actor.get_current_movements()
 	var current_cell = actor.get_current_cell()
 	var reachable_cells = pathfinding.find_reachable_cells(current_cell, mov)
 	draw_area(reachable_cells)
+	
+	return reachable_cells
 
 
 # Draw the movement of the given character

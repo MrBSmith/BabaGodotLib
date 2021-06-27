@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://BabaGodotLib/Isometric/IsoMap/IsoMapLayer.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/Combat/Area/AreaTileset.tres" type="TileSet" id=2]
 [ext_resource path="res://Environement/TileSet/InsideTower.tres" type="TileSet" id=3]
+[ext_resource path="res://BabaGodotLib/Isometric/IsoMap/IsoTilemap.gd" type="Script" id=4]
 
 [node name="Layer" type="TileMap"]
 mode = 1
@@ -21,6 +22,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -32,6 +34,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -41,6 +44,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -50,6 +54,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -59,6 +64,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -68,6 +74,7 @@ mode = 1
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
@@ -78,6 +85,7 @@ mode = 1
 tile_set = ExtResource( 2 )
 cell_size = Vector2( 32, 16 )
 format = 1
+script = ExtResource( 4 )
 __meta__ = {
 "_edit_lock_": true
 }
