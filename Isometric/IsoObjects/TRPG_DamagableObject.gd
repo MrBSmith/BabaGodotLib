@@ -130,9 +130,6 @@ func hurt(damage: int) -> void:
 		call("set_state", "Hurt")
 	else:
 		$AnimationPlayer.play("RedFlash")
-	
-	if get_current_HP() != 0:
-		emit_signal("action_consequence_finished")
 
 
 # Function override
@@ -168,6 +165,8 @@ func _on_unfocus_all_iso_object_query() -> void:
 func _on_hurt_animation_finished() -> void:
 	if get_current_HP() <= 0:
 		destroy()
+	else:
+		emit_signal("action_consequence_finished")
 
 
 func _on_destroy_animation_finished() -> void:

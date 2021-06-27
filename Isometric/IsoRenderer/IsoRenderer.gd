@@ -240,7 +240,8 @@ func add_iso_obj(obj: IsoObject) -> void:
 # Remove the given object from the rendering queue
 func remove_iso_obj(obj: Object) -> void:
 	for part in obj.render_parts:
-		part.queue_free()
+		if is_instance_valid(part):
+			part.queue_free()
 	
 	obj.render_parts = []
 
