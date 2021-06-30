@@ -103,7 +103,7 @@ func _fetch_ground() -> void:
 		var walls_cells = walls_tilemap.get_used_cells()
 		
 		for cell2d in current_layer.get_used_cells():
-			if find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
+			if IsoLogic.find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
 				if not cell2d in obstacles_cells && not cell2d in walls_cells:
@@ -244,7 +244,7 @@ func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
 func array2D_to_grid_cells(line2D: Array) -> PoolVector3Array:
 	var cell_array : PoolVector3Array = []
 	for point in line2D:
-		var cell = find_2D_cell(point, grounds)
+		var cell = IsoLogic.find_2D_cell(point, grounds)
 		if cell != Vector3.INF:
 			cell_array.append(cell)
 	
@@ -419,7 +419,6 @@ func is_cell_wall(cell: Vector3) -> bool:
 	return layer != null && layer.get_node("Walls").get_cell(cell.x, cell.y) != TileMap.INVALID_CELL
 
 
-
 func is_cell_above_ground(cell: Vector3):
 	return is_cell_ground(Vector3(cell.x, cell.y, round(cell.z - 1)))
 
@@ -443,36 +442,28 @@ func is_position_valid(cell: Vector3) -> bool:
 	return !is_damagable_on_cell(cell) && is_cell_ground(cell)
 
 
-# Find if a cell x and y is in the heightmap grid, and returns it
-# Return Vector3.INF if nothing was found
-static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
-	for grid_cell in grid:
-		if (cell.x == grid_cell.x) && (cell.y == grid_cell.y):
-			return grid_cell
-	return Vector3.INF
-
-
 # Get the adjacent cells of the given one
 func get_existing_adjacent_cells(cell: Vector3) -> PoolVector3Array:
 	var adjacents : PoolVector3Array = []
 	var relatives = IsoLogic.get_adjacent_cells(Vector2(cell.x, cell.y))
 	
 	for relative_cell in relatives:
-		var adj = find_2D_cell(relative_cell, grounds)
+		var adj = IsoLogic.find_2D_cell(relative_cell, grounds)
 		if adj != Vector3.INF:
 			adjacents.append(adj)
 	
 	return adjacents
 
 
-static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
-	var result_array := PoolVector3Array()
-	var v2_adjacent = IsoLogic.get_adjacent_cells(Vector2(cell.x, cell.y))
+func get_cells_in_range(origin: Vector3, dist_range: int) -> PoolVector3Array:
+	var cells_at_dist = IsoLogic.get_cells_in_circle(origin, dist_range)
+	var cells_in_range = PoolVector3Array()
 	
-	for adj in v2_adjacent:
-		var point = Vector3(adj.x, adj.y, cell.z)
-		result_array.append(point)
-	return result_array
+	for cell in cells_at_dist:
+		var z = get_cell2D_highest_z(Vector2(cell.x, cell.y))
+		cells_in_range.append(Vector3(cell.x, cell.y, z))
+	
+	return cells_in_range
 
 
 func get_nb_segments() -> Vector2:
@@ -521,7 +512,7 @@ func segment_get_center(segment_id: int) -> Vector3:
 		center = origin + Vector2(wrapi(i, 0, MAP_SEGMENT_SIZE), int(i / MAP_SEGMENT_SIZE))  
 		i += 1
 	
-	return find_2D_cell(center, walkable_cells)
+	return IsoLogic.find_2D_cell(center, walkable_cells)
 
 
 func cell_get_segment(cell: Vector3) -> int:

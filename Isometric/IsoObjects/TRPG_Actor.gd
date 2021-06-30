@@ -19,9 +19,9 @@ var active : bool = false
 var items : Array = []
 var equipment : Array = []
 
-var current_actions : int = 0 setget set_current_actions, get_current_actions
-var current_movements : int = 0 setget set_current_movements, get_current_movements
-var current_MP : int = 0 setget set_current_MP, get_current_MP
+export var current_actions : int = -1 setget set_current_actions, get_current_actions
+export var current_movements : int = -1 setget set_current_movements, get_current_movements
+export var current_MP : int = -1 setget set_current_MP, get_current_MP
 
 var default_range : int = 1 setget set_default_range, get_default_range
 
@@ -182,9 +182,10 @@ func _ready():
 	_err = connect("action_finished", self, "_on_action_finished")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	
-	set_current_actions(get_max_actions())
-	set_current_movements(get_max_movements())
-	set_current_MP(get_max_MP())
+	
+	if current_actions == -1: set_current_actions(get_max_actions())
+	if current_movements == -1: set_current_movements(get_max_movements())
+	if current_MP == -1: set_current_MP(get_max_MP())
 	update_equipment()
 
 

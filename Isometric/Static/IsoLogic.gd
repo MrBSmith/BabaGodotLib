@@ -49,6 +49,15 @@ static func iso_3D_dist(from: Vector3, to: Vector3) -> int:
 	return int(x_dist + y_dist + z_dist)
 
 
+# Find if a cell x and y is in the heightmap grid, and returns it
+# Return Vector3.INF if nothing was found
+static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
+	for grid_cell in grid:
+		if (cell.x == grid_cell.x) && (cell.y == grid_cell.y):
+			return grid_cell
+	return Vector3.INF
+
+
 # Get the adjacents cells of the given one 
 # This method DOSEN'T check if the cells exists. If you need to do so, 
 # use get_existing_adjacent_cells instead
@@ -59,6 +68,17 @@ static func get_adjacent_cells(cell: Vector2) -> Array:
 		Vector2(cell.x - 1, cell.y),
 		Vector2(cell.x, cell.y - 1)
 	]
+
+
+# Same thing as get_adjacent_cells but takes a Vector3 as an argument
+static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
+	var result_array := PoolVector3Array()
+	var v2_adjacent = get_adjacent_cells(Vector2(cell.x, cell.y))
+	
+	for adj in v2_adjacent:
+		var point = Vector3(adj.x, adj.y, cell.z)
+		result_array.append(point)
+	return result_array
 
 
 # Convert from a DIRECTION value to a direction expressed as a Vector2

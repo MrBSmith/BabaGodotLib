@@ -10,7 +10,7 @@ export var lifebar_scene_path = "res://Scenes/Actors/Gauge/DamagableSmallGauge.t
 export var defense : int = 0 setget set_defense, get_defense
 
 export var max_HP : int = 0 setget set_max_HP, get_max_HP
-var current_HP : int = 0 setget set_current_HP, get_current_HP
+export var current_HP : int = -1 setget set_current_HP, get_current_HP
 
 var lifebar : Control
 var clickable_area : Area2D
@@ -62,7 +62,7 @@ func _ready() -> void:
 	_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_animation_finished")
 	_err = connect("destroy_animation_finished", self, "_on_destroy_animation_finished")
 	
-	set_current_HP(get_max_HP())
+	if current_HP == -1: set_current_HP(get_max_HP())
 	
 	generate_lifebar()
 	generate_clickable_area()
@@ -77,6 +77,9 @@ func generate_lifebar() -> void:
 	lifebar.shake_feedback_on = true
 	lifebar.set_visible(false)
 	add_child(lifebar)
+	lifebar.set_gauge_max_value(get_max_HP())
+	lifebar.set_gauge_value(get_current_HP())
+	var __ = connect("hp_changed", lifebar, "_on_damagable_hp_changed")
 
 
 func get_sprite_texture(sprite: Node2D) -> Texture:

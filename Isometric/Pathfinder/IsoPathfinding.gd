@@ -73,7 +73,7 @@ func connect_walkable_cells(cells_array: PoolVector3Array, active_actor: TRPG_Ac
 
 			# If the current relative cell is outside the IsoMap,
 			# or if it is not inside the astar_node, skip to the next relative
-			if map_node.find_2D_cell(cell_relative, cells_array) == Vector3.INF:
+			if IsoLogic.find_2D_cell(cell_relative, cells_array) == Vector3.INF:
 				continue
 			if not astar_node.has_point(cell_rel_index):
 				continue
@@ -170,7 +170,7 @@ func find_relatives(point_array : PoolVector3Array, reachable_cells: PoolVector3
 
 		for relative in point_relative:
 			# If the current cell asn't been treated yet
-			var cell3D = map_node.find_2D_cell(relative, map_node.grounds)
+			var cell3D = IsoLogic.find_2D_cell(relative, map_node.grounds)
 			if not cell3D in reachable_cells:
 				result_array.append(cell3D)
 

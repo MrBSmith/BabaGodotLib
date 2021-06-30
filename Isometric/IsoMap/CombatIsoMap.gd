@@ -160,7 +160,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 			if obj.is_class("TRPG_Actor") && actor.get_team() == obj.get_team():
 				continue
 			
-			if not obj in targetables && actor.can_see(obj):
+			if not obj in targetables && actor.get_team().is_cell_in_view_field(obj.get_current_cell()):
 				targetables.append(obj)
 	
 	return targetables
@@ -264,6 +264,28 @@ func get_cells_in_square(origin: Vector3, size: int, dir: int) -> PoolVector3Arr
 			cells_in_square.append(Vector3(vec2.x, vec2.y, get_cell2D_highest_z(vec2)))
 	
 	return cells_in_square
+
+
+# Return an array of opponents (Actors of an opponent team) in the given range (on a 2D plane)
+func get_nearby_opponents(actor: TRPG_Actor, dist_range: int, currently_visible: bool = false) -> Array:
+	var actor_team = actor.get_team()
+	var actor_team_side = actor.get_team_side()
+	var cells_in_range = get_cells_in_range(actor.get_current_cell(), dist_range)
+	var opponents_array = []
+	
+	for cell in cells_in_range:
+		var damagable = get_damagable_on_cell(cell)
+		
+		if damagable != null && damagable.is_class("TRPG_Actor"):
+			if damagable.get_team_side() != actor_team_side:
+				if currently_visible:
+					var damagable_cell = damagable.get_current_cell()
+					if !actor_team.is_cell_in_view_field(damagable_cell):
+						continue
+				
+				opponents_array.append(damagable)
+	
+	return opponents_array
 
 
 # Return every TRPG_DamagableObject in the given aoe_target
