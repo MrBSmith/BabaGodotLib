@@ -22,6 +22,14 @@ onready var rendering_queue = $RenderingQueue
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
 
+var print_logs : bool = true
+
+enum cell_comp {
+	BEFORE,
+	EQUAL,
+	AFTER
+}
+
 enum type_priority {
 	TILE,
 	AREA,
@@ -37,8 +45,14 @@ func set_focus_array(array: Array): focus_array = array
 func get_focus_array() -> Array: return focus_array
 
 func set_visible_cells(value: Array):
+	var cell_difference = _find_visibile_cells_differences(visible_cells, value)
+	
+	if visible_cells == [[], []]:
+		_update_tiles_visibility_brute_force(value)
+	else:
+		_update_tile_visibility_by_diff(cell_difference)
+	
 	visible_cells = value
-	update_tiles_visibility()
 func get_visible_cells() -> Array: return visible_cells
 
 
@@ -183,13 +197,31 @@ func add_iso_rendering_part(part: RenderPart, obj: Node) -> void:
 		add_part(part, obj)
 	else:
 		var children = rendering_queue.get_children()
-		var correct_id = binary_search_id(children, part)
+		var correct_id = binary_search_part_id(children, part)
 		add_part(part, obj)
 		rendering_queue.move_child(part, correct_id)
 
 
 # Use the binary search algorithm to find the position the given part should have in the rendering queue
-func binary_search_id(queue: Array, part: RenderPart) -> int:
+func binary_search_part_id(queue: Array, part: RenderPart) -> int:
+	var id = -1
+	var min_id = 0
+	var max_id = queue.size() - 1
+	
+	while(min_id <= max_id):
+		id = int((min_id + max_id) / 2)
+		if compare_parts(part, queue[id]):
+			if id == 0 or id == max_id:
+				break
+			max_id = id
+		else: 
+			min_id = id + 1
+	
+	return id
+
+
+# Use the binary search algorithm to find the given part of the given cell
+func binary_search_cell(queue: Array, cell: Vector3) -> int:
 	var id = -1
 	var min_id = 0
 	var max_id = queue.size() - 1
@@ -197,13 +229,17 @@ func binary_search_id(queue: Array, part: RenderPart) -> int:
 	while(min_id <= max_id):
 		id = int((min_id + max_id) / 2)
 		
-		if xyz_sum_compare(part, queue[id]):
-			if id == 0 or id == max_id:
-				break
+		var comp = compare_cells(cell, queue[id].get_current_cell())
+		if id == max_id:
+			if comp == cell_comp.EQUAL: return id
+			else: return -1
+		
+		if comp in [cell_comp.EQUAL, cell_comp.BEFORE]:
+			if comp == cell_comp.EQUAL:
+				return id
 			max_id = id
 		else: 
 			min_id = id + 1
-	
 	return id
 
 
@@ -216,17 +252,62 @@ func add_part(part: RenderPart, obj: Node) -> void:
 	obj.render_parts.append(part)
 
 
+func _find_visibile_cells_differences(old: Array, new: Array) -> Array:
+	var diff = [[], [], []]
+	var new_combined = []
+	var old_combined = []
+	
+	for i in range(new.size()):
+		new_combined += new[i]
+		old_combined += old[i]
+	
+	for i in range(old.size()):
+		for cell in old[i]:
+			if !(cell in new_combined):
+				diff[IsoObject.VISIBILITY.NOT_VISIBLE].append(cell)
+			else:
+				if !(cell in new[i]):
+					var id = IsoObject.VISIBILITY.VISIBLE if i == IsoObject.VISIBILITY.BARELY_VISIBLE else IsoObject.VISIBILITY.BARELY_VISIBLE
+					diff[id].append(cell) 
+		
+		for cell in new[i]:
+			if !(cell in old_combined):
+				diff[i].append(cell)
+	
+	return diff
+
+
 # Update the tile visibility based on the visibles cells
-func update_tiles_visibility() -> void:
-	for child in rendering_queue.get_children():
+func _update_tiles_visibility_brute_force(view_field: Array) -> void:
+	var queue = rendering_queue.get_children()
+	for i in range(queue.size()):
+		var child = queue[i]
 		if child is TileRenderPart:
 			var part_cell = child.get_current_cell()
-			if part_cell in visible_cells[IsoObject.VISIBILITY.BARELY_VISIBLE]:
+			if part_cell in view_field[IsoObject.VISIBILITY.BARELY_VISIBLE]:
 				child.set_visibility(IsoObject.VISIBILITY.BARELY_VISIBLE)
-			elif not part_cell in visible_cells[IsoObject.VISIBILITY.VISIBLE]:
+			elif not part_cell in view_field[IsoObject.VISIBILITY.VISIBLE]:
 				child.set_visibility(IsoObject.VISIBILITY.NOT_VISIBLE)
 			else:
 				child.set_visibility(IsoObject.VISIBILITY.VISIBLE)
+	
+	if print_logs:
+		print("Update tile visibility with brute force strategy took %d iterations" % rendering_queue.get_child_count())
+
+
+func _update_tile_visibility_by_diff(cell_diff: Array) -> void:
+	var queue = rendering_queue.get_children()
+	var total_iter = 0
+	for i in range(cell_diff.size()):
+		for cell in cell_diff[i]:
+			var part_id = binary_search_cell(queue, cell)
+			if part_id == -1: continue
+			var part = rendering_queue.get_child(part_id)
+			if part is TileRenderPart: part.set_visibility(i)
+			total_iter += 1
+	
+	if print_logs:
+		print("Update tile visibility with by difference strategy took %d iterations" % total_iter)
 
 
 # Place the given obj at the right position in the rendering queue
@@ -256,7 +337,7 @@ func reorder_iso_obj(obj: IsoObject) -> void:
 func reorder_part(part: RenderPart) -> void:
 	var queue = rendering_queue.get_children()
 	queue.erase(part)
-	var dest_id = binary_search_id(queue, part)
+	var dest_id = binary_search_part_id(queue, part)
 	
 	if dest_id > part.get_index():
 		dest_id += 1
@@ -334,26 +415,49 @@ func get_type_priority(thing) -> int:
 	return -1
 
 
-# Compare two positions, return true if a must be renderer before b
-func xyz_sum_compare(a: RenderPart, b: RenderPart) -> bool:
-	var grid_pos_a = a.get_current_cell()
-	var grid_pos_b = b.get_current_cell()
+func compare_cells(a: Vector3, b: Vector3) -> int:
+	if a == b: return cell_comp.EQUAL
+	var sum_result = xyz_sum_compare(a, b)
 	
-	var sum_a = grid_pos_a.x + grid_pos_a.y + grid_pos_a.z
-	var sum_b = grid_pos_b.x + grid_pos_b.y + grid_pos_b.z
+	if sum_result == cell_comp.EQUAL:
+		if xyz_priority(a, b): return cell_comp.BEFORE
+		else: return cell_comp.AFTER
+	else: return sum_result
 
+
+func xyz_sum_compare(a: Vector3, b: Vector3) -> int:
+	var sum_a = a.x + a.y + a.z
+	var sum_b = b.x + b.y + b.z
+	
+	if sum_a == sum_b: return cell_comp.EQUAL
+	elif sum_a < sum_b: return cell_comp.BEFORE
+	else: return cell_comp.AFTER
+
+
+# If the type are the same compare z, then y, then x
+func xyz_priority(a: Vector3, b: Vector3) -> bool:
+	if a.z == b.z:
+		if a.y == b.y:
+			 return a.x < b.x
+		else: return a.y < b.y
+	else: return a.z < b.z
+
+
+# Compare two positions, return true if a must be renderer before b
+func compare_parts(a: RenderPart, b: RenderPart) -> bool:
+	var cell_a = a.get_current_cell()
+	var cell_b = b.get_current_cell()
+	
+	var sum_result = xyz_sum_compare(cell_a, cell_b)
+	
 	# First compare the sum x + y + z
 	# Then sort by type 
 	# If the type are the same compare z, then y, then x
-	if sum_a == sum_b:
+	if sum_result == cell_comp.EQUAL:
 		if get_type_priority(a) == get_type_priority(b):
-			if grid_pos_a.z == grid_pos_b.z:
-				if grid_pos_a.y == grid_pos_b.y:
-					 return grid_pos_a.x < grid_pos_b.x
-				else: return grid_pos_a.y < grid_pos_b.y
-			else: return grid_pos_a.z < grid_pos_b.z
+			return xyz_priority(cell_a, cell_b)
 		else: return get_type_priority(a) < get_type_priority(b)
-	else: return sum_a < sum_b
+	else: return sum_result == cell_comp.BEFORE
 
 
 # Returns the parts at the given 2D position
@@ -459,6 +563,7 @@ func disappear_transition(total_time: float = 4.0) -> void:
 
 
 #### SIGNAL RESPONSES ####
+
 
 func _on_iso_object_cell_changed(obj: IsoObject) -> void:
 	if !is_obj_in_rendering_queue(obj):

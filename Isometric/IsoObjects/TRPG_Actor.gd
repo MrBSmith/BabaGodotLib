@@ -131,6 +131,8 @@ func set_skills(array: Array):
 	skills = array
 func get_skills() -> Array: return skills
 
+func get_items() -> Array: return items
+
 func get_team() -> Node: 
 	var parent = get_parent()
 	if parent.is_class("ActorTeam"):

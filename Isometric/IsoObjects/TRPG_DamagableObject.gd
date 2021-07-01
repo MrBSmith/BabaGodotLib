@@ -77,6 +77,7 @@ func generate_lifebar() -> void:
 	lifebar.shake_feedback_on = true
 	lifebar.set_visible(false)
 	add_child(lifebar)
+	
 	lifebar.set_gauge_max_value(get_max_HP())
 	lifebar.set_gauge_value(get_current_HP())
 	var __ = connect("hp_changed", lifebar, "_on_damagable_hp_changed")
