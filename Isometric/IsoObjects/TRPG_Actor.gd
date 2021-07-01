@@ -11,13 +11,15 @@ export var MaxStats : Resource
 export var default_attack_effect : Resource
 export var default_attack_aoe : Resource setget , get_default_attack_aoe
 
+var active : bool = false
+
 export var weapon : Resource setget set_weapon, get_weapon
 export var skills := Array() setget set_skills, get_skills
 
-var active : bool = false
+var ailments : Array = []
 
-var items : Array = []
-var equipment : Array = []
+export var items : Array = [] setget , get_items
+export var equipment : Array = []
 
 export var current_actions : int = -1 setget set_current_actions, get_current_actions
 export var current_movements : int = -1 setget set_current_movements, get_current_movements

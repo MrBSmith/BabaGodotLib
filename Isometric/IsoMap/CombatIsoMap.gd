@@ -145,10 +145,14 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 # Get every TRPG_DamagableObject in range of the given actor that is not in same team
 # You can pass a actor_cell as an argument if you whant to check the targetables the actor would have
 # If it was on the given cell, if nothing is passed, the function will use the current_cell of the actor
-func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell := Vector3.INF) -> Array:
+func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, 
+	actor_cell := Vector3.INF, same_team := false, include_self := false) -> Array:
+	
 	var targetables = []
+	
 	if actor_cell == Vector3.INF: actor_cell = actor.get_current_cell()
 	var reachables = get_walkable_cells_in_circle(actor_cell, actor_range + 1, true)
+	reachables.append(actor_cell)
 	
 	for cell in reachables:
 		var obj = get_damagable_on_cell(cell)
@@ -157,11 +161,16 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int, actor_cell :=
 			continue
 		
 		if obj.is_class("TRPG_DamagableObject"):
-			if obj.is_class("TRPG_Actor") && actor.get_team() == obj.get_team():
-				continue
+			if obj.is_class("TRPG_Actor"):
+				if (actor.get_team() == obj.get_team()) != same_team:
+					continue
 			
-			if not obj in targetables && actor.get_team().is_cell_in_view_field(obj.get_current_cell()):
-				targetables.append(obj)
+			if not obj in targetables:
+				if (obj == actor && !include_self):
+					continue
+				
+				if actor.get_team().is_cell_in_view_field(obj.get_current_cell()):
+					targetables.append(obj)
 	
 	return targetables
 
