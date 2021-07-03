@@ -22,7 +22,7 @@ onready var rendering_queue = $RenderingQueue
 var visible_cells : Array = [[], []] setget set_visible_cells, get_visible_cells
 var focus_array : Array = [] setget set_focus_array, get_focus_array
 
-var print_logs : bool = true
+var print_logs : bool = false
 
 enum cell_comp {
 	BEFORE,
@@ -45,14 +45,14 @@ func set_focus_array(array: Array): focus_array = array
 func get_focus_array() -> Array: return focus_array
 
 func set_visible_cells(value: Array):
-	var cell_difference = _find_visibile_cells_differences(visible_cells, value)
-	
-	if visible_cells == [[], []]:
-		_update_tiles_visibility_brute_force(value)
-	else:
-		_update_tile_visibility_by_diff(cell_difference)
-	
+#	var cell_difference = _find_visibile_cells_differences(visible_cells, value)
+#
+#	if visible_cells == [[], []]:
+#		_update_tiles_visibility_brute_force(value)
+#	else:
+#		_update_tile_visibility_by_diff(cell_difference)
 	visible_cells = value
+	_update_tiles_visibility_brute_force(visible_cells)
 func get_visible_cells() -> Array: return visible_cells
 
 
@@ -231,12 +231,14 @@ func binary_search_cell(queue: Array, cell: Vector3) -> int:
 		
 		var comp = compare_cells(cell, queue[id].get_current_cell())
 		if id == max_id:
-			if comp == cell_comp.EQUAL: return id
-			else: return -1
+			if comp == cell_comp.EQUAL: break
+			else:
+				id = -1
+				break
 		
 		if comp in [cell_comp.EQUAL, cell_comp.BEFORE]:
 			if comp == cell_comp.EQUAL:
-				return id
+				break
 			max_id = id
 		else: 
 			min_id = id + 1
@@ -280,6 +282,7 @@ func _find_visibile_cells_differences(old: Array, new: Array) -> Array:
 # Update the tile visibility based on the visibles cells
 func _update_tiles_visibility_brute_force(view_field: Array) -> void:
 	var queue = rendering_queue.get_children()
+	
 	for i in range(queue.size()):
 		var child = queue[i]
 		if child is TileRenderPart:

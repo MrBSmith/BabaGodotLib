@@ -198,7 +198,8 @@ func _ready():
 func turn_start():
 	set_current_actions(get_max_actions() + action_modifier)
 	action_modifier = 0
-
+	
+	EVENTS.emit_signal("active_actor_turn_started", self)
 
 func turn_finish():
 	pass
