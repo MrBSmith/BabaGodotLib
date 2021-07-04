@@ -2,6 +2,10 @@ tool
 extends IsoMap
 class_name CombatIsoMap
 
+onready var team_container = $Interactives/ActorTeams
+
+export var fog_of_war := false
+
 # A class to handle combat specific logic for IsoMap
 
 
@@ -9,6 +13,10 @@ class_name CombatIsoMap
 
 
 #### BUILT-IN ####
+
+func _ready() -> void:
+	var __ = EVENTS.connect("actor_cell_changed", self, "_on_actor_cell_changed")
+
 
 
 #### LOGIC ####
@@ -90,8 +98,8 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 
 
 # Update the view field of the given actor by fetching every cells he can see and feed him
-func update_view_field(actor: IsoObject) -> void:
-	if !is_ready: 
+func update_view_field(actor: TRPG_Actor) -> void:
+	if !fog_of_war or !is_ready:
 		return
 	
 	var view_range = actor.get_view_range()
@@ -111,6 +119,24 @@ func update_view_field(actor: IsoObject) -> void:
 	actor.set_view_field([
 		visible_cells,
 		barely_visible_cells])
+
+
+func actor_update_visibility(actor: TRPG_Actor) -> void:
+	if !fog_of_war or actor.get_team_side() != ActorTeam.TEAM_TYPE.ENEMY:
+		return
+	
+	var actor_visible = false
+	var allies_team = team_container.get_teams_in_team_side(ActorTeam.TEAM_TYPE.ALLY)
+	
+	for team in allies_team:
+		var view_field = team.get_view_field()
+		for i in range(view_field.size()):
+			if actor.get_current_cell() in view_field[i]:
+				actor.set_visibility(i)
+				actor_visible = true
+	
+	if !actor_visible:
+		actor.set_visibility(IsoObject.VISIBILITY.HIDDEN)
 
 
 # Return true if at least one target is reachable by the active actor
@@ -343,7 +369,6 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 #### SIGNAL RESPONSES ####
 
 
-func on_iso_object_cell_changed(iso_object: IsoObject):
-	if iso_object.is_class("TRPG_Actor") && iso_object.is_team_side(ActorTeam.TEAM_TYPE.ALLY):
-		if owner.fog_of_war:
-			update_view_field(iso_object)
+func _on_actor_cell_changed(actor: TRPG_Actor) -> void:
+	update_view_field(actor)
+	actor_update_visibility(actor)

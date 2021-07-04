@@ -174,6 +174,7 @@ func set_sprites_visible_recursive(value: bool, node: Node) -> void:
 func _on_hide_iso_objects_event(hide: bool):
 	set_sprites_visible_recursive(!hide, self)
 
+
 func _on_targeted_feedback_loop_ended():
 	if targeted:
 		trigger_targeted_feedback(last_target_positive) 
