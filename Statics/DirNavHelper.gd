@@ -73,7 +73,10 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 			if display_warning:
 				if dir.current_is_dir(): print("Found dir: " + file_name)
 				else: push_error("Found file: " + file_name)
-				
+			
+			if !is_dir_empty(dir_path + "/" + file_name):
+				empty_folder(dir_path + "/" + file_name)
+			
 			dir.remove(file_name)
 			file_name = dir.get_next()
 		
