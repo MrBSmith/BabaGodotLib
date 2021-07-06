@@ -46,9 +46,9 @@ func init_cursor_position(level_node: LevelNode):
 		push_error("the current level_node can't be found at path " + cursor_start_level_path)
 		return
 	
-	cursor.set_current_level(level)
+	cursor.set_current_node(level)
 	cursor.set_global_position(level.get_global_position())
-	characters_container.set_current_level(level)
+	characters_container.set_current_node(level)
 	characters_container.set_global_position(level.get_global_position())
 
 
@@ -63,16 +63,16 @@ func are_level_nodes_bounded(level1: LevelNode, level2: LevelNode) -> bool:
 
 # Move the cursor based on the user input
 func move_cursor(dir: Vector2):
-	var adequate_node = find_adequate_level(dir)
+	var adequate_node = find_adequate_node(dir)
 	if adequate_node == null:
 		return
 	
-	cursor.move_to_level(adequate_node)
+	cursor.move_to_node(adequate_node)
 
 
 # Find the node targeted by the user, based on the direction of his input and returns it
-func find_adequate_level(dir: Vector2) -> LevelNode:
-	var current_cursor_level = cursor.get_current_level()
+func find_adequate_node(dir: Vector2) -> WorldMapNode:
+	var current_cursor_level = cursor.get_current_node()
 	var level_node_binds = get_binds(current_cursor_level)
 	
 	for bind in level_node_binds:
@@ -84,12 +84,17 @@ func find_adequate_level(dir: Vector2) -> LevelNode:
 	
 	return null
 
+
 func get_level_nodes() -> Array:
 	var levels_array = []
 	for child in $Levels.get_children():
 		if child is LevelNode and not child in levels_array:
 			levels_array.append(child)
 	return levels_array
+
+
+func _move_to_node(_node: WorldMapNode) -> void:
+	pass
 
 
 # Get every nodes connected to the given one by a bind
@@ -113,17 +118,17 @@ func get_bounded_level_nodes(node: LevelNode) -> Array:
 
 
 # Returns an arrayu containing all the binds of the given node
-func get_binds(level_node: LevelNode) -> Array:
+func get_binds(node: WorldMapNode) -> Array:
 	var bind_array := Array()
 	for bind in binds_container.get_children():
-		if bind.get_origin() == level_node or bind.get_destination() == level_node:
+		if bind.get_origin() == node or bind.get_destination() == node:
 			bind_array.append(bind)
 	
 	return bind_array
 
 
 # Return the bind conencting the two given nodes
-func get_bind(origin: LevelNode, dest: LevelNode) -> LevelNodeBind:
+func get_bind(origin: WorldMapNode, dest: WorldMapNode) -> LevelNodeBind:
 	for child in binds_container.get_children():
 		var bind_nodes = [child.get_origin(), child.get_destination()]
 		if origin in bind_nodes && dest in bind_nodes:
@@ -166,10 +171,11 @@ func _input(_event: InputEvent) -> void:
 		move_cursor(Vector2.LEFT)
 	
 	if Input.is_action_just_pressed("ui_accept"):
-		var cursor_level_node = cursor.get_current_level()
+		var cursor_node = cursor.get_current_node()
 		
-		if is_level_valid(cursor_level_node) and !is_animation_running():
-			enter_current_level()
+		if cursor_node is LevelNode:
+			if is_level_valid(cursor_node) and !is_animation_running():
+				enter_current_level()
 
 
 

@@ -51,7 +51,6 @@ func set_origin(value: Node2D):
 	
 	if origin == null:
 		origin_pos = Vector2.INF
-
 func get_origin() -> Node2D: return origin
 
 func set_destination(value: Node2D): 
