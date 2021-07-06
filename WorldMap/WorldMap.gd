@@ -176,7 +176,7 @@ func _input(_event: InputEvent) -> void:
 #### SIGNAL RESPONSES ####
 
 
-func _on_add_bind_query(origin: LevelNode, dest: LevelNode):
+func _on_add_bind_query(origin: WorldMapNode, dest: WorldMapNode):
 	var bind = bind_scene.instance()
 	binds_container.add_child(bind)
 	bind.owner = self
@@ -185,7 +185,7 @@ func _on_add_bind_query(origin: LevelNode, dest: LevelNode):
 	bind.set_destination(dest)
 
 
-func _on_remove_all_binds_query(node: LevelNode):
+func _on_remove_all_binds_query(node: WorldMapNode):
 	for bind in binds_container.get_children():
 		if bind.get_origin() == node or bind.get_destination() == node:
 			bind.queue_free()
