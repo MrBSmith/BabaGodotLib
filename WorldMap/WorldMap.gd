@@ -136,13 +136,16 @@ func enter_current_level():
 	var current_cursor_level = cursor.get_current_level()
 	GAME.goto_level_by_path(current_cursor_level.get_level_scene_path())
 
+
 func is_level_valid(level : LevelNode) -> bool:
 	return level != null and \
 	level.is_accessible() and \
 	level.get_level_scene_path() != ""
 
+
 func is_animation_running() -> bool:
 	return characters_container.is_moving()
+
 
 #### INPUTS ####
 
@@ -164,8 +167,7 @@ func _input(_event: InputEvent) -> void:
 	
 	if Input.is_action_just_pressed("ui_accept"):
 		var cursor_level_node = cursor.get_current_level()
-
-			
+		
 		if is_level_valid(cursor_level_node) and !is_animation_running():
 			enter_current_level()
 

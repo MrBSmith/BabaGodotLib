@@ -27,6 +27,7 @@ signal add_bind_query(origin, dest)
 # warning-ignore:unused_signal
 signal remove_all_binds_query(origin)
 signal hidden_changed(level_node, hidden_value)
+signal accessible_changed()
 signal level_visited(level_node)
 # warning-ignore:unused_signal
 signal position_changed()
@@ -57,10 +58,9 @@ func set_visited(value: bool):
 func is_visited() -> bool: return visited
 
 func set_accessible(value : bool):
-	accessible = value
-	if !accessible:
-		set_modulate(Color.firebrick)
-	else: set_modulate(Color.white)
+	if accessible != value:
+		accessible = value
+		emit_signal("accessible_changed")
 
 func is_accessible() -> bool: return accessible
 
@@ -105,6 +105,7 @@ func _ready() -> void:
 	
 	var __ = connect("hidden_changed", owner, "_on_level_node_hidden_changed")
 	__ = connect("level_visited", owner, "_on_level_visited")
+	__ = connect("accessible_changed", self, "_on_accessible_changed")
 	
 	if !Engine.editor_hint:
 		$ColorRect.queue_free()
@@ -113,6 +114,8 @@ func _ready() -> void:
 	else:
 		__ = connect("add_bind_query", owner, "_on_add_bind_query")
 		__ = connect("remove_all_binds_query", owner, "_on_remove_all_binds_query")
+	
+	emit_signal("accessible_changed")
 	
 	is_ready = true
 
@@ -138,3 +141,8 @@ func get_binds_count() -> int:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_accessible_changed() -> void:
+	if !accessible:
+		set_modulate(Color.firebrick)
+	else: set_modulate(Color.white)
