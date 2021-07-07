@@ -76,7 +76,7 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 					print("Found dir: " + file_name)
 			else:
 				if display_warning:
-					push_error("Found file: " + file_name)
+					print("Found file: " + file_name)
 					
 			dir.remove(file_name)
 			file_name = dir.get_next()
@@ -97,14 +97,19 @@ static func delete_folder(dir_path: String):
 # Transfer every file in the given folder to the given destination
 static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 	var dir := Directory.new()
+	var dest_dir_savedlevels_path : String = dest_dir + "/SavedLevels"
 	
 	if dir.open(temp_save_dir) == OK:
 		var err = dir.list_dir_begin(true, true)
 		if err != OK: print_debug("dir navigation error code: " + String(err))
 		var file = dir.get_next()
 		
+		if !is_dir_existing(dest_dir_savedlevels_path):
+			if dir.make_dir(dest_dir_savedlevels_path) != OK:
+				return
+		
 		while file != "":
-			err = dir.copy(temp_save_dir + "/" + file, dest_dir + "/" + file)
+			err = dir.copy(temp_save_dir + "/" + file, dest_dir_savedlevels_path + "/" + file)
 			if err != OK: print_debug("dir copy error code: " + String(err))
 			file = dir.get_next()
 		
