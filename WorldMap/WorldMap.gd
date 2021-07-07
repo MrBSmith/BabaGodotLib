@@ -15,10 +15,12 @@ onready var bind_scene = load(bind_scene_path)
 
 var cursor_moving : bool = false
 
+export var print_logs := true
 var is_ready : bool = false 
 
 # warning-ignore:unused_signal
 signal character_moving_feedback_finished
+signal world_map_node_removed(node)
 
 #### ACCESSORS ####
 
@@ -31,6 +33,15 @@ func get_class() -> String: return "WorldMap"
 func _ready():
 	is_ready = true
 	init_cursor_position(null)
+
+
+func _enter_tree() -> void:
+	var __ = get_tree().connect("node_removed", self, "_on_node_removed")
+
+
+func _exit_tree() -> void:
+	get_tree().disconnect("node_removed", self, "_on_node_removed")
+
 
 #### VIRTUALS ####
 
@@ -192,8 +203,17 @@ func _on_add_bind_query(origin: WorldMapNode, dest: WorldMapNode):
 
 
 func _on_remove_all_binds_query(node: WorldMapNode):
+	if print_logs:
+		print("remove binds associated with the node %s" % node)
+	
 	for bind in binds_container.get_children():
+		if print_logs:
+			print("Node's name: %s " % node.name)
+			print("Bind's origin is node: %s" % bind.get_origin().name)
+			print("Bind's destination is node: %s" % bind.get_destination().name)
+		
 		if bind.get_origin() == node or bind.get_destination() == node:
+			if print_logs: print("Bind removed: %s" % bind.name)
 			bind.queue_free()
 
 
@@ -209,3 +229,8 @@ func _on_level_visited(level_node : LevelNode):
 	for node in bounded_nodes:
 		if node.is_hidden():
 			node.set_hidden(false)
+
+
+func _on_node_removed(node: Node) -> void:
+	if node is WorldMapNode:
+		emit_signal("world_map_node_removed", node)
