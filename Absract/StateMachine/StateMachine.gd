@@ -47,7 +47,7 @@ func _ready():
 	default_state = get_child(0) if owner_default_state == null else owner_default_state
 	
 	# Set the state to be the default one, unless we are in a nested statesmachine
-	# Nested StatesMachines should'nt have a current_state if they are not the current_state of its parent
+	# Nested StatesMachines shouldn't have a current_state if they are not the current_state of its parent
 	if !is_nested():
 		set_state(default_state)
 	

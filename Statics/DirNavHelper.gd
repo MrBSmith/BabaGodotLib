@@ -51,7 +51,7 @@ static func is_dir_empty(dir_path) -> bool:
 		var file_name = dir.get_next()
 		return file_name == ""
 	else:
-		push_error("The directory at path " + dir_path + " could'nt be opened")
+		push_error("The directory at path " + dir_path + " couldn't be opened")
 		return true
 
 
@@ -70,13 +70,14 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 				push_error("No folder or file detected in " + dir_path)
 		
 		while file_name != "":
-			if display_warning:
-				if dir.current_is_dir(): print("Found dir: " + file_name)
-				else: push_error("Found file: " + file_name)
-			
-			if !is_dir_empty(dir_path + "/" + file_name):
+			if dir.current_is_dir():
 				empty_folder(dir_path + "/" + file_name)
-			
+				if display_warning:
+					print("Found dir: " + file_name)
+			else:
+				if display_warning:
+					push_error("Found file: " + file_name)
+					
 			dir.remove(file_name)
 			file_name = dir.get_next()
 		
