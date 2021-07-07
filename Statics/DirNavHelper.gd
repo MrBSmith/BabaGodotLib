@@ -9,24 +9,24 @@ enum DIR_FETCH_MODE {
 	FILE_ONLY
 }
 
-# Create the directories 
+# Create the directories
 static func create_dir(dir_path : String):
 	var dir = Directory.new()
-	
+
 	var dir_path_mod = dir_path.replacen("res://", "")
 	var splited_path : PoolStringArray = dir_path_mod.split("/")
 	var dir_to_create = splited_path[-1]
 	splited_path.remove(splited_path.size() - 1)
 	var parent_path = "res://" + splited_path.join("/")
-	
+
 	if !is_dir_existing(parent_path):
 		dir.open("res://")
 		dir.make_dir(parent_path)
-	
+
 	if !is_dir_existing(dir_path):
 		dir.open(parent_path)
 		dir.make_dir(dir_to_create)
-		
+
 		if debug:
 			print("Done ! Directory can in be found in : " + dir_path)
 
@@ -58,17 +58,17 @@ static func is_dir_empty(dir_path) -> bool:
 # Navigate through the given folder then removes all files and folders inside it
 static func empty_folder(dir_path: String, display_warning : bool = false):
 	var dir = Directory.new()
-	
+
 	if dir.open(dir_path) == OK:
 		if display_warning: print(dir_path + " has been opened successfully")
-		
+
 		dir.list_dir_begin(true, true)
 		var file_name = dir.get_next()
-		
+
 		if display_warning:
 			if file_name == "":
 				push_error("No folder or file detected in " + dir_path)
-		
+
 		while file_name != "":
 			if dir.current_is_dir():
 				empty_folder(dir_path + "/" + file_name)
@@ -77,10 +77,10 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 			else:
 				if display_warning:
 					print("Found file: " + file_name)
-					
+
 			dir.remove(file_name)
 			file_name = dir.get_next()
-		
+
 		dir.list_dir_end()
 	else:
 		push_error("An error occured when trying to access the path : " + dir_path)
@@ -98,21 +98,22 @@ static func delete_folder(dir_path: String):
 static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 	var dir := Directory.new()
 	var dest_dir_savedlevels_path : String = dest_dir + "/SavedLevels"
-	
+
 	if dir.open(temp_save_dir) == OK:
 		var err = dir.list_dir_begin(true, true)
 		if err != OK: print_debug("dir navigation error code: " + String(err))
 		var file = dir.get_next()
-		
+
 		if !is_dir_existing(dest_dir_savedlevels_path):
 			if dir.make_dir(dest_dir_savedlevels_path) != OK:
+				push_error("SavedLevels directory could not be created in Save Location, stopping transfer process")
 				return
-		
+
 		while file != "":
 			err = dir.copy(temp_save_dir + "/" + file, dest_dir_savedlevels_path + "/" + file)
 			if err != OK: print_debug("dir copy error code: " + String(err))
 			file = dir.get_next()
-		
+
 		dir.list_dir_end()
 
 
@@ -126,7 +127,7 @@ static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE
 	if error == OK:
 		dir.list_dir_begin(true, true)
 		var file = dir.get_next()
-		
+
 		while file != "":
 			if fetch_mode == DIR_FETCH_MODE.DIR_ONLY && !dir.current_is_dir() or \
 				fetch_mode == DIR_FETCH_MODE.FILE_ONLY && dir.current_is_dir():
@@ -135,7 +136,7 @@ static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE
 
 			files.append(file)
 			file = dir.get_next()
-		
+
 		dir.list_dir_end()
 
 		return files
