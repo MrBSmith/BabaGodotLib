@@ -2,6 +2,7 @@ tool
 extends CanvasLayer
 class_name WorldMap
 
+onready var level_node_container = $Levels
 onready var binds_container = $Binds
 onready var characters_container = $Characters
 
@@ -64,12 +65,24 @@ func init_cursor_position(level_node: LevelNode):
 
 
 # Returns true if the two given nodes are connected by a bind
-func are_level_nodes_bounded(level1: LevelNode, level2: LevelNode) -> bool:
+func are_level_nodes_bounded(node1: WorldMapNode, node2: WorldMapNode) -> bool:
 	for bind in binds_container.get_children():
 		var bind_nodes = [bind.get_origin(), bind.get_destination()]
-		if level1 in bind_nodes && level2 in bind_nodes:
+		if node1 in bind_nodes && node2 in bind_nodes:
 			return true
 	return false
+
+
+# Returns true if the two given nodes designated by their id are connected by a bind
+func are_level_nodes_bounded_id(node1_id: int, node2_id: int) -> bool:
+	var nb_nodes = level_node_container.get_child_count()
+	if node1_id > nb_nodes - 1 or node2_id > nb_nodes - 1 or node1_id < 0 or node2_id < 0:
+		push_warning("One of the given node_id is out of bounds")
+		return false
+	
+	var node1 = level_node_container.get_child(node1_id)
+	var node2 = level_node_container.get_child(node2_id)
+	return are_level_nodes_bounded(node1, node2)
 
 
 # Move the cursor based on the user input
