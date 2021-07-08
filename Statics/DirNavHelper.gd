@@ -143,3 +143,17 @@ static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE
 
 	else:
 		return []
+
+# Feed a configuration file by giving a dictionary
+# Modify the cfg found at the cfg_path, or create it if nothing was found
+static func save_properties_in_cfg(cfg_path: String, properties_dict: Dictionary): # -> GlobalScope Error
+	var config_file = ConfigFile.new()
+	if is_file_existing(cfg_path):
+		config_file.load(cfg_path)
+	
+	for section in properties_dict.keys():
+		for property in properties_dict[section].keys():
+			var value = properties_dict[section][property]
+			config_file.set_value(section, property, value)
+	
+	return config_file.save(cfg_path)
