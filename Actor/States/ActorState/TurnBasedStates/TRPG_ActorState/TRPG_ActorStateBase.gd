@@ -62,3 +62,5 @@ func _on_actor_changed_direction(dir: int):
 		 return
 	
 	update_actor_animation(dir)
+
+
