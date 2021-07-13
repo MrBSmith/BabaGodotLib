@@ -105,8 +105,8 @@ func apply_texture_change(obj_sprite: Node2D, sprite_node: Sprite) -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_object_cell_changed(cell: Vector3):
-	set_current_cell(cell + Vector3(0, 0, get_altitude()))
+func _on_object_cell_changed(_from: Vector3, to: Vector3):
+	set_current_cell(to + Vector3(0, 0, get_altitude()))
 
 
 func _on_object_global_position_changed(world_pos: Vector2):

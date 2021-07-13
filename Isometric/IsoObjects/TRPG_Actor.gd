@@ -309,7 +309,11 @@ func can_see(obj: IsoObject) -> bool:
 		return true
 	
 	var obj_cell = obj.get_current_cell()
-	return obj_cell in view_field[0] or obj_cell in view_field[1]
+	return can_see_cell(obj_cell)
+
+
+func can_see_cell(cell: Vector3) -> bool:
+	return cell in view_field[0] or cell in view_field[1]
 
 
 # Return the altitude of the current cell of the character
@@ -347,8 +351,8 @@ func _on_action_finished(_action_name: String) -> void:
 	pass
 
 
-func _on_cell_changed(_new_cell: Vector3) -> void:
-	EVENTS.emit_signal("actor_cell_changed", self)
+func _on_cell_changed(from: Vector3, to: Vector3) -> void:
+	EVENTS.emit_signal("actor_cell_changed", self, from, to)
 
 # Function override
 func _on_destroy_animation_finished() -> void:

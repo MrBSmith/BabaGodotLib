@@ -14,10 +14,6 @@ export var fog_of_war := false
 
 #### BUILT-IN ####
 
-func _ready() -> void:
-	var __ = EVENTS.connect("actor_cell_changed", self, "_on_actor_cell_changed")
-
-
 
 #### LOGIC ####
 
@@ -366,7 +362,7 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 	return objects_array
 
 
-func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor) -> Vector3:
+func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor, checked_cells: Array = []) -> Vector3:
 	var path = pathfinding.find_path(actor.get_current_cell(), dest)
 	var reachable = Vector3.INF
 	
@@ -374,7 +370,8 @@ func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor) -> Vector3:
 		var adjacents = IsoLogic.get_adjacent_cells(Vector2(dest.x, dest.y))
 		
 		for cell in adjacents:
-			reachable = get_nearest_reachable_cell(Vector3(cell.x, cell.y, dest.z), actor)
+			checked_cells.append(cell)
+			reachable = get_nearest_reachable_cell(Vector3(cell.x, cell.y, dest.z), actor, checked_cells)
 			if reachable != Vector3.INF:
 				break
 	else: reachable = dest
@@ -384,7 +381,3 @@ func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor) -> Vector3:
 
 #### SIGNAL RESPONSES ####
 
-
-func _on_actor_cell_changed(actor: TRPG_Actor) -> void:
-	update_view_field(actor)
-	actor_update_visibility(actor)

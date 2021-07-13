@@ -35,7 +35,7 @@ export var height : int = 1 setget set_height, get_height
 export var passable : bool = true setget set_passable, is_passable
 
 signal modulate_changed(mod)
-signal cell_changed(cell)
+signal cell_changed(from, to)
 signal global_position_changed(world_pos)
 signal targeted_feedback_loop_ended()
 signal destroy_animation_finished()
@@ -44,10 +44,11 @@ signal destroy_animation_finished()
 
 func set_current_cell(value: Vector3):
 	var value_changed : bool = value != current_cell
+	var previous_cell = current_cell
 	current_cell = value
 	if value_changed && is_ready:
 		EVENTS.emit_signal("iso_object_cell_changed", self)
-		emit_signal("cell_changed", current_cell)
+		emit_signal("cell_changed", previous_cell, current_cell)
 
 func get_current_cell() -> Vector3: return current_cell
 

@@ -117,6 +117,9 @@ func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Ar
 	var start_cell_id = compute_cell_index(start_cell)
 	var end_cell_id = compute_cell_index(end_cell)
 	
+	if !astar_node.has_point(start_cell_id) or !astar_node.has_point(end_cell_id):
+		return PoolVector3Array()
+	
 	var start_cell_state = astar_node.is_point_disabled(start_cell_id)
 	var end_cell_state = astar_node.is_point_disabled(end_cell_id)
 	
