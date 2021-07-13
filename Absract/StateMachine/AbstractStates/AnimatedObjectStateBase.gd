@@ -73,5 +73,5 @@ func _on_animation_finished():
 
 
 func _on_state_animation_finished() -> void:
-	if toggle_state_mode:
+	if toggle_state_mode && is_current_state():
 		states_machine.set_state(states_machine.previous_state)
