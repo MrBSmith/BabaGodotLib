@@ -541,6 +541,19 @@ func segment_exists_v(seg_pos: Vector2) -> bool:
 	return nb_seg_rect.has_point(seg_pos)
 
 
+# Retruns a PoolVector3Array that contains the path to move towards a cell as much as possible
+func find_approch_cell_path(actor: TRPG_Actor, cell: Vector3, max_movement : int = 0) -> PoolVector3Array:
+	var actor_cell = actor.get_current_cell()
+	var actor_movement = actor.get_current_movements() if max_movement == 0 else max_movement
+	
+	var path_to_reach = pathfinding.find_path_to_reach(actor_cell, cell)
+	
+	if max_movement != -1:
+		path_to_reach.resize(int(clamp(actor_movement + 1, 0, path_to_reach.size())))
+	
+	return path_to_reach
+
+
 #### SIGNAL RESPONSES ####
 
 func _on_iso_object_cell_changed(_iso_object: IsoObject):
