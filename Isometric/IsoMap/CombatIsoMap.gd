@@ -366,6 +366,22 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 	return objects_array
 
 
+func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor) -> Vector3:
+	var path = pathfinding.find_path(actor.get_current_cell(), dest)
+	var reachable = Vector3.INF
+	
+	if path.empty():
+		var adjacents = IsoLogic.get_adjacent_cells(Vector2(dest.x, dest.y))
+		
+		for cell in adjacents:
+			reachable = get_nearest_reachable_cell(Vector3(cell.x, cell.y, dest.z), actor)
+			if reachable != Vector3.INF:
+				break
+	else: reachable = dest
+	
+	return reachable
+
+
 #### SIGNAL RESPONSES ####
 
 

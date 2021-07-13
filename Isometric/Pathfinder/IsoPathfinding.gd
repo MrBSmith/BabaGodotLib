@@ -112,7 +112,7 @@ func find_path(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	return cell_path
 
 
-# Find a path between the start_cell and the end_cell (Considering the start_cell as passable)
+# Find a path between the start_cell and the end_cell (Considering both start_cell & end_cell as passable)
 func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	var start_cell_id = compute_cell_index(start_cell)
 	var end_cell_id = compute_cell_index(end_cell)
