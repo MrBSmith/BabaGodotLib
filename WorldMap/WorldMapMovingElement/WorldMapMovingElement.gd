@@ -7,7 +7,7 @@ export var speed : float = 100.0
 onready var tween_node = $Tween
 
 var moving : bool = false setget set_moving, is_moving
-var current_level : LevelNode = null setget set_current_level, get_current_level
+var current_node : WorldMapNode = null setget set_current_node, get_current_node
 
 var path := PoolVector2Array()
 
@@ -22,8 +22,8 @@ func get_class() -> String: return "WorldMapMovingElement"
 func set_moving(value: bool): moving = value
 func is_moving() -> bool: return moving
 
-func set_current_level(value: LevelNode): current_level = value
-func get_current_level() -> LevelNode: return current_level
+func set_current_node(value: WorldMapNode): current_node = value
+func get_current_node() -> WorldMapNode: return current_node
 
 #### BUILT-IN ####
 
@@ -33,8 +33,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if Engine.editor_hint && current_level != null:
-		set_position(current_level.get_position())
+	if Engine.editor_hint && current_node != null:
+		set_position(current_node.get_position())
 
 
 func _physics_process(delta: float) -> void:
@@ -57,18 +57,18 @@ func _physics_process(delta: float) -> void:
 
 #### LOGIC ####
 
-func move_to_level(level_node: LevelNode, interpol: bool = true):
-	if level_node == null or is_moving():
+func move_to_node(node: WorldMapNode, interpol: bool = true):
+	if node == null or is_moving():
 		 return
 	
-	var bind = owner.get_bind(current_level, level_node)
+	var bind = owner.get_bind(current_node, node)
 	var move_path = bind.get_point_path()
 	
 	# If we need move along the bind in backwards order
-	if bind.origin == level_node:
+	if bind.origin == node:
 		move_path.invert()
 	
-	set_current_level(level_node)
+	set_current_node(node)
 	
 	move_along_path(move_path, interpol)
 

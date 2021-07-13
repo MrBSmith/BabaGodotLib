@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://BabaGodotLib/WorldMap/LevelNodeBind/LevelNodeBind.gd" type="Script" id=1]
-[ext_resource path="res://Scenes/WorldMap/LevelNode/State/Hidden.gd" type="Script" id=2]
-[ext_resource path="res://Scenes/WorldMap/LevelNode/State/Visible.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/WorldMap/WorldMapNode/LevelNode/State/Hidden.gd" type="Script" id=2]
+[ext_resource path="res://Scenes/WorldMap/WorldMapNode/LevelNode/State/Visible.gd" type="Script" id=3]
 [ext_resource path="res://BabaGodotLib/Absract/StateMachine/AbstractStates/Disappear.gd" type="Script" id=4]
 [ext_resource path="res://BabaGodotLib/Absract/StateMachine/StateMachine.gd" type="Script" id=5]
 [ext_resource path="res://BabaGodotLib/Absract/StateMachine/AbstractStates/Appear.gd" type="Script" id=7]

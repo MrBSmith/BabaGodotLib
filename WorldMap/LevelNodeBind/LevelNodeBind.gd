@@ -51,7 +51,6 @@ func set_origin(value: Node2D):
 	
 	if origin == null:
 		origin_pos = Vector2.INF
-
 func get_origin() -> Node2D: return origin
 
 func set_destination(value: Node2D): 
@@ -205,7 +204,6 @@ func _update_line():
 		line_points_array.append(point_pos)
 		curve.add_point(point_pos)
 	
-	
 	if line.has_method("set_end_cap_node") && line.has_method("set_start_cap_node"):
 		line.set_end_cap_node(destination)
 		line.set_start_cap_node(origin)
@@ -224,15 +222,15 @@ func reroll_line_gen():
 
 
 # Return the direction the path of the bind is aiming to, based on the given level_node 
-func get_path_direction_form_node(level_node: LevelNode) -> Vector2:
+func get_path_direction_form_node(node: WorldMapNode) -> Vector2:
 	if !angled_bind:
 		var dir = origin.direction_to(destination)
-		if level_node == destination:
+		if node == destination:
 			dir = -dir
 		return dir
 	else:
 		var path = get_point_path()
-		if level_node == destination:
+		if node == destination:
 			path.invert()
 		
 		if path.size() <= 1:
