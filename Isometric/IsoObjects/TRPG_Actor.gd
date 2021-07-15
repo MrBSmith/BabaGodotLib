@@ -169,6 +169,9 @@ func get_current_attack_effect() -> Resource:
 	else:
 		return default_attack_effect
 
+func get_current_attack_combat_effect_object() -> CombatEffectObject:
+	return weapon.get_combat_effect_object()
+
 # Function override
 func is_dead() -> bool: return get_state() == $States/Death
 
