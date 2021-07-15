@@ -185,7 +185,7 @@ func _ready():
 	var _err = connect("cell_changed", self, "_on_cell_changed")
 	_err = connect("action_finished", self, "_on_action_finished")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
-	
+	_err = $States/Hurt.connect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
 	
 	if current_actions == -1: set_current_actions(get_max_actions())
 	if current_movements == -1: set_current_movements(get_max_movements())
@@ -342,9 +342,9 @@ func _on_state_changed(new_state: Object) -> void:
 		if active:
 			if previous_state is TRPG_ActionState:
 				emit_signal("action_finished", previous_state.name)
-		else:
-			if previous_state.name == "Hurt":
-				_on_hurt_animation_finished()
+		
+		if previous_state.name == "Hurt":
+			emit_signal("action_consequence_finished")
 
 
 func _on_action_finished(_action_name: String) -> void:
@@ -357,3 +357,8 @@ func _on_cell_changed(from: Vector3, to: Vector3) -> void:
 # Function override
 func _on_destroy_animation_finished() -> void:
 	pass
+
+# Function override
+func _on_hurt_feedback_finished() -> void:
+	if get_current_HP() <= 0:
+		destroy()

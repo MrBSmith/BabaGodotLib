@@ -59,7 +59,8 @@ func _ready() -> void:
 	yield(owner, "ready")
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
-	_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_animation_finished")
+	if !self.is_class("TRPG_Actor"):
+		_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_feedback_finished")
 	_err = connect("destroy_animation_finished", self, "_on_destroy_animation_finished")
 	
 	if current_HP == -1: set_current_HP(get_max_HP())
@@ -166,7 +167,7 @@ func _on_unfocus_all_iso_object_query() -> void:
 	hide_infos()
 
 
-func _on_hurt_animation_finished() -> void:
+func _on_hurt_feedback_finished() -> void:
 	if get_current_HP() <= 0:
 		destroy()
 	else:
