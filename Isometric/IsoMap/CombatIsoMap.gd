@@ -362,21 +362,26 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 	return objects_array
 
 
-func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor, checked_cells: Array = []) -> Vector3:
-	var path = pathfinding.find_path(actor.get_current_cell(), dest)
-	var reachable = Vector3.INF
+# Get the nearest reachable cell from the given dest cell by the given actor in the given range
+# If the range isn't provided, the function will fetch the actor's current_movements
+func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor, move_range: int = -1) -> Vector3:
+	var nearest_cell = Vector3.INF
+	if move_range == -1:
+		move_range = actor.get_current_movements()
 	
-	if path.empty():
-		var adjacents = IsoLogic.get_adjacent_cells(Vector2(dest.x, dest.y))
-		
-		for cell in adjacents:
-			checked_cells.append(cell)
-			reachable = get_nearest_reachable_cell(Vector3(cell.x, cell.y, dest.z), actor, checked_cells)
-			if reachable != Vector3.INF:
+	var cells_in_range = get_cells_in_range(actor.get_current_cell(), move_range)
+	var sorted_cells = IsoLogic.sort_cells_by_dist(dest, cells_in_range)
+	
+	for dist_array in sorted_cells:
+		for cell in dist_array:
+			if cell == dest: continue
+			var path = pathfinding.find_path(actor.get_current_cell(), cell)
+			
+			if !path.empty():
+				nearest_cell = cell
 				break
-	else: reachable = dest
 	
-	return reachable
+	return nearest_cell
 
 
 #### SIGNAL RESPONSES ####
