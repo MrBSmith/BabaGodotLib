@@ -3,7 +3,6 @@ class_name TRPG_DamagableObject
 
 onready var sprite_node = get_node_or_null("Sprite")
 onready var animated_sprite_node = get_node_or_null("AnimatedSprite")
-onready var animation_player_node = get_node_or_null("AnimationPlayer")
 onready var lifebar_scene = load(lifebar_scene_path)
 
 export var lifebar_scene_path = "res://Scenes/Actors/Gauge/DamagableSmallGauge.tscn"
@@ -59,8 +58,7 @@ func _ready() -> void:
 	yield(owner, "ready")
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
-	if !self.is_class("TRPG_Actor"):
-		_err = $AnimationPlayer.connect("animation_finished", self, "_on_hurt_feedback_finished")
+	_err = $Tween.connect("flash_finished", self, "_on_hurt_flash_finished")
 	_err = connect("destroy_animation_finished", self, "_on_destroy_animation_finished")
 	
 	if current_HP == -1: set_current_HP(get_max_HP())
@@ -165,6 +163,10 @@ func _on_mouse_exited() -> void:
 
 func _on_unfocus_all_iso_object_query() -> void:
 	hide_infos()
+
+
+func _on_hurt_flash_finished() -> void:
+	_on_hurt_feedback_finished()
 
 
 func _on_hurt_feedback_finished() -> void:

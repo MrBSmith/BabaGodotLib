@@ -3,6 +3,7 @@ class_name TRPG_Actor
 
 onready var statesmachine = $States
 onready var move_node = $States/Move
+onready var animation_player = $AnimationPlayer
 onready var sfx_node = get_node_or_null("SFX")
 
 export var portrait : Texture
@@ -141,6 +142,13 @@ func get_team() -> Node:
 		return parent
 	else:
 		return null
+
+func get_combat_state() -> ActorCombatState:
+	return ActorCombatState.new(get_current_HP(),
+								get_max_HP(),
+								get_current_MP(),
+								get_max_MP(),
+								ailments)
 
 func get_team_side():
 	var team = get_team()
@@ -356,6 +364,11 @@ func _on_action_finished(_action_name: String) -> void:
 
 func _on_cell_changed(from: Vector3, to: Vector3) -> void:
 	EVENTS.emit_signal("actor_cell_changed", self, from, to)
+
+
+# Function override
+func _on_hurt_flash_finished() -> void:
+	pass
 
 # Function override
 func _on_destroy_animation_finished() -> void:
