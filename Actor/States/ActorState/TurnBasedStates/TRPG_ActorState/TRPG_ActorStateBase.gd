@@ -47,7 +47,7 @@ func update_actor_animation(actor_dir: int):
 			states_machine.set_state(states_machine.previous_state)
 	
 	# Triggers the AnimationPlayer with the name of this state if one exists 
-	var animation_player : AnimationPlayer = owner.animation_player
+	var animation_player : AnimationPlayer = owner.get("animation_player")
 	if animation_player != null && animation_player.has_animation(name):
 		animation_player.play(name)
 	

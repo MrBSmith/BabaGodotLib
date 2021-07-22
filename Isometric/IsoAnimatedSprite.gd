@@ -40,6 +40,7 @@ func _ready() -> void:
 	var _err = connect("frame_changed", self, "_on_frame_changed")
 	_err = connect("animation_finished", self, "_on_animation_finished")
 
+
 #### VIRTUALS ####
 
 

@@ -74,7 +74,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
+func init_rendering_queue(layers_array: Array) -> void:
 	for i in range(layers_array.size()):
 		for cell in layers_array[i].get_used_cells():
 			var height = i - int(is_cell_slope(cell, layers_array[i])) * 0.5
@@ -85,9 +85,7 @@ func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
 			for cell in child.get_used_cells():
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
 				add_cell_to_queue(cell, child, height, scatter)
-	
-#	for obj in objects_array:
-#		add_iso_obj(obj)
+
 
 
 # Add the given cell to te rendering queue

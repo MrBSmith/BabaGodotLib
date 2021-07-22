@@ -3,7 +3,6 @@ class_name TRPG_Actor
 
 onready var statesmachine = $States
 onready var move_node = $States/Move
-onready var animation_player = $AnimationPlayer
 onready var sfx_node = get_node_or_null("SFX")
 
 export var portrait : Texture
@@ -39,8 +38,10 @@ var path := PoolVector3Array()
 
 signal state_changed(state)
 signal changed_direction(dir)
-signal action_spent
+signal action_spent()
 signal action_finished(action_name)
+#warning-ignore:unused_signal
+signal hit()
 
 ### ACCESORS ###
 
@@ -265,14 +266,15 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 	EVENTS.emit_signal("damagable_targeted", targets_array)
 	
 	# Trigger the attack
-	for target in targets_array:
-		var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
-
-		for damage in damage_array:
-			target.hurt(damage)
-
-		var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
-		set_direction(dir)
+	for i in range(effect.nb_hits):
+		yield(self, "hit")
+		for target in targets_array:
+			var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
+			
+			target.hurt(damage_array[i])
+			
+			var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
+			set_direction(dir)
 
 
 # Move the active_actor along the path
