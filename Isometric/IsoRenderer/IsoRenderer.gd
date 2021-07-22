@@ -86,8 +86,8 @@ func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
 				add_cell_to_queue(cell, child, height, scatter)
 	
-	for obj in objects_array:
-		add_iso_obj(obj)
+#	for obj in objects_array:
+#		add_iso_obj(obj)
 
 
 # Add the given cell to te rendering queue

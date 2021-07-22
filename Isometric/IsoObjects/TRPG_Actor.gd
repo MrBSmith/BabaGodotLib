@@ -198,6 +198,8 @@ func _ready():
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
 	_err = $States/Hurt.connect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
 	
+	_err = $AnimatedSprite.connect("frame_changed", self, "_on_animated_sprite_frame_changed")
+	
 	if current_actions == -1: set_current_actions(get_max_actions())
 	if current_movements == -1: set_current_movements(get_max_movements())
 	if current_MP == -1: set_current_MP(get_max_MP())
@@ -378,3 +380,10 @@ func _on_destroy_animation_finished() -> void:
 func _on_hurt_feedback_finished() -> void:
 	if get_current_HP() <= 0:
 		destroy()
+
+
+func _on_animated_sprite_frame_changed() -> void:
+	var current_anim = $AnimatedSprite.get_animation()
+	var frame = $AnimatedSprite.get_frame()
+	if "Attack".is_subsequence_ofi(current_anim) && frame == 2:
+		pass
