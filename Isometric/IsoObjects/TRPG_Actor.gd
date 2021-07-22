@@ -105,12 +105,12 @@ func get_weapon() -> Resource: return weapon
 func get_defense() -> int: return MaxStats.get_defense()
 
 func get_view_range() -> int: return MaxStats.get_view_range() + get_altitude() * 2
+
 func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
 		if is_team_side(0):
 			EVENTS.emit_signal("visible_cells_changed", self)
-
 func get_view_field() -> Array: return view_field
 func get_view_field_v3_array() -> PoolVector3Array: return PoolVector3Array(view_field[0] + view_field[1])
 
@@ -324,7 +324,7 @@ func can_see(obj: IsoObject) -> bool:
 
 
 func can_see_cell(cell: Vector3) -> bool:
-	return cell in view_field[0] or cell in view_field[1]
+	return !owner.fog_of_war or cell in view_field[0] or cell in view_field[1]
 
 
 # Return the altitude of the current cell of the character

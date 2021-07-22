@@ -25,3 +25,7 @@ static func v2_invert_members(vec: Vector2) -> Vector2:
 # Rotate the given Vector2 the given amount of degrees
 static func v2_rotate_deg(vec: Vector2, rotation: float) -> Vector2:
 	return vec.rotated(deg2rad(rotation) * PI)
+
+static func clamp_v(val: Vector2, min_val: Vector2, max_val: Vector2) -> Vector2:
+	 return Vector2(clamp(val.x, min_val.x, max_val.x),
+					clamp(val.y, min_val.y, max_val.y))

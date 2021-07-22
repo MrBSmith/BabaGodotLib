@@ -4,7 +4,6 @@ class_name CombatIsoMap
 
 onready var team_container = $Interactives/ActorTeams
 
-export var fog_of_war := false
 
 # A class to handle combat specific logic for IsoMap
 
@@ -93,9 +92,9 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 	return visible_cells
 
 
-# Update the view field of the given actor by fetching every cells he can see and feed him
+# Update the view field of the given actor by fetching every cells he/she can see and feed it
 func update_view_field(actor: TRPG_Actor) -> void:
-	if !fog_of_war or !is_ready:
+	if !owner.fog_of_war or !is_ready:
 		return
 	
 	var view_range = actor.get_view_range()
@@ -118,7 +117,7 @@ func update_view_field(actor: TRPG_Actor) -> void:
 
 
 func actor_update_visibility(actor: TRPG_Actor) -> void:
-	if !fog_of_war or actor.get_team_side() != ActorTeam.TEAM_TYPE.ENEMY:
+	if !owner.fog_of_war or actor.get_team_side() != ActorTeam.TEAM_TYPE.ENEMY:
 		return
 	
 	var actor_visible = false
@@ -191,7 +190,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int,
 				if (obj == actor && !include_self):
 					continue
 				
-				if actor.get_team().is_cell_in_view_field(obj.get_current_cell()):
+				if actor.get_team().can_see_cell(obj.get_current_cell()):
 					targetables.append(obj)
 	
 	return targetables
@@ -311,7 +310,7 @@ func get_nearby_opponents(actor: TRPG_Actor, dist_range: int, currently_visible:
 			if damagable.get_team_side() != actor_team_side:
 				if currently_visible:
 					var damagable_cell = damagable.get_current_cell()
-					if !actor_team.is_cell_in_view_field(damagable_cell):
+					if !actor_team.can_see_cell(damagable_cell):
 						continue
 				
 				opponents_array.append(damagable)

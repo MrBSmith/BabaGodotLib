@@ -145,9 +145,7 @@ func _init_object_grid_pos():
 
 
 
-
 #### LAYERS ####
-
 
 func get_map_rect() -> Rect2:
 	var layer_0 = get_layer(0)
@@ -470,7 +468,7 @@ func get_nb_segments() -> Vector2:
 	var map_rect = get_map_rect()
 	var map_size = map_rect.size
 	
-	return (map_size / MAP_SEGMENT_SIZE).round()
+	return Math.clamp_v((map_size / MAP_SEGMENT_SIZE).round(), Vector2.ONE, Vector2.INF)
 
 
 func segment_get_pos(segment_id: int) -> Vector2:
