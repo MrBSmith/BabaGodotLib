@@ -60,6 +60,7 @@ func get_visible_cells() -> Array: return visible_cells
 
 func _ready() -> void:
 	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
+	_err = EVENTS.connect("iso_object_height_changed", self, "_on_iso_object_height_changed")
 	_err = EVENTS.connect("iso_object_added", self, "_on_iso_object_added")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
 	_err = EVENTS.connect("area_added", self, "_on_area_added")
@@ -69,7 +70,6 @@ func _ready() -> void:
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
-
 
 
 #### LOGIC ####
@@ -85,7 +85,6 @@ func init_rendering_queue(layers_array: Array) -> void:
 			for cell in child.get_used_cells():
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
 				add_cell_to_queue(cell, child, height, scatter)
-
 
 
 # Add the given cell to te rendering queue
@@ -568,6 +567,15 @@ func disappear_transition(total_time: float = 4.0) -> void:
 
 func _on_iso_object_cell_changed(obj: IsoObject) -> void:
 	if !is_obj_in_rendering_queue(obj):
+		add_iso_obj(obj)
+
+
+func _on_iso_object_height_changed(obj: IsoObject, from: int, to: int) -> void:
+	if to > from:
+		var parts_array = obj.render_parts.duplicate()
+		for part in parts_array:
+			part.destroy()
+	
 		add_iso_obj(obj)
 
 

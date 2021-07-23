@@ -265,6 +265,9 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 	
 	EVENTS.emit_signal("damagable_targeted", targets_array)
 	
+	var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
+	set_direction(dir)
+	
 	# Trigger the attack
 	for i in range(effect.nb_hits):
 		yield(self, "hit")
@@ -272,9 +275,6 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 			var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
 			
 			target.hurt(damage_array[i])
-			
-			var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
-			set_direction(dir)
 
 
 # Move the active_actor along the path
@@ -387,5 +387,5 @@ func _on_hurt_feedback_finished() -> void:
 func _on_animated_sprite_frame_changed() -> void:
 	var current_anim = $AnimatedSprite.get_animation()
 	var frame = $AnimatedSprite.get_frame()
-	if "Attack".is_subsequence_ofi(current_anim) && frame == 2:
+	if "Attack".is_subsequence_ofi(current_anim) && frame in [2, 5]:
 		pass

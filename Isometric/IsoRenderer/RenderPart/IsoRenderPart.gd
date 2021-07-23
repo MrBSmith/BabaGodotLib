@@ -44,6 +44,7 @@ func _ready() -> void:
 	var _err = object_ref.connect("cell_changed", self, "_on_object_cell_changed")
 	_err = object_ref.connect("global_position_changed", self, "_on_object_global_position_changed")
 	_err = object_ref.connect("modulate_changed", self, "_on_object_modulate_changed")
+	_err = object_ref.connect("height_changed", self, "_on_object_height_changed")
 	_err = connect("cell_changed", renderer, "_on_part_cell_changed")
 
 
@@ -107,6 +108,11 @@ func apply_texture_change(obj_sprite: Node2D, sprite_node: Sprite) -> void:
 
 func _on_object_cell_changed(_from: Vector3, to: Vector3):
 	set_current_cell(to + Vector3(0, 0, get_altitude()))
+
+
+func _on_object_height_changed(_from: int, to: int) -> void:
+	if altitude > to:
+		destroy()
 
 
 func _on_object_global_position_changed(world_pos: Vector2):
