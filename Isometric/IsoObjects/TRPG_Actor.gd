@@ -120,12 +120,11 @@ func set_direction(value: int):
 		print("The given direction value is outside the DIRECTION enum size | entity name: " + self.name)
 		return
 	
-	if value == direction:
+	if value == direction: 
 		return
 	
-	else:
-		direction = value
-		emit_signal("changed_direction", direction)
+	direction = value
+	emit_signal("changed_direction", direction)
 func get_direction() -> int: return direction 
 
 func set_skills(array: Array):

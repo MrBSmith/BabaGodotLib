@@ -34,6 +34,7 @@ func _init(obj: Node, sprite_array: Array, cell: Vector3, world_pos: Vector2,
 		sprite_node.set_name(sprite.name)
 		sprite_node.set_owner(self)
 		sprite_node.set_visible(!sprite.is_hidden())
+		sprite_node.set_flip_h(sprite.is_flipped_h())
 		var part_texture = AtlasTexture.new()
 		sprite_node.set_texture(part_texture)
 		

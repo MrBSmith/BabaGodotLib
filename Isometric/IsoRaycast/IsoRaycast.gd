@@ -3,25 +3,15 @@ class_name IsoRaycast
 
 
 # Get every cells visible between the origin and the destination
-static func get_line_of_sight(map: IsoMap, origin: Vector3, dest: Vector3, obj_ignored : Array = []) -> PoolVector3Array:
+static func get_line_of_sight(map: IsoMap, origin: Vector3, dest: Vector3, _obj_ignored : Array = []) -> PoolVector3Array:
 	var line = bresenham3D(origin.round(), dest.round())
 	var line_of_sight = PoolVector3Array()
 	
 	for cell in line:
 		if cell == line[0]: continue
-		
-		if !map.is_cell_free(cell):
-			if map.is_cell_tile(cell) or map.is_cell_wall(cell) or map.is_occupied_by_obstacle(cell):
-				line_of_sight.append(cell)
-				break
-			else:
-				var obj = map.get_damagable_on_cell(cell)
-				var obj_cell = obj.get_current_cell()
-				line_of_sight.append(obj_cell)
-				if not obj in obj_ignored:
-					break
-		else:
-			line_of_sight.append(cell)
+		line_of_sight.append(cell)
+		if !map.is_cell_free(cell) && (map.is_cell_wall(cell) or map.is_occupied_by_obstacle(cell)):
+			break
 	
 	return line_of_sight
 

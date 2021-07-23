@@ -33,6 +33,9 @@ func draw_area(cells_array: PoolVector3Array, area_type: String = "Target") -> v
 	for cell in cells_array:
 		var alt = round(cell.z)
 		var layer = get_layer(alt)
+		if layer == null:
+			continue
+		
 		var tilemap : TileMap = layer.get_node("Area")
 		var tileset : TileSet = tilemap.get_tileset()
 		var tile_id = tileset.find_tile_by_name(area_type.capitalize())
