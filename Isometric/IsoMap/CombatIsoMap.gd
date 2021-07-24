@@ -104,7 +104,7 @@ func update_view_field(actor: TRPG_Actor) -> void:
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	
-	var visible_cells = Array(get_visible_cells(actor_cell, actor_height, view_range, true, [actor]))
+	var visible_cells = Array(get_visible_cells(actor_cell.round(), actor_height, view_range, true, [actor]))
 	var barely_visible_cells = Array()
 	
 	for cell in visible_cells:

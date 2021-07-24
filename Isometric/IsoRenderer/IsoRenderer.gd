@@ -283,7 +283,7 @@ func _update_tiles_visibility_brute_force(view_field: Array) -> void:
 	for i in range(queue.size()):
 		var child = queue[i]
 		if child is TileRenderPart:
-			var part_cell = child.get_current_cell()
+			var part_cell = child.get_current_cell().round()
 			if part_cell in view_field[IsoObject.VISIBILITY.BARELY_VISIBLE]:
 				child.set_visibility(IsoObject.VISIBILITY.BARELY_VISIBLE)
 			elif not part_cell in view_field[IsoObject.VISIBILITY.VISIBLE]:
