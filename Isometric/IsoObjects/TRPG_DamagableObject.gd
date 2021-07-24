@@ -125,9 +125,9 @@ func hide_infos() -> void:
 	EVENTS.emit_signal("iso_object_unfocused", self)
 
 
-func hurt(damage: int) -> void:
+func hurt(damage: int, critical: bool = false) -> void:
 	set_current_HP(Math.clampi(get_current_HP() - damage, 0, get_max_HP()))
-	EVENTS.emit_signal("damage_inflicted", damage, self)
+	EVENTS.emit_signal("damage_inflicted", damage, self, critical)
 	
 	if has_method("set_state"):
 		call("set_state", "Hurt")
