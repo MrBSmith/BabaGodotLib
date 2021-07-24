@@ -143,20 +143,15 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 	var attack_range = actor.get_current_range()
 	var actor_cell = actor.get_current_cell()
 	
-	if owner.fog_of_war:
-		reachable_cells = actor.get_view_field_v3_array()
-	else:
-		reachable_cells = IsoLogic.get_cells_in_sphere(actor_cell, attack_range + 1)
+	reachable_cells = get_cells_in_range(actor_cell, attack_range + 1)
 	
 	for cell in reachable_cells:
 		# Remove cells in view_field but too far away to be reached
-		if owner.fog_of_war:
-			var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
-			if dist > attack_range:
-				continue
-
 		var obj = get_damagable_on_cell(cell)
 		if obj == null or obj == actor:
+			continue
+		
+		if !actor.can_see(obj):
 			continue
 		
 		if (obj.is_class("TRPG_Actor") && actor.get_team_side() != obj.get_team_side())\

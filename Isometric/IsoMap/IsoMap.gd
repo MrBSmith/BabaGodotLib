@@ -53,8 +53,8 @@ func _ready():
 	# Store all the passable cells into the array grounds
 	
 	_fetch_layers()
-	_init_object_grid_pos()
 	_fetch_ground()
+	_init_object_grid_pos()
 	_fetch_damagables()
 	
 	yield(owner, "ready")
@@ -75,7 +75,6 @@ func _ready():
 		obj.map = self
 	
 	is_ready = true
-	
 	emit_signal("map_generation_finished")
 
 
@@ -138,10 +137,9 @@ func _fetch_layers() -> void:
 
 # Give every actor, his default grid pos
 func _init_object_grid_pos():
-	yield(owner, "ready")
-	
 	for object in get_tree().get_nodes_in_group("IsoObject"):
-		object.set_current_cell(get_pos_highest_cell(object.position))
+		var cell = get_pos_highest_cell(object.position)
+		object.set_current_cell(cell)
 
 
 

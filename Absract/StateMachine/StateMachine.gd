@@ -20,6 +20,7 @@ class_name StatesMachine
 var current_state : Object = null
 var previous_state : Object = null
 var default_state : Object = null
+export var no_default_state : bool = false
 
 # Usefull only if this instance of StatesMachine is nested (ie its parent is also a StatesMachine)
 # When this state is entered, if this bool is true, reset the child state to the default one
@@ -48,7 +49,7 @@ func _ready():
 	
 	# Set the state to be the default one, unless we are in a nested statesmachine
 	# Nested StatesMachines shouldn't have a current_state if they are not the current_state of its parent
-	if !is_nested():
+	if !is_nested() && !no_default_state:
 		set_state(default_state)
 	
 	# Connect sub-statesmachines
