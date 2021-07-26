@@ -6,7 +6,6 @@ onready var move_node = $States/Move
 onready var sfx_node = get_node_or_null("SFX")
 
 export var portrait : Texture
-export var timeline_port : Texture
 export var MaxStats : Resource
 export var default_attack_effect : Resource
 export var default_attack_aoe : Resource setget , get_default_attack_aoe
@@ -179,6 +178,23 @@ func get_current_attack_effect() -> Resource:
 
 func get_current_attack_combat_effect_object() -> CombatEffectObject:
 	return weapon.get_combat_effect_object()
+
+func get_idle_bottom_texture() -> AtlasTexture:
+	var sprite_frames = animated_sprite_node.get_sprite_frames()
+	var atlas_texture = sprite_frames.get_frame("IdleBottom", 0)
+	var atlas_image = atlas_texture.get_atlas().get_data()
+	var image = Image.new()
+	var region_size = atlas_texture.region.size
+	
+	image.create(region_size.x, region_size.y, false, Image.FORMAT_RGBA8)
+	image.blit_rect(atlas_image, atlas_texture.region, Vector2.ZERO)
+	image = Utils.trim_image(image)
+
+	var image_texture = ImageTexture.new()
+	image_texture.create_from_image(image, 3)
+
+	return image_texture
+
 
 # Function override
 func is_dead() -> bool: return get_state() == $States/Death
