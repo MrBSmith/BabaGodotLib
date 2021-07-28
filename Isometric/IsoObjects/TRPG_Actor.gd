@@ -179,7 +179,7 @@ func get_current_attack_effect() -> Resource:
 func get_current_attack_combat_effect_object() -> CombatEffectObject:
 	return weapon.get_combat_effect_object()
 
-func get_idle_bottom_texture() -> AtlasTexture:
+func get_idle_bottom_texture() -> Texture:
 	var sprite_frames = animated_sprite_node.get_sprite_frames()
 	var atlas_texture = sprite_frames.get_frame("IdleBottom", 0)
 	var atlas_image = atlas_texture.get_atlas().get_data()
@@ -191,8 +191,8 @@ func get_idle_bottom_texture() -> AtlasTexture:
 	image = Utils.trim_image(image)
 
 	var image_texture = ImageTexture.new()
-	image_texture.create_from_image(image, 3)
-
+	image_texture.create_from_image(image, 2)
+	
 	return image_texture
 
 

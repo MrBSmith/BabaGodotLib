@@ -61,6 +61,6 @@ static func trim_image(image: Image) -> Image:
 	
 	
 	var output_img = Image.new()
-	output_img.create(biggest_x - smallest_x, biggest_y - smallest_y, false, Image.FORMAT_RGBA8)
+	output_img.create(biggest_x - smallest_x + 1, biggest_y - smallest_y + 1, false, Image.FORMAT_RGBA8)
 	output_img.blit_rect(image, Rect2(smallest_x, smallest_y, biggest_x, biggest_y), Vector2.ZERO)
 	return output_img
