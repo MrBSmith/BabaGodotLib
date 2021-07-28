@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://BabaGodotLib/Isometric/IsoRenderer/IsoRenderer.gd" type="Script" id=1]
+[ext_resource path="res://BabaGodotLib/Isometric/IsoRenderer/RenderPart/PartTween.gd" type="Script" id=2]
+
+[node name="Renderer" type="Node2D"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Tween" type="Tween" parent="."]
+script = ExtResource( 2 )
+
+[node name="RenderingQueue" type="Node2D" parent="."]

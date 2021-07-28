@@ -57,8 +57,6 @@ func _ready():
 	_init_object_grid_pos()
 	_fetch_damagables()
 	
-	yield(owner, "ready")
-	
 	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
 	_err = EVENTS.connect("cursor_world_pos_changed", self, "_on_cursor_world_pos_changed")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
@@ -67,8 +65,13 @@ func _ready():
 	# by checking all the cells in the IsoMap to see if they are not an obstacle
 	walkable_cells = pathfinding.set_walkable_cells(grounds)
 	
-	# Create the connections between all the walkable cells
-	pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
+	
+	if owner != null:
+		var active_actor = owner.get("active_actor")
+	
+		# Create the connections between all the walkable cells
+		if is_instance_valid(active_actor):
+			pathfinding.connect_walkable_cells(walkable_cells, active_actor)
 	
 	for obj in get_tree().get_nodes_in_group("IsoObject"):
 		obj.set_current_cell(get_pos_highest_cell(obj.position))
@@ -96,16 +99,14 @@ func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
 		var current_layer = layers_array[i]
-		var layer_obstacles_tilemap = current_layer.get_node("Obstacles")
 		var walls_tilemap = current_layer.get_node("Walls")
-		var obstacles_cells = layer_obstacles_tilemap.get_used_cells()
 		var walls_cells = walls_tilemap.get_used_cells()
 		
 		for cell2d in current_layer.get_used_cells():
 			if IsoLogic.find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
-				if not cell2d in obstacles_cells && not cell2d in walls_cells:
+				if not cell2d in walls_cells:
 					if get_cell_slope_type(cell2d, i) != 0:
 						current_cell -= Vector3(0, 0, 0.5)
 					feed_array.append(current_cell)

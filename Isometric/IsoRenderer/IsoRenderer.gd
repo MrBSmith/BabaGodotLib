@@ -531,6 +531,11 @@ func add_area(map: IsoMap, cell_array: PoolVector3Array) -> void:
 		add_cell_to_queue(Vector2(cell.x, cell.y), area, height)
 
 
+func clear_tiles() -> void:
+	for render_part in rendering_queue.get_children():
+		if render_part.get_object_ref() is TileMap:
+			render_part.destroy()
+
 #### ANIMATION ####
 
 # Apply a tile shake effect
