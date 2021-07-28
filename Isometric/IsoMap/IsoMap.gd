@@ -17,6 +17,8 @@ onready var pathfinding = $Pathfinding
 onready var layer_0_node = $Layer
 onready var cursor = $Interactives/Cursor
 
+export var tileset : TileSet = null setget set_tileset, get_tileset
+
 var layers_array : Array setget , get_layers_array
 
 var grounds := PoolVector3Array()
@@ -29,12 +31,14 @@ signal map_generation_finished
 
 #### ACCESSORS ####
 
+func is_class(value: String): return value == "IsoMap" or .is_class(value)
+func get_class() -> String: return "IsoMap"
+
 func set_damagables(array: Array):
 	if array != damagables:
 		damagables = array
 		walkable_cells = pathfinding.set_walkable_cells(grounds)
 		pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
-
 func get_damagables() -> Array: return damagables
 
 func get_layers_array() -> Array: return layers_array
@@ -45,6 +49,15 @@ func get_tilemaps_recursive(array: Array, node: Node) -> void:
 			array.append(child)
 			if child.get_child_count() > 0:
 				get_tilemaps_recursive(array, child)
+
+func set_tileset(value: TileSet): 
+	tileset = value
+	for layer in get_layers_array():
+		layer.set_tileset(tileset)
+		for child in layer.get_children():
+			if child is TileMap:
+				child.set_tileset(tileset)
+func get_tileset() -> TileSet: return tileset
 
 #### BUILT IN ####
 
@@ -115,10 +128,10 @@ func _fetch_ground() -> void:
 	# Handle bridges
 	for i in range(layers_array.size()):
 		for child in layers_array[i].get_children():
-			var tileset = child.get_tileset()
+			var layer_tileset = child.get_tileset()
 			for cell in child.get_used_cells():
 				var tile_id = child.get_cellv(cell)
-				var tile_name = tileset.tile_get_name(tile_id)
+				var tile_name = layer_tileset.tile_get_name(tile_id)
 				if "Bridge" in tile_name:
 					var cell_3D = Vector3(cell.x, cell.y, i)
 					if "Left" in tile_name:
@@ -164,6 +177,12 @@ func get_layer(height: float) -> IsoMapLayer:
 func get_layer_id(height: float) -> int:
 	return get_layer(round(height)).get_index()
 
+
+func get_layer_height(layer: IsoMapLayer) -> int:
+	for i in range(layers_array.size()):
+		if layers_array[i] == layer:
+			return i
+	return -1
 
 # Count the number of layers
 func count_layers() -> int:
@@ -291,13 +310,13 @@ func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	if layer == null:
 		return SLOPE_TYPE.NONE
 	
-	var tileset : TileSet = layer.get_tileset()
+	var layer_tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
-	if !(tile_id in tileset.get_tiles_ids()):
+	if !(tile_id in layer_tileset.get_tiles_ids()):
 		return SLOPE_TYPE.NONE
 	
-	var tile_name = tileset.tile_get_name(tile_id)
+	var tile_name = layer_tileset.tile_get_name(tile_id)
 		
 	if !"slope".is_subsequence_ofi(tile_name) && !"stair".is_subsequence_ofi(tile_name):
 		return SLOPE_TYPE.NONE
@@ -357,14 +376,14 @@ func is_occupied_by_obstacle(cell: Vector3) -> bool:
 			continue
 		
 		var cell_size = obstacle_tilemap.get_cell_size()
-		var tileset = obstacle_tilemap.get_tileset()
+		var layer_tileset = obstacle_tilemap.get_tileset()
 		var tile_mode = tileset.tile_get_tile_mode(tile_id)
 		var tile_size = Vector2.ZERO
 		
 		if tile_mode == TileSet.SINGLE_TILE:
-			tile_size = tileset.tile_get_region(tile_id).size
+			tile_size = layer_tileset.tile_get_region(tile_id).size
 		else:
-			tile_size = tileset.autotile_get_size(tile_id)
+			tile_size = layer_tileset.autotile_get_size(tile_id)
 		
 		var obst_height = round(tile_size.y / cell_size.y)
 		if i + obst_height > cell.z && i <= cell.z:

@@ -5,39 +5,13 @@ class_name IsoMapLayer
 # A base class to represent a IsoMapLayer
 # Also carry a tool that place walls below a tile automaticly
 
-signal tile_added(cell)
-signal tile_removed(cell)
-
 const print_log : bool = false
-
 
 func _ready() -> void:
 	var _err = EVENTS.connect("hide_iso_objects", self, "_on_hide_iso_objects_event")
 	
 	if !Engine.editor_hint:
 		set_visible(false)
-	
-	var __ = connect("tile_added", self , "_on_tile_added")
-	__ = connect("tile_removed", self , "_on_tile_removed")
-
-
-# Built-in funciton_overide
-func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
-		 flip_h: bool = false,  flip_v: bool = false, 
-		subtile_pos:= Vector2.ZERO) -> void :
-	
-	var cell = Vector2(x, y)
-	
-	if tile_id != -1:
-		if tile_id in get_tileset().get_tiles_ids():
-			if not cell in get_used_cells() or \
-			(cell in get_used_cells() && get_cellv(cell) != tile_id):
-				emit_signal("tile_added", cell)
-	else:
-		if cell in get_used_cells():
-			emit_signal("tile_removed", cell)
-	
-	.set_cell(x, y, tile_id, transpose, flip_h, flip_v, subtile_pos)
 
 
 #### LOGIC ####

@@ -10,6 +10,9 @@ onready var team_container = $Interactives/ActorTeams
 
 #### ACCESSORS ####
 
+func is_class(value: String): return value == "CombatIsoMap" or .is_class(value)
+func get_class() -> String: return "CombatIsoMap"
+
 
 #### BUILT-IN ####
 

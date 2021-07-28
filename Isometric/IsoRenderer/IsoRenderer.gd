@@ -70,6 +70,9 @@ func _ready() -> void:
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
+	_err = EVENTS.connect("tile_added", self, "_on_iso_tilemap_tile_added")
+	_err = EVENTS.connect("tile_removed", self, "_on_iso_tilemap_tile_removed")
+	_err = EVENTS.connect("iso_tilemap_cleared", self, "_on_iso_tilemap_cleared")
 
 
 #### LOGIC ####
@@ -319,7 +322,7 @@ func add_iso_obj(obj: IsoObject) -> void:
 
 
 # Remove the given object from the rendering queue
-func remove_iso_obj(obj: Object) -> void:
+func remove_parts_of_obj(obj: Object) -> void:
 	for part in obj.render_parts:
 		if is_instance_valid(part):
 			part.queue_free()
@@ -536,6 +539,7 @@ func clear_tiles() -> void:
 		if render_part.get_object_ref() is TileMap:
 			render_part.destroy()
 
+
 #### ANIMATION ####
 
 # Apply a tile shake effect
@@ -589,7 +593,7 @@ func _on_iso_object_added(obj: IsoObject) -> void:
 
 
 func _on_iso_object_removed(obj: IsoObject) -> void:
-	remove_iso_obj(obj)
+	remove_parts_of_obj(obj)
 
 
 func _on_part_cell_changed(part: IsoRenderPart, _cell: Vector3) -> void:
@@ -625,8 +629,20 @@ func _on_area_cleared(map: IsoMap) -> void:
 	for i in range(layers_array.size()):
 		var layer = layers_array[i]
 		var area = layer.get_node("Area")
-		remove_iso_obj(area)
+		remove_parts_of_obj(area)
 
 
 func _on_click_at_cell_event(cell: Vector3) -> void:
 	shake(Vector2(cell.x, cell.y), 3, 0.2)
+
+
+func _on_iso_tilemap_tile_added(tilemap: IsoTileMap, cell: Vector3) -> void:
+	add_cell_to_queue(Vector2(cell.x, cell.y), tilemap, cell.z)
+
+
+func _on_iso_tilemap_tile_removed(tilemap: IsoTileMap, cell: Vector3) -> void:
+	remove_part_at_cell(cell, tilemap)
+
+
+func _on_iso_tilemap_cleared(tilemap: IsoTileMap) -> void:
+	remove_parts_of_obj(tilemap)
