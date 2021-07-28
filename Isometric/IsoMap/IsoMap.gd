@@ -15,6 +15,7 @@ enum SLOPE_TYPE {
 
 onready var pathfinding = $Pathfinding
 onready var layer_0_node = $Layer
+onready var cursor = $Interactives/Cursor
 
 var layers_array : Array setget , get_layers_array
 
