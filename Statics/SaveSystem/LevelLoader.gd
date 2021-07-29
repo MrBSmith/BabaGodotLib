@@ -7,16 +7,16 @@ static func build_level_from_loaded_properties(dir: String, level : Level):
 	if !level.is_inside_tree():
 		yield(level, "tree_entered")
 	
-	var level_properties : Dictionary = _load_level_properties_from_json(dir, level.get_name())
+	var level_properties : Dictionary = _load_level_properties_from_json(dir)
 	level.apply_loaded_properties(level_properties)
 
 
 # Load the json file corresponding to the given level_name
 # Return a dictionary containing every objects with their path as a key and a property dict as value
 # The property dict contains each property name as key and property value as value
-static func _load_level_properties_from_json(dir: String, level_name : String) -> Dictionary:
+static func _load_level_properties_from_json(dir: String) -> Dictionary:
 	var loaded_level_properties : Dictionary = {}
-	var loaded_objects : Dictionary = _deserialize_level_properties(dir + "/" + level_name + ".json")
+	var loaded_objects : Dictionary = _deserialize_level_properties(dir)
 	for object_dict in loaded_objects.keys():
 		var property_dict : Dictionary = {}
 		for keys in loaded_objects[object_dict].keys():
