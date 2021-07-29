@@ -21,6 +21,7 @@ func get_class() -> String: return "AnimatedObjectStateBase"
 func _ready() -> void:
 	yield(owner, "ready")
 	animated_sprite = owner.get_node_or_null("AnimatedSprite")
+	var __ = connect("state_animation_finished", self, "_on_state_animation_finished")
 
 	if animated_sprite != null:
 		var _err = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
@@ -69,5 +70,8 @@ func _on_animation_finished():
 	if current_animation == "Start" + name:
 		if sprite_frames != null and sprite_frames.has_animation(name):
 			animated_sprite.play(name)
-	else:
+
+
+func _on_state_animation_finished() -> void:
+	if toggle_state_mode && is_current_state():
 		states_machine.set_state(states_machine.previous_state)

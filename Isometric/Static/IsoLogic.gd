@@ -144,3 +144,21 @@ static func sort_cells_by_dist(origin: Vector3, cells_array: PoolVector3Array) -
 			output_dict[dist] = [cell]
 	
 	return output_dict.values()
+
+
+static func split_move_path(path: PoolVector3Array, segment_size: int) -> Array:
+	var path_a = Array(path)
+	var slices_array = []
+	#warning-ignore:integer_division
+	var nb_sub_path = int(path.size() / segment_size)
+	var rest = path.size() % segment_size
+	var is_rest = bool(rest)
+	
+	for i in range(nb_sub_path + 1 * int(is_rest)):
+		var nb_elem = segment_size if i < nb_sub_path else rest
+		var sub_path = []
+		for j in range(nb_elem):
+			sub_path.append(path_a[i * segment_size + j])
+		slices_array.append(sub_path)
+	
+	return slices_array

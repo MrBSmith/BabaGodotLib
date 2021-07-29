@@ -36,6 +36,7 @@ func set_window_texture(value: Texture):
 
 func _ready() -> void:
 	var __ = EVENTS.connect("update_unabled_actions", self, "_on_update_unabled_actions")
+	__ = EVENTS.connect("combat_new_turn_started", self, "_on_combat_new_turn_started")
 	__ = EVENTS.connect("disable_actions", self, "_on_disable_actions_event")
 	__ = EVENTS.connect("add_action_submenu", self, "_on_add_action_submenu")
 	__ = EVENTS.connect("target_choice_state_entered", self, "_on_target_choice_state_entered")
@@ -107,6 +108,9 @@ func create_description_window(description_data) -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_combat_new_turn_started(actor: TRPG_Actor) -> void:
+	set_visible(actor.get_team_side() == ActorTeam.TEAM_TYPE.ALLY)
 
 
 func _on_update_unabled_actions(move: bool, attack: bool, item : bool, skill: bool, wait: bool):

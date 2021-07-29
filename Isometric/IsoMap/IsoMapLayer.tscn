@@ -39,16 +39,6 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="Obstacles" type="TileMap" parent="."]
-mode = 1
-tile_set = ExtResource( 3 )
-cell_size = Vector2( 32, 16 )
-format = 1
-script = ExtResource( 4 )
-__meta__ = {
-"_edit_lock_": true
-}
-
 [node name="Walls" type="TileMap" parent="."]
 mode = 1
 tile_set = ExtResource( 3 )

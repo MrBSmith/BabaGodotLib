@@ -6,7 +6,6 @@ onready var move_node = $States/Move
 onready var sfx_node = get_node_or_null("SFX")
 
 export var portrait : Texture
-export var timeline_port : Texture
 export var MaxStats : Resource
 export var default_attack_effect : Resource
 export var default_attack_aoe : Resource setget , get_default_attack_aoe
@@ -38,8 +37,10 @@ var path := PoolVector3Array()
 
 signal state_changed(state)
 signal changed_direction(dir)
-signal action_spent
+signal action_spent()
 signal action_finished(action_name)
+#warning-ignore:unused_signal
+signal hit()
 
 ### ACCESORS ###
 
@@ -104,12 +105,12 @@ func get_weapon() -> Resource: return weapon
 func get_defense() -> int: return MaxStats.get_defense()
 
 func get_view_range() -> int: return MaxStats.get_view_range() + get_altitude() * 2
+
 func set_view_field(value: Array):
 	if value != view_field:
 		view_field = value
 		if is_team_side(0):
 			EVENTS.emit_signal("visible_cells_changed", self)
-
 func get_view_field() -> Array: return view_field
 func get_view_field_v3_array() -> PoolVector3Array: return PoolVector3Array(view_field[0] + view_field[1])
 
@@ -118,12 +119,11 @@ func set_direction(value: int):
 		print("The given direction value is outside the DIRECTION enum size | entity name: " + self.name)
 		return
 	
-	if value == direction:
+	if value == direction: 
 		return
 	
-	else:
-		direction = value
-		emit_signal("changed_direction", direction)
+	direction = value
+	emit_signal("changed_direction", direction)
 func get_direction() -> int: return direction 
 
 func set_skills(array: Array):
@@ -141,6 +141,13 @@ func get_team() -> Node:
 		return parent
 	else:
 		return null
+
+func get_combat_state() -> ActorCombatState:
+	return ActorCombatState.new(get_current_HP(),
+								get_max_HP(),
+								get_current_MP(),
+								get_max_MP(),
+								ailments)
 
 func get_team_side():
 	var team = get_team()
@@ -169,6 +176,26 @@ func get_current_attack_effect() -> Resource:
 	else:
 		return default_attack_effect
 
+func get_current_attack_combat_effect_object() -> CombatEffectObject:
+	return weapon.get_combat_effect_object()
+
+func get_idle_bottom_texture() -> Texture:
+	var sprite_frames = animated_sprite_node.get_sprite_frames()
+	var atlas_texture = sprite_frames.get_frame("IdleBottom", 0)
+	var atlas_image = atlas_texture.get_atlas().get_data()
+	var image = Image.new()
+	var region_size = atlas_texture.region.size
+	
+	image.create(region_size.x, region_size.y, false, Image.FORMAT_RGBA8)
+	image.blit_rect(atlas_image, atlas_texture.region, Vector2.ZERO)
+	image = Utils.trim_image(image)
+
+	var image_texture = ImageTexture.new()
+	image_texture.create_from_image(image, 2)
+	
+	return image_texture
+
+
 # Function override
 func is_dead() -> bool: return get_state() == $States/Death
 
@@ -185,7 +212,7 @@ func _ready():
 	var _err = connect("cell_changed", self, "_on_cell_changed")
 	_err = connect("action_finished", self, "_on_action_finished")
 	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
-	
+	_err = $States/Hurt.connect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
 	
 	if current_actions == -1: set_current_actions(get_max_actions())
 	if current_movements == -1: set_current_movements(get_max_movements())
@@ -251,15 +278,16 @@ func apply_combat_effect(effect: Effect, aoe_target: AOE_Target, action_spent: i
 	
 	EVENTS.emit_signal("damagable_targeted", targets_array)
 	
+	var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
+	set_direction(dir)
+	
 	# Trigger the attack
-	for target in targets_array:
-		var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
-
-		for damage in damage_array:
-			target.hurt(damage)
-
-		var dir = IsoLogic.get_cell_direction(current_cell, aoe_target.target_cell)
-		set_direction(dir)
+	for i in range(effect.nb_hits):
+		yield(self, "hit")
+		for target in targets_array:
+			var damage_array = CombatEffectHandler.compute_damage(effect, self, target)
+			
+			target.hurt(damage_array[i])
 
 
 # Move the active_actor along the path
@@ -309,7 +337,11 @@ func can_see(obj: IsoObject) -> bool:
 		return true
 	
 	var obj_cell = obj.get_current_cell()
-	return obj_cell in view_field[0] or obj_cell in view_field[1]
+	return can_see_cell(obj_cell)
+
+
+func can_see_cell(cell: Vector3) -> bool:
+	return !owner.fog_of_war or cell in view_field[0] or cell in view_field[1]
 
 
 # Return the altitude of the current cell of the character
@@ -338,18 +370,28 @@ func _on_state_changed(new_state: Object) -> void:
 		if active:
 			if previous_state is TRPG_ActionState:
 				emit_signal("action_finished", previous_state.name)
-		else:
-			if previous_state.name == "Hurt":
-				_on_hurt_animation_finished()
+		
+		if previous_state.name == "Hurt":
+			emit_signal("action_consequence_finished")
 
 
 func _on_action_finished(_action_name: String) -> void:
 	pass
 
 
-func _on_cell_changed(_new_cell: Vector3) -> void:
-	EVENTS.emit_signal("actor_cell_changed", self)
+func _on_cell_changed(from: Vector3, to: Vector3) -> void:
+	EVENTS.emit_signal("actor_cell_changed", self, from, to)
+
+
+# Function override
+func _on_hurt_flash_finished() -> void:
+	pass
 
 # Function override
 func _on_destroy_animation_finished() -> void:
 	pass
+
+# Function override
+func _on_hurt_feedback_finished() -> void:
+	if get_current_HP() <= 0:
+		destroy()

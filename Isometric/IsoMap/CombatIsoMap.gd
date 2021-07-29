@@ -4,19 +4,17 @@ class_name CombatIsoMap
 
 onready var team_container = $Interactives/ActorTeams
 
-export var fog_of_war := false
 
 # A class to handle combat specific logic for IsoMap
 
 
 #### ACCESSORS ####
 
+func is_class(value: String): return value == "CombatIsoMap" or .is_class(value)
+func get_class() -> String: return "CombatIsoMap"
+
 
 #### BUILT-IN ####
-
-func _ready() -> void:
-	var __ = EVENTS.connect("actor_cell_changed", self, "_on_actor_cell_changed")
-
 
 
 #### LOGIC ####
@@ -38,6 +36,9 @@ func draw_area(cells_array: PoolVector3Array, area_type: String = "Target") -> v
 	for cell in cells_array:
 		var alt = round(cell.z)
 		var layer = get_layer(alt)
+		if layer == null:
+			continue
+		
 		var tilemap : TileMap = layer.get_node("Area")
 		var tileset : TileSet = tilemap.get_tileset()
 		var tile_id = tileset.find_tile_by_name(area_type.capitalize())
@@ -97,16 +98,16 @@ func get_visible_cells(origin: Vector3, h: int, ran: int,
 	return visible_cells
 
 
-# Update the view field of the given actor by fetching every cells he can see and feed him
+# Update the view field of the given actor by fetching every cells he/she can see and feed it
 func update_view_field(actor: TRPG_Actor) -> void:
-	if !fog_of_war or !is_ready:
+	if !owner.fog_of_war or !is_ready:
 		return
 	
 	var view_range = actor.get_view_range()
 	var actor_cell = actor.get_current_cell()
 	var actor_height = actor.get_height()
 	
-	var visible_cells = Array(get_visible_cells(actor_cell, actor_height, view_range, true, [actor]))
+	var visible_cells = Array(get_visible_cells(actor_cell.round(), actor_height, view_range, true, [actor]))
 	var barely_visible_cells = Array()
 	
 	for cell in visible_cells:
@@ -122,7 +123,7 @@ func update_view_field(actor: TRPG_Actor) -> void:
 
 
 func actor_update_visibility(actor: TRPG_Actor) -> void:
-	if !fog_of_war or actor.get_team_side() != ActorTeam.TEAM_TYPE.ENEMY:
+	if !owner.fog_of_war or actor.get_team_side() != ActorTeam.TEAM_TYPE.ENEMY:
 		return
 	
 	var actor_visible = false
@@ -145,20 +146,15 @@ func has_target_reachable(actor: TRPG_Actor) -> bool:
 	var attack_range = actor.get_current_range()
 	var actor_cell = actor.get_current_cell()
 	
-	if owner.fog_of_war:
-		reachable_cells = actor.get_view_field_v3_array()
-	else:
-		reachable_cells = IsoLogic.get_cells_in_sphere(actor_cell, attack_range + 1)
+	reachable_cells = get_cells_in_range(actor_cell, attack_range + 1)
 	
 	for cell in reachable_cells:
 		# Remove cells in view_field but too far away to be reached
-		if owner.fog_of_war:
-			var dist = IsoLogic.iso_2D_dist(actor_cell, cell)
-			if dist > attack_range:
-				continue
-
 		var obj = get_damagable_on_cell(cell)
 		if obj == null or obj == actor:
+			continue
+		
+		if !actor.can_see(obj):
 			continue
 		
 		if (obj.is_class("TRPG_Actor") && actor.get_team_side() != obj.get_team_side())\
@@ -195,7 +191,7 @@ func get_targetables_in_range(actor: TRPG_Actor, actor_range: int,
 				if (obj == actor && !include_self):
 					continue
 				
-				if actor.get_team().is_cell_in_view_field(obj.get_current_cell()):
+				if actor.get_team().can_see_cell(obj.get_current_cell()):
 					targetables.append(obj)
 	
 	return targetables
@@ -315,7 +311,7 @@ func get_nearby_opponents(actor: TRPG_Actor, dist_range: int, currently_visible:
 			if damagable.get_team_side() != actor_team_side:
 				if currently_visible:
 					var damagable_cell = damagable.get_current_cell()
-					if !actor_team.is_cell_in_view_field(damagable_cell):
+					if !actor_team.can_see_cell(damagable_cell):
 						continue
 				
 				opponents_array.append(damagable)
@@ -366,9 +362,27 @@ func get_objects_in_area(area: PoolVector3Array) -> Array:
 	return objects_array
 
 
+# Get the nearest reachable cell from the given dest cell by the given actor in the given range
+# If the range isn't provided, the function will fetch the actor's current_movements
+func get_nearest_reachable_cell(dest: Vector3, actor: TRPG_Actor, move_range: int = -1) -> Vector3:
+	var nearest_cell = Vector3.INF
+	if move_range == -1:
+		move_range = actor.get_current_movements()
+	
+	var cells_in_range = get_cells_in_range(actor.get_current_cell(), move_range)
+	var sorted_cells = IsoLogic.sort_cells_by_dist(dest, cells_in_range)
+	
+	for dist_array in sorted_cells:
+		for cell in dist_array:
+			if cell == dest: continue
+			var path = pathfinding.find_path(actor.get_current_cell(), cell)
+			
+			if !path.empty():
+				nearest_cell = cell
+				break
+	
+	return nearest_cell
+
+
 #### SIGNAL RESPONSES ####
 
-
-func _on_actor_cell_changed(actor: TRPG_Actor) -> void:
-	update_view_field(actor)
-	actor_update_visibility(actor)

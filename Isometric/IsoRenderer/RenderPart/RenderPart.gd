@@ -44,7 +44,11 @@ func get_altitude() -> int: return altitude
 
 #### LOGIC ####
 
-
+func destroy() -> void:
+	if is_instance_valid(object_ref) && object_ref is IsoObject:
+		object_ref.render_parts.erase(self)
+	
+	queue_free()
 
 #### INPUTS ####
 

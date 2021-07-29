@@ -35,7 +35,8 @@ export var height : int = 1 setget set_height, get_height
 export var passable : bool = true setget set_passable, is_passable
 
 signal modulate_changed(mod)
-signal cell_changed(cell)
+signal cell_changed(from, to)
+signal height_changed(from, to)
 signal global_position_changed(world_pos)
 signal targeted_feedback_loop_ended()
 signal destroy_animation_finished()
@@ -44,19 +45,20 @@ signal destroy_animation_finished()
 
 func set_current_cell(value: Vector3):
 	var value_changed : bool = value != current_cell
+	var previous_cell = current_cell
 	current_cell = value
 	if value_changed && is_ready:
 		EVENTS.emit_signal("iso_object_cell_changed", self)
-		emit_signal("cell_changed", current_cell)
-
+		emit_signal("cell_changed", previous_cell, current_cell)
 func get_current_cell() -> Vector3: return current_cell
 
 func set_height(value : int):
 	var value_changed : bool = value != height
+	var former_value = height
 	height = value
 	if value_changed && is_ready:
-		EVENTS.emit_signal("iso_object_cell_changed", self)
-
+		EVENTS.emit_signal("iso_object_height_changed", self, former_value, height)
+		emit_signal("height_changed", former_value, height)
 func get_height() -> int: return height
 
 func set_passable(value : bool): passable = value
@@ -69,7 +71,6 @@ func set_visibility(value: int):
 	if value != visibility:
 		visibility = value
 		set_modulate(COLOR_SCHEME[visibility])
-
 func get_visibility() -> int: return visibility
 
 func set_always_visible(value: bool): always_visible = value
@@ -87,7 +88,6 @@ func set_modulate(value: Color):
 func is_in_view_field() -> bool:
 	return get_visibility() in [VISIBILITY.VISIBLE, VISIBILITY.BARELY_VISIBLE]
 
-
 func set_targeted(value: bool, positive: bool = false):
 	targeted = value
 	if targeted:
@@ -95,7 +95,6 @@ func set_targeted(value: bool, positive: bool = false):
 	else:
 		var __ = tween.remove_all()
 		set_modulate(COLOR_SCHEME[visibility])
-
 func is_targeted() -> bool: return targeted
 
 

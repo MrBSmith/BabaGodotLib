@@ -15,6 +15,9 @@ enum SLOPE_TYPE {
 
 onready var pathfinding = $Pathfinding
 onready var layer_0_node = $Layer
+onready var cursor = $Interactives/Cursor
+
+export var tileset : TileSet = null setget set_tileset, get_tileset
 
 var layers_array : Array setget , get_layers_array
 
@@ -28,12 +31,14 @@ signal map_generation_finished
 
 #### ACCESSORS ####
 
+func is_class(value: String): return value == "IsoMap" or .is_class(value)
+func get_class() -> String: return "IsoMap"
+
 func set_damagables(array: Array):
 	if array != damagables:
 		damagables = array
 		walkable_cells = pathfinding.set_walkable_cells(grounds)
 		pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
-
 func get_damagables() -> Array: return damagables
 
 func get_layers_array() -> Array: return layers_array
@@ -45,6 +50,15 @@ func get_tilemaps_recursive(array: Array, node: Node) -> void:
 			if child.get_child_count() > 0:
 				get_tilemaps_recursive(array, child)
 
+func set_tileset(value: TileSet): 
+	tileset = value
+	for layer in get_layers_array():
+		layer.set_tileset(tileset)
+		for child in layer.get_children():
+			if child is TileMap:
+				child.set_tileset(tileset)
+func get_tileset() -> TileSet: return tileset
+
 #### BUILT IN ####
 
 func _ready():
@@ -53,11 +67,9 @@ func _ready():
 	# Store all the passable cells into the array grounds
 	
 	_fetch_layers()
-	_init_object_grid_pos()
 	_fetch_ground()
+	_init_object_grid_pos()
 	_fetch_damagables()
-	
-	yield(owner, "ready")
 	
 	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
 	_err = EVENTS.connect("cursor_world_pos_changed", self, "_on_cursor_world_pos_changed")
@@ -67,15 +79,19 @@ func _ready():
 	# by checking all the cells in the IsoMap to see if they are not an obstacle
 	walkable_cells = pathfinding.set_walkable_cells(grounds)
 	
-	# Create the connections between all the walkable cells
-	pathfinding.connect_walkable_cells(walkable_cells, owner.active_actor)
+	
+	if owner != null:
+		var active_actor = owner.get("active_actor")
+	
+		# Create the connections between all the walkable cells
+		if is_instance_valid(active_actor):
+			pathfinding.connect_walkable_cells(walkable_cells, active_actor)
 	
 	for obj in get_tree().get_nodes_in_group("IsoObject"):
 		obj.set_current_cell(get_pos_highest_cell(obj.position))
 		obj.map = self
 	
 	is_ready = true
-	
 	emit_signal("map_generation_finished")
 
 
@@ -97,16 +113,14 @@ func _fetch_ground() -> void:
 	var feed_array : PoolVector3Array = []
 	for i in range(layers_array.size() - 1, -1, -1):
 		var current_layer = layers_array[i]
-		var layer_obstacles_tilemap = current_layer.get_node("Obstacles")
 		var walls_tilemap = current_layer.get_node("Walls")
-		var obstacles_cells = layer_obstacles_tilemap.get_used_cells()
 		var walls_cells = walls_tilemap.get_used_cells()
 		
 		for cell2d in current_layer.get_used_cells():
 			if IsoLogic.find_2D_cell(Vector2(cell2d.x, cell2d.y), feed_array) == Vector3.INF:
 				var current_cell = Vector3(cell2d.x, cell2d.y, i)
 				
-				if not cell2d in obstacles_cells && not cell2d in walls_cells:
+				if not cell2d in walls_cells:
 					if get_cell_slope_type(cell2d, i) != 0:
 						current_cell -= Vector3(0, 0, 0.5)
 					feed_array.append(current_cell)
@@ -114,10 +128,10 @@ func _fetch_ground() -> void:
 	# Handle bridges
 	for i in range(layers_array.size()):
 		for child in layers_array[i].get_children():
-			var tileset = child.get_tileset()
+			var layer_tileset = child.get_tileset()
 			for cell in child.get_used_cells():
 				var tile_id = child.get_cellv(cell)
-				var tile_name = tileset.tile_get_name(tile_id)
+				var tile_name = layer_tileset.tile_get_name(tile_id)
 				if "Bridge" in tile_name:
 					var cell_3D = Vector3(cell.x, cell.y, i)
 					if "Left" in tile_name:
@@ -138,16 +152,13 @@ func _fetch_layers() -> void:
 
 # Give every actor, his default grid pos
 func _init_object_grid_pos():
-	yield(owner, "ready")
-	
 	for object in get_tree().get_nodes_in_group("IsoObject"):
-		object.set_current_cell(get_pos_highest_cell(object.position))
-
+		var cell = get_pos_highest_cell(object.position)
+		object.set_current_cell(cell)
 
 
 
 #### LAYERS ####
-
 
 func get_map_rect() -> Rect2:
 	var layer_0 = get_layer(0)
@@ -166,6 +177,12 @@ func get_layer(height: float) -> IsoMapLayer:
 func get_layer_id(height: float) -> int:
 	return get_layer(round(height)).get_index()
 
+
+func get_layer_height(layer: IsoMapLayer) -> int:
+	for i in range(layers_array.size()):
+		if layers_array[i] == layer:
+			return i
+	return -1
 
 # Count the number of layers
 func count_layers() -> int:
@@ -293,13 +310,13 @@ func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	if layer == null:
 		return SLOPE_TYPE.NONE
 	
-	var tileset : TileSet = layer.get_tileset()
+	var layer_tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
-	if !(tile_id in tileset.get_tiles_ids()):
+	if !(tile_id in layer_tileset.get_tiles_ids()):
 		return SLOPE_TYPE.NONE
 	
-	var tile_name = tileset.tile_get_name(tile_id)
+	var tile_name = layer_tileset.tile_get_name(tile_id)
 		
 	if !"slope".is_subsequence_ofi(tile_name) && !"stair".is_subsequence_ofi(tile_name):
 		return SLOPE_TYPE.NONE
@@ -359,14 +376,14 @@ func is_occupied_by_obstacle(cell: Vector3) -> bool:
 			continue
 		
 		var cell_size = obstacle_tilemap.get_cell_size()
-		var tileset = obstacle_tilemap.get_tileset()
+		var layer_tileset = obstacle_tilemap.get_tileset()
 		var tile_mode = tileset.tile_get_tile_mode(tile_id)
 		var tile_size = Vector2.ZERO
 		
 		if tile_mode == TileSet.SINGLE_TILE:
-			tile_size = tileset.tile_get_region(tile_id).size
+			tile_size = layer_tileset.tile_get_region(tile_id).size
 		else:
-			tile_size = tileset.autotile_get_size(tile_id)
+			tile_size = layer_tileset.autotile_get_size(tile_id)
 		
 		var obst_height = round(tile_size.y / cell_size.y)
 		if i + obst_height > cell.z && i <= cell.z:
@@ -470,7 +487,7 @@ func get_nb_segments() -> Vector2:
 	var map_rect = get_map_rect()
 	var map_size = map_rect.size
 	
-	return (map_size / MAP_SEGMENT_SIZE).round()
+	return Math.clamp_v((map_size / MAP_SEGMENT_SIZE).round(), Vector2.ONE, Vector2.INF)
 
 
 func segment_get_pos(segment_id: int) -> Vector2:
@@ -539,6 +556,19 @@ func segment_exists_v(seg_pos: Vector2) -> bool:
 	var nb_seg_rect = Rect2(Vector2.ZERO, nb_seg_v)
 	
 	return nb_seg_rect.has_point(seg_pos)
+
+
+# Retruns a PoolVector3Array that contains the path to move towards a cell as much as possible
+func find_approch_cell_path(actor: TRPG_Actor, cell: Vector3, max_movement : int = -1) -> PoolVector3Array:
+	var actor_cell = actor.get_current_cell()
+	var actor_movement = actor.get_current_movements() if max_movement == -1 else max_movement
+	
+	var path_to_reach = pathfinding.find_path_to_reach(actor_cell, cell)
+	
+	if max_movement != -1:
+		path_to_reach.resize(int(clamp(actor_movement + 1, 0, path_to_reach.size())))
+	
+	return path_to_reach
 
 
 #### SIGNAL RESPONSES ####

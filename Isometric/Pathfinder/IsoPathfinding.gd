@@ -27,7 +27,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 # Determine which cells are walkale and which are not
-func set_walkable_cells(cell_array : PoolVector3Array):
+func set_walkable_cells(cell_array: PoolVector3Array):
 	var passable_cell_array : PoolVector3Array = []
 	astar_node.clear()
 
@@ -112,10 +112,13 @@ func find_path(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	return cell_path
 
 
-# Find a path between the start_cell and the end_cell (Considering the start_cell as passable)
+# Find a path between the start_cell and the end_cell (Considering both start_cell & end_cell as passable)
 func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Array:
 	var start_cell_id = compute_cell_index(start_cell)
 	var end_cell_id = compute_cell_index(end_cell)
+	
+	if !astar_node.has_point(start_cell_id) or !astar_node.has_point(end_cell_id):
+		return PoolVector3Array()
 	
 	var start_cell_state = astar_node.is_point_disabled(start_cell_id)
 	var end_cell_state = astar_node.is_point_disabled(end_cell_id)
@@ -124,6 +127,7 @@ func find_path_to_reach(start_cell: Vector3, end_cell: Vector3) -> PoolVector3Ar
 	astar_node.set_point_disabled(start_cell_id, false)
 	
 	var path = find_path(start_cell, end_cell)
+	
 	astar_node.set_point_disabled(start_cell_id, start_cell_state)
 	astar_node.set_point_disabled(end_cell_id, end_cell_state)
 	
@@ -158,7 +162,7 @@ func find_reachable_cells(origin: Vector3, radius: int) -> PoolVector3Array:
 
 # Find all the relatives to an array of points, checking if they haven't been treated before,
 # and return it in an array
-func find_relatives(point_array : PoolVector3Array, reachable_cells: PoolVector3Array) -> PoolVector3Array:
+func find_relatives(point_array: PoolVector3Array, reachable_cells: PoolVector3Array) -> PoolVector3Array:
 	var result_array : PoolVector3Array = []
 
 	for cell in point_array:

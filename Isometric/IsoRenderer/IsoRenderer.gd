@@ -60,6 +60,7 @@ func get_visible_cells() -> Array: return visible_cells
 
 func _ready() -> void:
 	var _err = EVENTS.connect("iso_object_cell_changed", self, "_on_iso_object_cell_changed")
+	_err = EVENTS.connect("iso_object_height_changed", self, "_on_iso_object_height_changed")
 	_err = EVENTS.connect("iso_object_added", self, "_on_iso_object_added")
 	_err = EVENTS.connect("iso_object_removed", self, "_on_iso_object_removed")
 	_err = EVENTS.connect("area_added", self, "_on_area_added")
@@ -69,12 +70,14 @@ func _ready() -> void:
 	_err = EVENTS.connect("appear_transition", self, "_on_appear_transition")
 	_err = EVENTS.connect("disappear_transition", self, "_on_disappear_transition")
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
-
+	_err = EVENTS.connect("tile_added", self, "_on_iso_tilemap_tile_added")
+	_err = EVENTS.connect("tile_removed", self, "_on_iso_tilemap_tile_removed")
+	_err = EVENTS.connect("iso_tilemap_cleared", self, "_on_iso_tilemap_cleared")
 
 
 #### LOGIC ####
 
-func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
+func init_rendering_queue(layers_array: Array) -> void:
 	for i in range(layers_array.size()):
 		for cell in layers_array[i].get_used_cells():
 			var height = i - int(is_cell_slope(cell, layers_array[i])) * 0.5
@@ -85,9 +88,6 @@ func init_rendering_queue(layers_array: Array, objects_array: Array) -> void:
 			for cell in child.get_used_cells():
 				var height = i - int(is_cell_slope(cell, child)) * 0.5
 				add_cell_to_queue(cell, child, height, scatter)
-	
-	for obj in objects_array:
-		add_iso_obj(obj)
 
 
 # Add the given cell to te rendering queue
@@ -286,7 +286,7 @@ func _update_tiles_visibility_brute_force(view_field: Array) -> void:
 	for i in range(queue.size()):
 		var child = queue[i]
 		if child is TileRenderPart:
-			var part_cell = child.get_current_cell()
+			var part_cell = child.get_current_cell().round()
 			if part_cell in view_field[IsoObject.VISIBILITY.BARELY_VISIBLE]:
 				child.set_visibility(IsoObject.VISIBILITY.BARELY_VISIBLE)
 			elif not part_cell in view_field[IsoObject.VISIBILITY.VISIBLE]:
@@ -322,7 +322,7 @@ func add_iso_obj(obj: IsoObject) -> void:
 
 
 # Remove the given object from the rendering queue
-func remove_iso_obj(obj: Object) -> void:
+func remove_parts_of_obj(obj: Object) -> void:
 	for part in obj.render_parts:
 		if is_instance_valid(part):
 			part.queue_free()
@@ -534,6 +534,12 @@ func add_area(map: IsoMap, cell_array: PoolVector3Array) -> void:
 		add_cell_to_queue(Vector2(cell.x, cell.y), area, height)
 
 
+func clear_tiles() -> void:
+	for render_part in rendering_queue.get_children():
+		if render_part.get_object_ref() is TileMap:
+			render_part.destroy()
+
+
 #### ANIMATION ####
 
 # Apply a tile shake effect
@@ -573,12 +579,21 @@ func _on_iso_object_cell_changed(obj: IsoObject) -> void:
 		add_iso_obj(obj)
 
 
+func _on_iso_object_height_changed(obj: IsoObject, from: int, to: int) -> void:
+	if to > from:
+		var parts_array = obj.render_parts.duplicate()
+		for part in parts_array:
+			part.destroy()
+	
+		add_iso_obj(obj)
+
+
 func _on_iso_object_added(obj: IsoObject) -> void:
 	add_iso_obj(obj)
 
 
 func _on_iso_object_removed(obj: IsoObject) -> void:
-	remove_iso_obj(obj)
+	remove_parts_of_obj(obj)
 
 
 func _on_part_cell_changed(part: IsoRenderPart, _cell: Vector3) -> void:
@@ -614,8 +629,20 @@ func _on_area_cleared(map: IsoMap) -> void:
 	for i in range(layers_array.size()):
 		var layer = layers_array[i]
 		var area = layer.get_node("Area")
-		remove_iso_obj(area)
+		remove_parts_of_obj(area)
 
 
 func _on_click_at_cell_event(cell: Vector3) -> void:
 	shake(Vector2(cell.x, cell.y), 3, 0.2)
+
+
+func _on_iso_tilemap_tile_added(tilemap: IsoTileMap, cell: Vector3) -> void:
+	add_cell_to_queue(Vector2(cell.x, cell.y), tilemap, cell.z)
+
+
+func _on_iso_tilemap_tile_removed(tilemap: IsoTileMap, cell: Vector3) -> void:
+	remove_part_at_cell(cell, tilemap)
+
+
+func _on_iso_tilemap_cleared(tilemap: IsoTileMap) -> void:
+	remove_parts_of_obj(tilemap)
