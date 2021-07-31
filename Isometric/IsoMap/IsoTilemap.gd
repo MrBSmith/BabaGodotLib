@@ -7,6 +7,9 @@ signal tile_added(cell)
 signal tile_removed(cell)
 signal tile_replaced(cell)
 
+signal tile_rect_added(rect)
+signal tile_rect_removed(rect)
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "IsoTileMap" or .is_class(value)
@@ -19,12 +22,13 @@ func _ready() -> void:
 	var __ = connect("tile_added", self , "_on_tile_added")
 	__ = connect("tile_removed", self , "_on_tile_removed")
 	__ = connect("tile_replaced", self , "_on_tile_replaced")
+	__ = connect("tile_rect_added", self , "_on_tile_rect_added")
+	__ = connect("tile_rect_removed", self , "_on_tile_rect_removed")
 
 
 # Built-in funciton_overide
-func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
-		 flip_h: bool = false,  flip_v: bool = false, 
-		subtile_pos:= Vector2.ZERO) -> void :
+func set_cell(x: int, y: int, tile_id: int, flip_h: bool = false,  flip_v: bool = false,
+			transpose: bool = false, subtile_pos:= Vector2.ZERO) -> void :
 	
 	var cell = Vector2(x, y)
 	
@@ -46,10 +50,24 @@ func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
 
 
 # Built-in funciton_overide
-func set_cellv(cell: Vector2, tile_id: int, flip_h: bool = false, 
-		flip_v: bool = false, transpose: bool = false):
+func set_cellv(cell: Vector2, tile_id: int, flip_h: bool = false,  flip_v: bool = false,
+			transpose: bool = false, subtile_pos:= Vector2.ZERO) -> void :
 
-	set_cell(int(cell.x), int(cell.y), tile_id, transpose, flip_h, flip_v)
+	set_cell(int(cell.x), int(cell.y), tile_id, flip_h, flip_v, transpose, subtile_pos)
+
+
+func set_rect_cell(rect: Rect2, tile_id: int, transpose: bool = false, 
+					flip_h: bool = false, flip_v: bool = false) -> void:
+	
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell = Vector2(rect.position.x + j, rect.position.y + i)
+			.set_cellv(cell, tile_id, flip_h, flip_v, transpose)
+	
+	if tile_id == -1:
+		emit_signal("tile_rect_removed", rect)
+	else:
+		emit_signal("tile_rect_added", rect)
 
 
 func update_bitmask_area(cell: Vector2) -> void:
@@ -103,3 +121,17 @@ func _on_tile_removed(cell: Vector2) -> void:
 func _on_tile_replaced(cell: Vector2) -> void:
 	_on_tile_added(cell)
 	_on_tile_removed(cell)
+
+
+func _on_tile_rect_added(rect: Rect2) -> void:
+	yield(get_tree(), "idle_frame")
+	update_bitmask_region(rect.position - Vector2.ONE, rect.position + rect.size + Vector2.ONE)
+	
+	EVENTS.emit_signal("rect_tile_added", self, rect, get_layer_id())
+
+
+func _on_tile_rect_removed(rect: Rect2) -> void:
+	yield(get_tree(), "idle_frame")
+	update_bitmask_region(rect.position - Vector2.ONE, rect.position + rect.size + Vector2.ONE)
+	
+	EVENTS.emit_signal("rect_tile_removed", self, rect, get_layer_id())

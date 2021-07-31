@@ -21,18 +21,19 @@ func _update_walls(tile: Vector2) -> void:
 	var tiles_id_array = tile_set.get_tiles_ids()
 	
 	var tile_id = get_cellv(tile)
-	var tile_name = tileset.tile_get_name(tile_id)
+	var tile_name = tileset.tile_get_name(tile_id) if tile_id != -1 else ""
 	
 	# Find the wall tile corresponding 
 	var wall_tile_id = -1
-	for current_tile_id in tiles_id_array:
-		var current_tile_name = tileset.tile_get_name(current_tile_id)
-		if "wall".is_subsequence_ofi(current_tile_name) \
-		&& tile_name.is_subsequence_ofi(current_tile_name):
-			wall_tile_id = current_tile_id
-			break
+	if tile_id != -1 :
+		for current_tile_id in tiles_id_array:
+			var current_tile_name = tileset.tile_get_name(current_tile_id)
+			if "wall".is_subsequence_ofi(current_tile_name) \
+			&& tile_name.is_subsequence_ofi(current_tile_name):
+				wall_tile_id = current_tile_id
+				break
 	
-	if wall_tile_id != -1:
+	if wall_tile_id != -1 or tile_id == -1:
 		var variation = randi() % 3
 		
 		for i in range(2):
@@ -114,3 +115,28 @@ func _on_tile_removed(cell: Vector2) -> void:
 func _on_tile_replaced(cell: Vector2) -> void:
 	_on_tile_removed(cell)
 	_on_tile_added(cell)
+
+
+func _on_tile_rect_added(rect: Rect2) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell = Vector2(rect.position.x + j, rect.position.y + i)
+			_update_walls(cell)
+			_update_tile_neighbours(cell)
+	
+	._on_tile_rect_added(rect)
+
+
+func _on_tile_rect_removed(rect: Rect2) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell = Vector2(rect.position.x + j, rect.position.y + i)
+			
+			for k in range(2):
+				var current_wall_tilemap = $WestWall if k == 0 else $EastWall
+				current_wall_tilemap.set_cell(cell.x, cell.y, -1,
+					false, false, false, Vector2.ZERO)
+			
+			_update_tile_neighbours(cell)
+	
+	._on_tile_rect_removed(rect)

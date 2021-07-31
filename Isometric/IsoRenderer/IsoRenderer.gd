@@ -72,6 +72,8 @@ func _ready() -> void:
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
 	_err = EVENTS.connect("tile_added", self, "_on_iso_tilemap_tile_added")
 	_err = EVENTS.connect("tile_removed", self, "_on_iso_tilemap_tile_removed")
+	_err = EVENTS.connect("rect_tile_added", self, "_on_iso_tilemap_rect_tile_added")
+	_err = EVENTS.connect("rect_tile_removed", self, "_on_iso_tilemap_rect_tile_removed")
 	_err = EVENTS.connect("iso_tilemap_cleared", self, "_on_iso_tilemap_cleared")
 	_err = EVENTS.connect("autotile_region_updated", self, "_on_iso_tilemap_autotile_region_updated")
 
@@ -674,3 +676,19 @@ func _on_iso_tilemap_autotile_region_updated(tilemap: IsoTileMap, cell: Vector3)
 func _on_iso_tilemap_cleared(tilemap: IsoTileMap) -> void:
 	remove_parts_of_obj(tilemap)
 
+
+func _on_iso_tilemap_rect_tile_added(tilemap: IsoTileMap, rect: Rect2, z: int) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell2 = rect.position + Vector2(j, i)
+			var cell3 = Utils.vec2_to_vec3(cell2, z)
+			remove_part_at_cell(cell3, tilemap)
+			add_cell_to_queue(cell2, tilemap, z)
+
+
+func _on_iso_tilemap_rect_tile_removed(tilemap: IsoTileMap, rect: Rect2, z: int) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell2 = rect.position + Vector2(j, i)
+			var cell3 = Utils.vec2_to_vec3(cell2, z)
+			remove_part_at_cell(cell3, tilemap)

@@ -64,3 +64,11 @@ static func trim_image(image: Image) -> Image:
 	output_img.create(biggest_x - smallest_x + 1, biggest_y - smallest_y + 1, false, Image.FORMAT_RGBA8)
 	output_img.blit_rect(image, Rect2(smallest_x, smallest_y, biggest_x, biggest_y), Vector2.ZERO)
 	return output_img
+
+
+static func vec2_to_vec3(vec2: Vector2, z: float) -> Vector3:
+	return Vector3(vec2.x, vec2.y, z)
+
+
+static func vec2_from_vec3(vec3: Vector3) -> Vector2:
+	return Vector2(vec3.x, vec3.y)

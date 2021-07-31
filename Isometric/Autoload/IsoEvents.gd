@@ -13,6 +13,9 @@ signal click_at_cell(cell)
 signal tile_added(tilemap, cell)
 signal tile_removed(tilemap, cell)
 signal tile_replaced(tilemap, cell)
+signal rect_tile_added(tilemap, rect, z)
+signal rect_tile_removed(tilemap, rect, z)
+
 signal autotile_region_updated(tilemap, cell)
 signal iso_tilemap_cleared(tilemap)
 
