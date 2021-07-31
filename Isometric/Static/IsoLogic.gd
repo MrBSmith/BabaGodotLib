@@ -61,19 +61,31 @@ static func find_2D_cell(cell : Vector2, grid: PoolVector3Array) -> Vector3:
 # Get the adjacents cells of the given one 
 # This method DOSEN'T check if the cells exists. If you need to do so, 
 # use get_existing_adjacent_cells instead
-static func get_adjacent_cells(cell: Vector2) -> Array:
-	return [ 
-		Vector2(cell.x + 1, cell.y),
-		Vector2(cell.x, cell.y + 1),
-		Vector2(cell.x - 1, cell.y),
-		Vector2(cell.x, cell.y - 1)
-	]
+static func get_adjacent_cells(cell: Vector2, diagonals: bool = false) -> Array:
+	if diagonals:
+		return [ 
+			Vector2(cell.x + 1, cell.y),
+			Vector2(cell.x, cell.y + 1),
+			Vector2(cell.x + 1, cell.y + 1),
+			Vector2(cell.x - 1, cell.y),
+			Vector2(cell.x, cell.y - 1),
+			Vector2(cell.x - 1, cell.y - 1),
+			Vector2(cell.x + 1, cell.y - 1),
+			Vector2(cell.x - 1, cell.y + 1)
+		]
+	else:
+		return [ 
+			Vector2(cell.x + 1, cell.y),
+			Vector2(cell.x, cell.y + 1),
+			Vector2(cell.x - 1, cell.y),
+			Vector2(cell.x, cell.y - 1)
+		]
 
 
 # Same thing as get_adjacent_cells but takes a Vector3 as an argument
-static func get_v3_adjacent_cells(cell: Vector3) -> PoolVector3Array:
+static func get_v3_adjacent_cells(cell: Vector3, diagonals: bool = false) -> PoolVector3Array:
 	var result_array := PoolVector3Array()
-	var v2_adjacent = get_adjacent_cells(Vector2(cell.x, cell.y))
+	var v2_adjacent = get_adjacent_cells(Vector2(cell.x, cell.y), diagonals)
 	
 	for adj in v2_adjacent:
 		var point = Vector3(adj.x, adj.y, cell.z)

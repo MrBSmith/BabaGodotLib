@@ -27,15 +27,30 @@ func set_cell(x: int, y: int, tile_id: int, transpose: bool = false,
 	var cell = Vector2(x, y)
 	
 	if tile_id != -1:
+		if cell in get_used_cells() && get_cellv(cell) == tile_id:
+			return
+		
 		if tile_id in get_tileset().get_tiles_ids():
-			if not cell in get_used_cells() or \
-			(cell in get_used_cells() && get_cellv(cell) != tile_id):
+			if not cell in get_used_cells():
 				emit_signal("tile_added", cell)
 	else:
 		if cell in get_used_cells():
 			emit_signal("tile_removed", cell)
 	
 	.set_cell(x, y, tile_id, transpose, flip_h, flip_v, subtile_pos)
+
+
+# Built-in funciton_overide
+func set_cellv(cell: Vector2, tile_id: int, flip_h: bool = false, 
+		flip_v: bool = false, transpose: bool = false):
+
+	set_cell(int(cell.x), int(cell.y), tile_id, transpose, flip_h, flip_v)
+
+func update_bitmask_area(cell: Vector2) -> void:
+	.update_bitmask_area(cell)
+	
+	EVENTS.emit_signal("autotile_region_updated", self, Vector3(cell.x, cell.y, get_layer_id()))
+
 
 func clear():
 	.clear()
@@ -76,4 +91,4 @@ func _on_tile_removed(cell: Vector2) -> void:
 		return
 	
 	yield(get_tree(), "idle_frame")
-	EVENTS.emit_signal("tile_added", self, Vector3(cell.x, cell.y, get_layer_id()))
+	EVENTS.emit_signal("tile_removed", self, Vector3(cell.x, cell.y, get_layer_id()))

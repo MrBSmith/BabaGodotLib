@@ -10,6 +10,11 @@ signal disappear_transition()
 
 signal click_at_cell(cell)
 
+signal tile_added(tilemap, cell)
+signal tile_removed(tilemap, cell)
+signal autotile_region_updated(tilemap, cell)
+signal iso_tilemap_cleared(tilemap)
+
 signal cursor_world_pos_changed(cursor)
 signal cursor_cell_changed(cursor, cell)
 

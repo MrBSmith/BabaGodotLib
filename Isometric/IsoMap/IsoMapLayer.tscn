@@ -19,7 +19,6 @@ __meta__ = {
 [node name="WestWall" type="TileMap" parent="."]
 show_behind_parent = true
 mode = 1
-tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )
@@ -31,7 +30,6 @@ __meta__ = {
 process_priority = -1
 show_behind_parent = true
 mode = 1
-tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )
@@ -41,7 +39,6 @@ __meta__ = {
 
 [node name="Walls" type="TileMap" parent="."]
 mode = 1
-tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )
@@ -51,7 +48,6 @@ __meta__ = {
 
 [node name="Decors" type="TileMap" parent="."]
 mode = 1
-tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )
@@ -61,7 +57,6 @@ __meta__ = {
 
 [node name="Slopes" type="TileMap" parent="."]
 mode = 1
-tile_set = ExtResource( 3 )
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )
@@ -73,6 +68,39 @@ __meta__ = {
 modulate = Color( 1, 1, 1, 0.627451 )
 mode = 1
 tile_set = ExtResource( 2 )
+cell_size = Vector2( 32, 16 )
+format = 1
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="Ghost" type="TileMap" parent="."]
+modulate = Color( 1, 1, 1, 0.482353 )
+mode = 1
+cell_size = Vector2( 32, 16 )
+format = 1
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="WestWall" type="TileMap" parent="Ghost"]
+modulate = Color( 1, 1, 1, 0.47451 )
+show_behind_parent = true
+mode = 1
+cell_size = Vector2( 32, 16 )
+format = 1
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="EastWall" type="TileMap" parent="Ghost"]
+process_priority = -1
+modulate = Color( 1, 1, 1, 0.498039 )
+show_behind_parent = true
+mode = 1
 cell_size = Vector2( 32, 16 )
 format = 1
 script = ExtResource( 4 )

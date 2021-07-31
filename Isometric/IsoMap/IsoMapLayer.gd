@@ -66,6 +66,11 @@ func _update_tile_neighbours(tile: Vector2) -> void:
 			_update_walls(tile + dir)
 
 
+func clear():
+	.clear()
+	for child in get_children():
+		child.clear()
+
 #### INPUTS ####
 
 
@@ -83,6 +88,10 @@ func _on_tile_added(cell: Vector2) -> void:
 	
 	_update_walls(cell)
 	_update_tile_neighbours(cell)
+	
+	update_bitmask_area(cell)
+	
+	EVENTS.emit_signal("tile_added", self, Vector3(cell.x, cell.y, get_layer_id()))
 
 
 func _on_tile_removed(cell: Vector2) -> void:
@@ -97,4 +106,6 @@ func _on_tile_removed(cell: Vector2) -> void:
 			false, false, false, Vector2.ZERO)
 	
 	_update_tile_neighbours(cell)
-
+	update_bitmask_area(cell)
+	
+	EVENTS.emit_signal("tile_removed", self, Vector3(cell.x, cell.y, get_layer_id()))
