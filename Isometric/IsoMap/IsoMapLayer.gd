@@ -109,3 +109,8 @@ func _on_tile_removed(cell: Vector2) -> void:
 	update_bitmask_area(cell)
 	
 	EVENTS.emit_signal("tile_removed", self, Vector3(cell.x, cell.y, get_layer_id()))
+
+
+func _on_tile_replaced(cell: Vector2) -> void:
+	_on_tile_removed(cell)
+	_on_tile_added(cell)
