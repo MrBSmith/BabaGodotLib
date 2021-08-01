@@ -70,6 +70,26 @@ func set_rect_cell(rect: Rect2, tile_id: int, transpose: bool = false,
 		emit_signal("tile_rect_added", rect)
 
 
+func set_cell_array(tile_array: Array) -> void:
+	var smallest_x = INF
+	var smallest_y = INF
+	var biggest_x = -INF
+	var biggest_y = -INF
+	
+	for tile in tile_array:
+		var cell = tile.cell
+		
+		if cell.x < smallest_x: smallest_x = cell.x
+		if cell.y < smallest_y: smallest_y = cell.y
+		if cell.x > biggest_x: biggest_x = cell.x
+		if cell.y > biggest_y: biggest_y = cell.y
+		
+		.set_cellv(Utils.vec2_from_vec3(cell), tile.tile_id)
+	
+	emit_signal("tile_rect_added", (Rect2(Vector2(smallest_x, smallest_y), 
+				Vector2(biggest_x - smallest_x, biggest_y - smallest_y))))
+
+
 func update_bitmask_area(cell: Vector2) -> void:
 	.update_bitmask_area(cell)
 	
