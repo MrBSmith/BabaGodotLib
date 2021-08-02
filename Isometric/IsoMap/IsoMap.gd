@@ -4,7 +4,7 @@ class_name IsoMap
 
 # A base class to handle an iso IsoMap
 # An iso IsoMap must be the parent of as many IsoMapLayer as your IsoMap has grounds (altitude levels)
-
+ 
 const MAP_SEGMENT_SIZE = 6
 
 enum SLOPE_TYPE {
@@ -18,6 +18,8 @@ onready var layer_0_node = $Layer
 onready var cursor = $Interactives/Cursor
 
 export var tileset : TileSet = null setget set_tileset, get_tileset
+
+var layer_scene = preload("res://BabaGodotLib/Isometric/IsoMap/IsoMapLayer.tscn")
 
 var layers_array : Array setget , get_layers_array
 
@@ -87,7 +89,6 @@ func _ready():
 			pathfinding.connect_walkable_cells(walkable_cells, active_actor)
 	
 	for obj in get_tree().get_nodes_in_group("IsoObject"):
-		obj.set_current_cell(get_pos_highest_cell(obj.position))
 		obj.map = self
 	
 	is_ready = true
@@ -152,6 +153,8 @@ func _fetch_layers() -> void:
 func _init_object_grid_pos():
 	for object in get_tree().get_nodes_in_group("IsoObject"):
 		var cell = get_pos_highest_cell(object.position)
+		if cell == Vector3.INF:
+			cell = Vector3.ZERO
 		object.set_current_cell(cell)
 
 
@@ -160,6 +163,24 @@ func _init_object_grid_pos():
 func get_map_rect() -> Rect2:
 	var layer_0 = get_layer(0)
 	return layer_0.get_used_rect()
+
+
+func add_layer(height: float) -> void:
+	if get_layer(height) != null:
+		return
+	
+	var highest_layer_z = get_highest_layer_z()
+	var nb_layers_to_add = height - highest_layer_z
+	
+	for _i in range(nb_layers_to_add):
+		var layer = layer_scene.instance()
+		layers_array.append(layer)
+		call_deferred("add_child", layer)
+		set_layer_tileset_recursive(layer)
+
+
+func get_highest_layer_z() -> int:
+	return layers_array.size() - 1 
 
 
 # Return the layer at the given height
@@ -180,6 +201,7 @@ func get_layer_height(layer: IsoMapLayer) -> int:
 		if layers_array[i] == layer:
 			return i
 	return -1
+
 
 # Count the number of layers
 func count_layers() -> int:
