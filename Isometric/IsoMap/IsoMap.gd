@@ -172,10 +172,12 @@ func add_layer(height: float) -> void:
 	var highest_layer_z = get_highest_layer_z()
 	var nb_layers_to_add = height - highest_layer_z
 	
-	for _i in range(nb_layers_to_add):
+	for i in range(nb_layers_to_add):
 		var layer = layer_scene.instance()
 		layers_array.append(layer)
 		call_deferred("add_child", layer)
+		var layer_pos = Vector2.UP * (highest_layer_z + i + 1) * GAME.TILE_SIZE 
+		layer.set_position(layer_pos)
 		set_layer_tileset_recursive(layer)
 
 
@@ -250,9 +252,7 @@ func get_last_layer() -> IsoMapLayer:
 
 # Takes a world position and a layer id and return the corresponding 2D cell in the given layer
 func world_to_layer_2D_cell(pos : Vector2, layer_id : int = 0) -> Vector2:
-	pos.y -= layer_id * 16
-	return layers_array[layer_id].world_to_map(pos)
-
+	return layers_array[0].world_to_map(pos) + Vector2.ONE * layer_id
 
 # Return the actor or obstacle placed on the given cell
 # Works also if the cell is one of the cell the body of the object is in
@@ -426,7 +426,7 @@ func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
 		if get_cell_slope_type(current_cell_2D, i) != 0:
 			current_cell_3D -= Vector3(0, 0, 0.5)
 		
-		if current_cell_3D in grounds:
+		if get_layer(i).get_cellv(current_cell_2D) != -1:
 			return current_cell_3D
 		
 	return Vector3.INF
