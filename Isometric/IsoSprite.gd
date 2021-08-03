@@ -15,6 +15,7 @@ export var hidden : bool = false setget set_hidden, is_hidden
 signal sprite_texture_changed(sprite)
 signal flip_changed(flipH, flipV)
 signal hidden_changed(sprite, value)
+signal modulate_changed(sprite, mod)
 
 #### ACCESSORS ####
 
@@ -25,7 +26,6 @@ func set_flip_h(value: bool):
 	if value != flip_h:
 		.set_flip_h(value)
 		emit_signal("flip_changed", flip_h, flip_v)
-
 func set_flip_v(value: bool):
 	if value != flip_v:
 		.set_flip_v(value)
@@ -34,8 +34,11 @@ func set_flip_v(value: bool):
 func set_hidden(value: bool):
 	hidden = value
 	emit_signal("hidden_changed", self, hidden)
-
 func is_hidden() -> bool: return hidden
+
+func set_modulate(value: Color):
+	.set_modulate(value)
+	emit_signal("modulate_changed", modulate)
 
 
 #### BUILT-IN ####

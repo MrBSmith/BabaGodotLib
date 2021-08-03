@@ -52,11 +52,8 @@ func get_tilemaps_recursive(array: Array, node: Node) -> void:
 
 func set_tileset(value: TileSet): 
 	tileset = value
-	for layer in get_layers_array():
-		layer.set_tileset(tileset)
-		for child in layer.get_children():
-			if child is TileMap:
-				child.set_tileset(tileset)
+	for layer in layers_array:
+		set_layer_tileset_recursive(layer)
 func get_tileset() -> TileSet: return tileset
 
 #### BUILT IN ####
@@ -64,9 +61,11 @@ func get_tileset() -> TileSet: return tileset
 func _ready():
 	if Engine.editor_hint:
 		return
-	# Store all the passable cells into the array grounds
 	
 	_fetch_layers()
+	for layer in layers_array:
+		set_layer_tileset_recursive(layer)
+	
 	_fetch_ground()
 	_init_object_grid_pos()
 	_fetch_damagables()
@@ -128,10 +127,9 @@ func _fetch_ground() -> void:
 	# Handle bridges
 	for i in range(layers_array.size()):
 		for child in layers_array[i].get_children():
-			var layer_tileset = child.get_tileset()
 			for cell in child.get_used_cells():
 				var tile_id = child.get_cellv(cell)
-				var tile_name = layer_tileset.tile_get_name(tile_id)
+				var tile_name = tileset.tile_get_name(tile_id)
 				if "Bridge" in tile_name:
 					var cell_3D = Vector3(cell.x, cell.y, i)
 					if "Left" in tile_name:
@@ -155,7 +153,6 @@ func _init_object_grid_pos():
 	for object in get_tree().get_nodes_in_group("IsoObject"):
 		var cell = get_pos_highest_cell(object.position)
 		object.set_current_cell(cell)
-
 
 
 #### LAYERS ####
@@ -313,7 +310,7 @@ func get_cell_slope_type(cell2D: Vector2, layer_id: int) -> int:
 	var layer_tileset : TileSet = layer.get_tileset()
 	var tile_id : int = layer.get_cellv(cell2D)
 	
-	if !(tile_id in layer_tileset.get_tiles_ids()):
+	if layer_tileset == null or !(tile_id in layer_tileset.get_tiles_ids()):
 		return SLOPE_TYPE.NONE
 	
 	var tile_name = layer_tileset.tile_get_name(tile_id)
@@ -569,6 +566,15 @@ func find_approch_cell_path(actor: TRPG_Actor, cell: Vector3, max_movement : int
 		path_to_reach.resize(int(clamp(actor_movement + 1, 0, path_to_reach.size())))
 	
 	return path_to_reach
+
+
+func set_layer_tileset_recursive(node: TileMap) -> void:
+	if node.get_tileset() == null:
+		node.set_tileset(tileset)
+		
+	for child in node.get_children():
+		if child is TileMap:
+			set_layer_tileset_recursive(child)
 
 
 #### SIGNAL RESPONSES ####

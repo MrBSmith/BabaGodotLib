@@ -72,7 +72,10 @@ func _ready() -> void:
 	_err = EVENTS.connect("update_rendered_visible_cells", self, "_on_update_rendered_visible_cells")
 	_err = EVENTS.connect("tile_added", self, "_on_iso_tilemap_tile_added")
 	_err = EVENTS.connect("tile_removed", self, "_on_iso_tilemap_tile_removed")
+	_err = EVENTS.connect("rect_tile_added", self, "_on_iso_tilemap_rect_tile_added")
+	_err = EVENTS.connect("rect_tile_removed", self, "_on_iso_tilemap_rect_tile_removed")
 	_err = EVENTS.connect("iso_tilemap_cleared", self, "_on_iso_tilemap_cleared")
+	_err = EVENTS.connect("autotile_region_updated", self, "_on_iso_tilemap_autotile_region_updated")
 
 
 #### LOGIC ####
@@ -108,6 +111,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 	
 	# Get the tile id and the position of the cell in the autotile
 	var tile_id = tilemap.get_cellv(cell)
+	
+	if tile_id == -1:
+		return
+	
 	var tile_mode = tileset.tile_get_tile_mode(tile_id)
 	var tile_region = tileset.tile_get_region(tile_id)
 	var tile_tileset_pos = tile_region.position
@@ -186,6 +193,10 @@ func add_cell_to_queue(cell: Vector2, tilemap: TileMap, height: float, scatter: 
 func is_cell_slope(cell: Vector2, tilemap: TileMap) -> bool:
 	var tileset : TileSet = tilemap.get_tileset()
 	var tile_id : int = tilemap.get_cell(int(cell.x), int(cell.y))
+	
+	if tilemap.get_cellv(cell) == -1 or tileset == null:
+		return false
+	
 	var tile_name = tileset.tile_get_name(tile_id)
 	
 	return "slope".is_subsequence_ofi(tile_name) or "stair".is_subsequence_ofi(tile_name)
@@ -339,6 +350,10 @@ func reorder_iso_obj(obj: IsoObject) -> void:
 # Replace the given part at the right position in the rendering queue
 func reorder_part(part: RenderPart) -> void:
 	var queue = rendering_queue.get_children()
+	
+	if queue.size() <= 1:
+		return
+	 
 	queue.erase(part)
 	var dest_id = binary_search_part_id(queue, part)
 	
@@ -641,8 +656,39 @@ func _on_iso_tilemap_tile_added(tilemap: IsoTileMap, cell: Vector3) -> void:
 
 
 func _on_iso_tilemap_tile_removed(tilemap: IsoTileMap, cell: Vector3) -> void:
+	if tilemap.name == "WestWall":
+		cell += Vector3(0, 1, -1)
+	elif tilemap.name == "EastWall":
+		cell += Vector3(1, 0, -1)
+	
 	remove_part_at_cell(cell, tilemap)
+
+
+func _on_iso_tilemap_autotile_region_updated(tilemap: IsoTileMap, cell: Vector3) -> void:
+	var cell_rect = IsoLogic.get_v3_adjacent_cells(cell, true)
+	cell_rect.append(cell)
+	
+	for c in cell_rect:
+		remove_part_at_cell(c, tilemap)
+		add_cell_to_queue(Vector2(c.x, c.y), tilemap, c.z)
 
 
 func _on_iso_tilemap_cleared(tilemap: IsoTileMap) -> void:
 	remove_parts_of_obj(tilemap)
+
+
+func _on_iso_tilemap_rect_tile_added(tilemap: IsoTileMap, rect: Rect2, z: int) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell2 = rect.position + Vector2(j, i)
+			var cell3 = Utils.vec2_to_vec3(cell2, z)
+			remove_part_at_cell(cell3, tilemap)
+			add_cell_to_queue(cell2, tilemap, z)
+
+
+func _on_iso_tilemap_rect_tile_removed(tilemap: IsoTileMap, rect: Rect2, z: int) -> void:
+	for i in range(rect.size.y + 1):
+		for j in range(rect.size.x + 1):
+			var cell2 = rect.position + Vector2(j, i)
+			var cell3 = Utils.vec2_to_vec3(cell2, z)
+			remove_part_at_cell(cell3, tilemap)
