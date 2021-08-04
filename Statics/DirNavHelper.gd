@@ -13,35 +13,39 @@ enum DIR_FETCH_MODE {
 static func create_dir(dir_path : String):
 	var dir = Directory.new()
 	
-	var prefix = dir_path.split("/")[0] + "//"
+	var prefix = _get_path_prefix(dir_path)
 	var dir_path_mod = dir_path.replacen(prefix, "")
 	var splited_path : PoolStringArray = dir_path_mod.split("/")
-	var dir_to_create = splited_path[-1]
 	splited_path.remove(splited_path.size() - 1)
 	var parent_path = prefix + splited_path.join("/")
 
 	if !is_dir_existing(parent_path):
-		dir.open(prefix)
 		var err = dir.make_dir(parent_path)
 		if err != OK:
 			push_error("Dir at path %s can't be created, error code: %d" % [parent_path, err])
 	
 	if !is_dir_existing(dir_path):
-		dir.open(parent_path)
-		var err = dir.make_dir(dir_to_create)
+		var err = dir.make_dir(dir_path)
 		if err != OK:
-			push_error("Dir at path %s can't be created, error code: %d" % [dir_to_create, err])
+			push_error("Dir at path %s can't be created, error code: %d" % [dir_path, err])
 
+
+static func _get_path_prefix(path: String) -> String:
+	return path.split("/")[0] + "//"
 
 # Check if the directory at the given path exists or not
 static func is_dir_existing(dir_path : String) -> bool:
 	var dir = Directory.new()
+	var prefix = _get_path_prefix(dir_path)
+	dir.open(prefix)
 	return dir.dir_exists(dir_path)
 
 
 # Check if the file at the given path exists or not
 static func is_file_existing(file_path: String) -> bool:
 	var dir = Directory.new()
+	var prefix = _get_path_prefix(file_path)
+	dir.open(prefix)
 	return dir.file_exists(file_path)
 
 
@@ -109,7 +113,7 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 		if !is_dir_existing(dest_dir_savedlevels_path):
 			if dir.make_dir(dest_dir_savedlevels_path) != OK:
-				push_error("SavedLevels directory could not be created in Save Location, stopping transfer process")
+				push_error("saved_levels directory could not be created in Save Location, stopping transfer process")
 				return
 
 		while file != "":
