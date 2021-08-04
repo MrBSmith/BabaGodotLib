@@ -21,11 +21,13 @@ static func create_dir(dir_path : String):
 	var parent_path = prefix + splited_path.join("/")
 
 	if !is_dir_existing(parent_path):
+		dir.open(prefix)
 		var err = dir.make_dir(parent_path)
 		if err != OK:
 			push_error("Dir at path %s can't be created, error code: %d" % [parent_path, err])
 	
 	if !is_dir_existing(dir_path):
+		dir.open(parent_path)
 		var err = dir.make_dir(dir_to_create)
 		if err != OK:
 			push_error("Dir at path %s can't be created, error code: %d" % [dir_to_create, err])
@@ -120,9 +122,8 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 # Fetch the content of the given dir
 # fetch_mode determine if you want to fetch only folders, only files or everything
-static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.ALL, prefix:= "res://") -> Array:
+static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.ALL) -> Array:
 	var dir = Directory.new()
-	dir.open(prefix)
 	var error = dir.open(dir_path)
 	var files = []
 
