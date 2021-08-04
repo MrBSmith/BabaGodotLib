@@ -41,7 +41,7 @@ static func load_config_file(cfg_file_path: String) -> ConfigFile:
 	if error == OK:
 		return config_file
 	else:
-		push_error("Failed to load settings cfg file. error code : " + str(error))
+		push_error("Failed to load settings cfg file at path %s. error code : %d" % [cfg_file_path, error])
 		return null
 
 
@@ -57,7 +57,7 @@ static func find_corresponding_save_file(dir_path: String, save_id : int) -> Str
 			if save_id == file_save_id:
 				return cfg_path
 		else:
-			push_error("Failed to load settings cfg file. error code : " + str(error))
+			push_error("Failed to load settings cfg file with path %s. error code : %d" % [cfg_path, error])
 	return ""
 
 
