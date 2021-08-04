@@ -1,7 +1,7 @@
 extends Node
 class_name DirNavHelper
 
-const debug : bool = false
+const debug : bool = true
 
 enum DIR_FETCH_MODE {
 	ALL,
@@ -12,23 +12,25 @@ enum DIR_FETCH_MODE {
 # Create the directories
 static func create_dir(dir_path : String):
 	var dir = Directory.new()
-
-	var dir_path_mod = dir_path.replacen("res://", "")
+	
+	var prefix = dir_path.split("/")[0] + "//"
+	var dir_path_mod = dir_path.replacen(prefix, "")
 	var splited_path : PoolStringArray = dir_path_mod.split("/")
 	var dir_to_create = splited_path[-1]
 	splited_path.remove(splited_path.size() - 1)
-	var parent_path = "res://" + splited_path.join("/")
+	var parent_path = prefix + splited_path.join("/")
 
 	if !is_dir_existing(parent_path):
-		dir.open("res://")
-		dir.make_dir(parent_path)
-
+		dir.open(prefix)
+		var err = dir.make_dir(parent_path)
+		if err != OK:
+			push_error("Dir at path %s can't be created, error code: %d" % [parent_path, err])
+	
 	if !is_dir_existing(dir_path):
 		dir.open(parent_path)
-		dir.make_dir(dir_to_create)
-
-		if debug:
-			print("Done ! Directory can in be found in : " + dir_path)
+		var err = dir.make_dir(dir_to_create)
+		if err != OK:
+			push_error("Dir at path %s can't be created, error code: %d" % [dir_to_create, err])
 
 
 # Check if the directory at the given path exists or not
@@ -44,8 +46,9 @@ static func is_file_existing(file_path: String) -> bool:
 
 
 # Check if the give directory is empty or not
-static func is_dir_empty(dir_path) -> bool:
+static func is_dir_empty(dir_path: String) -> bool:
 	var dir = Directory.new()
+	
 	if dir.open(dir_path) == OK:
 		dir.list_dir_begin(true, true)
 		var file_name = dir.get_next()
@@ -58,7 +61,7 @@ static func is_dir_empty(dir_path) -> bool:
 # Navigate through the given folder then removes all files and folders inside it
 static func empty_folder(dir_path: String, display_warning : bool = false):
 	var dir = Directory.new()
-
+	
 	if dir.open(dir_path) == OK:
 		if display_warning: print(dir_path + " has been opened successfully")
 
@@ -67,7 +70,7 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 
 		if display_warning:
 			if file_name == "":
-				push_error("No folder or file detected in " + dir_path)
+				push_warning("No folder or file detected in " + dir_path)
 
 		while file_name != "":
 			if dir.current_is_dir():
@@ -97,7 +100,7 @@ static func delete_folder(dir_path: String):
 # Transfer every file in the given folder to the given destination
 static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 	var dir := Directory.new()
-	var dest_dir_savedlevels_path : String = dest_dir + "/SavedLevels"
+	var dest_dir_savedlevels_path : String = dest_dir + "/saved_levels"
 
 	if dir.open(temp_save_dir) == OK:
 		var err = dir.list_dir_begin(true, true)
