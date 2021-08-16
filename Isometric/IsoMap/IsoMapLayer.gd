@@ -17,21 +17,11 @@ func _ready() -> void:
 #### LOGIC ####
 
 func _update_walls(tile: Vector2) -> void:
-	var tileset = get_tileset()
 	var tiles_id_array = tile_set.get_tiles_ids()
 	
 	var tile_id = get_cellv(tile)
-	var tile_name = tileset.tile_get_name(tile_id) if tile_id != -1 else ""
-	
-	# Find the wall tile corresponding 
-	var wall_tile_id = -1
-	if tile_id != -1 :
-		for current_tile_id in tiles_id_array:
-			var current_tile_name = tileset.tile_get_name(current_tile_id)
-			if "wall".is_subsequence_ofi(current_tile_name) \
-			&& tile_name.is_subsequence_ofi(current_tile_name):
-				wall_tile_id = current_tile_id
-				break
+	var tile_name = tile_set.tile_get_name(tile_id) if tile_id != -1 else ""
+	var wall_tile_id = tile_set.find_tile_by_name(tile_name + "Wall")
 	
 	if wall_tile_id != -1 or tile_id == -1:
 		var variation = randi() % 3
