@@ -8,6 +8,10 @@ class_name PathPoint
 export var method_name : String = ""
 export var argument_array : Array = []
 
+func _ready() -> void:
+	set_as_toplevel(true)
+
+
 func get_event() -> Array:
 	var method_array = []
 	method_array.append(method_name)
