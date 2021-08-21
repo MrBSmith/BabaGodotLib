@@ -17,8 +17,6 @@ func _ready() -> void:
 #### LOGIC ####
 
 func _update_walls(tile: Vector2) -> void:
-	var tiles_id_array = tile_set.get_tiles_ids()
-	
 	var tile_id = get_cellv(tile)
 	var tile_name = tile_set.tile_get_name(tile_id) if tile_id != -1 else ""
 	var wall_tile_id = tile_set.find_tile_by_name(tile_name + "Wall")
@@ -38,7 +36,9 @@ func _update_walls(tile: Vector2) -> void:
 						false, false, false, subtile_pos)
 			
 			if print_log:
-				if current_wall_tilemap == $WestWall:
+				if tile_to_place == -1:
+					print("Added an empty wall at cell %s" % String(tile))
+				elif current_wall_tilemap == $WestWall:
 					print("Added a west wall a cell %s" % String(tile))
 				elif current_wall_tilemap == $EastWall:
 					print("Added a east wall a cell %s" % String(tile))
@@ -67,6 +67,7 @@ func clear():
 
 
 #### SIGNAL RESPONSES ####
+
 
 func _on_hide_iso_objects_event(hide: bool) -> void:
 	set_visible(!hide)
@@ -109,11 +110,11 @@ func _on_tile_replaced(cell: Vector2) -> void:
 
 
 func _on_tile_rect_added(rect: Rect2) -> void:
-	for i in range(rect.size.y + 1):
-		for j in range(rect.size.x + 1):
+	for i in range(rect.size.y):
+		for j in range(rect.size.x):
 			var cell = Vector2(rect.position.x + j, rect.position.y + i)
 			_update_walls(cell)
-			_update_tile_neighbours(cell)
+#			_update_tile_neighbours(cell)
 	
 	._on_tile_rect_added(rect)
 

@@ -577,6 +577,21 @@ func segment_exists_v(seg_pos: Vector2) -> bool:
 	return nb_seg_rect.has_point(seg_pos)
 
 
+func get_same_adjacent_tiles(cell: Vector3, tile_id: int, array: Array) -> void:
+	var adj_array = IsoLogic.get_v3_adjacent_cells(cell)
+	
+	for adj_cell in adj_array:
+		if adj_cell in array:
+			continue
+		
+		var layer = get_layer(adj_cell.z)
+		var id = layer.get_cellv(Utils.vec2_from_vec3(adj_cell))
+		
+		if id == tile_id:
+			array.append(adj_cell)
+			get_same_adjacent_tiles(adj_cell, tile_id, array)
+
+
 # Retruns a PoolVector3Array that contains the path to move towards a cell as much as possible
 func find_approch_cell_path(actor: TRPG_Actor, cell: Vector3, max_movement : int = -1) -> PoolVector3Array:
 	var actor_cell = actor.get_current_cell()

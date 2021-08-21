@@ -122,7 +122,11 @@ func create():
 	EVENTS.emit_signal("iso_object_added", self)
 
 
-func destroy():
+func queue_free() -> void:
+	destroy()
+
+
+func destroy() -> void:
 	if is_in_group("IsoObject"):
 		remove_from_group("IsoObject")
 	
@@ -136,7 +140,7 @@ func destroy():
 	# Queue free this node only if the IsoObject doesn't have a state machines, 
 	# meaning it can't have a dead state
 	if !is_class("TRPG_Actor"):
-		queue_free()
+		.queue_free()
 
 
 func trigger_destroy_animation() -> void:
