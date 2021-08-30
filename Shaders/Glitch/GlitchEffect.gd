@@ -53,8 +53,8 @@ func generate_glitch():
 	var rng_sign = sign(randf() - 0.5)
 	
 	shader_material.set_shader_param("apply", true)
-	shader_material.set_shader_param("displace_amount", int(rand_range(30.0, 60.0) * rng_sign))
-	shader_material.set_shader_param("aberation_amount", rand_range(-10.0, 10.0))
+	shader_material.set_shader_param("displace_amount", int(rand_range(30.0, 100.0) * rng_sign))
+	shader_material.set_shader_param("aberation_amount", rand_range(-20.0, 20.0))
 	
 	sub_glitch_timer_node.set_wait_time(rand_range(0.05, 0.1))
 	sub_glitch_timer_node.start()
