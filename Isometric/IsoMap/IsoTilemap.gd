@@ -87,7 +87,7 @@ func set_cell_array(tile_array: Array) -> void:
 		.set_cellv(Utils.vec2_from_vec3(cell), tile.tile_id)
 	
 	emit_signal("tile_rect_added", (Rect2(Vector2(smallest_x, smallest_y), 
-				Vector2(biggest_x - smallest_x, biggest_y - smallest_y))))
+				Vector2(biggest_x - smallest_x + 1, biggest_y - smallest_y + 1))))
 
 
 func update_bitmask_area(cell: Vector2) -> void:
@@ -139,8 +139,8 @@ func _on_tile_removed(cell: Vector2) -> void:
 
 
 func _on_tile_replaced(cell: Vector2) -> void:
-	_on_tile_added(cell)
 	_on_tile_removed(cell)
+	_on_tile_added(cell)
 
 
 func _on_tile_rect_added(rect: Rect2) -> void:

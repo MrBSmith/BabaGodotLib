@@ -555,6 +555,11 @@ func clear_tiles() -> void:
 			render_part.destroy()
 
 
+func clear() -> void:
+	for child in rendering_queue.get_children():
+		child.queue_free()
+
+
 #### ANIMATION ####
 
 # Apply a tile shake effect
