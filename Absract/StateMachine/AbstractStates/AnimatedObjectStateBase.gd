@@ -64,9 +64,6 @@ func _on_animation_finished():
 	if !"Start".is_subsequence_ofi(current_animation):
 		emit_signal("state_animation_finished")
 	
-	if !toggle_state_mode or !name.is_subsequence_ofi(current_animation):
-		return
-	
 	if current_animation == "Start" + name:
 		if sprite_frames != null and sprite_frames.has_animation(name):
 			animated_sprite.play(name)
