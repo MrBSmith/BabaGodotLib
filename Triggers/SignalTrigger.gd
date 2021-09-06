@@ -27,11 +27,11 @@ func _ready() -> void:
 	
 	if instance_listened_path != "":
 		var instance = get_tree().get_current_scene().get_node_or_null(instance_listened_path)
-		if instance_listened == null:
+		if instance == null:
 			push_error("No node where found at the sepcified node path : %s" % instance_listened_path)
 		else:
 			set_instance_listened(instance)
-	
+			
 	if instance_listened != null:
 		await_instance_signal()
 
