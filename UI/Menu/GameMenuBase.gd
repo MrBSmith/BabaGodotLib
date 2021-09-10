@@ -18,10 +18,7 @@ func _ready():
 	is_ready = true
 	_setup()
 
-
-
 #### LOGIC ####
-
 
 # This is called by _ready()
 # This function exist so it can be overriden in children classes, unlike _ready
@@ -29,14 +26,12 @@ func _setup():
 	connect_menu_options(opt_container)
 	focus_first_option()
 
-
 # Focus the first available option
 func focus_first_option():
 	for button in buttons_array:
 		if !button.is_disabled():
 			button.set_focused(true)
 			break
-
 
 # Connect the options in the menu 
 # the wrapping argument determine if the cursor needs to wraps around 
@@ -92,8 +87,6 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
 		_err = button.connect("focus_changed", self, "_on_menu_option_focus_changed")
 
-
-
 func feed_buttons_array(option_container: Control):
 	if option_container == null:
 		return
@@ -103,34 +96,28 @@ func feed_buttons_array(option_container: Control):
 		if child is Button:
 			buttons_array.append(child)
 
-
 # Stock the default state of every button
 func load_default_buttons_state():
 	for button in buttons_array:
 		var button_state = button.is_disabled()
 		default_button_state.append(button_state)
 
-
 func set_buttons_disabled(value : bool):
 	for button in buttons_array:
 		button.set_disabled(value)
-
 
 func set_buttons_default_state():
 	for i in range(buttons_array.size()):
 		buttons_array[i].set_disabled(default_button_state[i])
 
-
 func navigate_sub_menu(menu: Control):
 	get_parent().add_child(menu)
 	queue_free()
-
 
 #### VIRTUAL ####
 
 func cancel():
 	pass
-
 
 #### INPUT ####
 
@@ -149,4 +136,3 @@ func _on_menu_option_focus_changed(_button : Button, focus: bool) -> void:
 # Here you can add the code that tells the game what to do based on what option was chose
 func _on_menu_option_chose(_option) -> void:
 	pass
-
