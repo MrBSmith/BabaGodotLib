@@ -4,10 +4,12 @@ tool
 
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
+signal hidden_changed
 
 var is_ready : bool = false
 var focused : bool = false setget set_focused, is_focused
 
+export var hidden : bool = false setget set_hidden, is_hidden
 export var all_caps : bool = false setget set_all_caps
 
 #### ACCESSSORS ####
@@ -17,8 +19,8 @@ func set_focused(value: bool):
 		focused = value
 		if focused: 
 			grab_focus()
-		emit_signal("focus_changed", self, focused)
-
+		if is_ready:
+			emit_signal("focus_changed", self, focused)
 func is_focused() -> bool: return focused
 
 func set_all_caps(value: bool):
@@ -28,12 +30,17 @@ func set_all_caps(value: bool):
 	else:
 		text = text.capitalize()
 
-
 func set_text(value: String):
 	if all_caps:
 		text = value.to_upper()
 	else:
 		text = value
+
+func set_hidden(value: bool):
+	if value != hidden:
+		hidden = value
+		emit_signal("hidden_changed")
+func is_hidden() -> bool: return hidden
 
 #### BUILT-IN ####
 
@@ -45,6 +52,8 @@ func _ready() -> void:
 	_err = connect("mouse_entered", self, "_on_mouse_entered")
 	_err = connect("mouse_exited", self, "_on_mouse_exited")
 	
+	var __ = connect("hidden_changed", self, "_on_hidden_changed")
+	_on_hidden_changed()
 	
 	set_text(text)
 	
@@ -57,20 +66,35 @@ func _on_gui_input(event : InputEvent):
 	if event.is_action_pressed("ui_accept") && is_focused():
 		set_pressed(true)
 
+
 func _on_pressed(): 
 	emit_signal("option_chose", self)
 
 
 func _on_mouse_entered():
-	if !is_disabled():
+	if !is_disabled() && !is_hidden():
 		set_focused(true)
+
 
 func _on_mouse_exited():
 	if !is_disabled():
 		set_focused(false)
 
+
 func _on_focus_entered():
-	set_focused(true)
+	if !hidden:
+		set_focused(true)
+
 
 func _on_focus_exited():
 	set_focused(false)
+
+
+func _on_hidden_changed() -> void:
+	if hidden:
+		set_modulate(Color.transparent)
+	else:
+		set_modulate(Color.white)
+		
+		if is_hovered() && !is_disabled():
+			set_focused(true)

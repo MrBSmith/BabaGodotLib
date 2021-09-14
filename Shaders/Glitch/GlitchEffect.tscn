@@ -8,7 +8,6 @@ script = ExtResource( 4 )
 [node name="GlitchCoolDown" type="Timer" parent="."]
 wait_time = 0.8
 one_shot = true
-autostart = true
 
 [node name="GlitchDuration" type="Timer" parent="."]
 one_shot = true

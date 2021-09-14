@@ -55,7 +55,8 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 func set_to_black() -> void:
 	$ColorRect.set_frame_color(Color.black)
 
-
+func set_to_transparent() -> void:
+	$ColorRect.set_frame_color(Color.transparent)
 
 #### INPUTS ####
 
