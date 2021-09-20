@@ -10,6 +10,8 @@ onready var buttons_array : Array = []
 var default_button_state : Array = []
 var is_ready : bool = false
 
+signal sub_menu_left()
+
 #### BUILT-IN ####
 
 # Check the options when the scenes is ready, to get sure at least one of them is clickable
