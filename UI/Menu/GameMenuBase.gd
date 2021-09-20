@@ -10,7 +10,8 @@ onready var buttons_array : Array = []
 var default_button_state : Array = []
 var is_ready : bool = false
 
-signal sub_menu_left()
+#warning-ignore:unused_signal
+signal sub_menu_left
 
 #### BUILT-IN ####
 
