@@ -1,7 +1,7 @@
 extends Control
 class_name MenuBase
 
-export var opt_container_path : String = "HBoxContainer/V_OptContainer"
+export var opt_container_path : String = "VBoxContainer"
 
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
