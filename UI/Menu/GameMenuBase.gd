@@ -10,8 +10,17 @@ onready var buttons_array : Array = []
 var default_button_state : Array = []
 var is_ready : bool = false
 
+var submenu : bool = false setget set_submenu, is_submenu
+
 #warning-ignore:unused_signal
 signal sub_menu_left
+
+
+#### ACCESSORS ####
+
+func set_submenu(value: bool) -> void: submenu = value
+func is_submenu() -> bool: return submenu
+
 
 #### BUILT-IN ####
 
@@ -114,6 +123,7 @@ func set_buttons_default_state():
 		buttons_array[i].set_disabled(default_button_state[i])
 
 func navigate_sub_menu(menu: Control):
+	menu.set_submenu(true)
 	get_parent().add_child(menu)
 	queue_free()
 
