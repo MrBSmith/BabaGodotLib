@@ -136,6 +136,12 @@ func set_buttons_default_state():
 		buttons_array[i].set_disabled(default_button_state[i])
 
 
+func _go_to_last_menu() -> void:
+	if self == get_tree().get_current_scene():
+		EVENTS.emit_signal("navigate_menu_back_query", null, self)
+	else:
+		EVENTS.emit_signal("navigate_menu_back_query", get_parent(), self)
+
 func _resume_game():
 	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
@@ -147,7 +153,7 @@ func cancel():
 		CANCEL_ACTION.RESUME_GAME:
 			_resume_game()
 		CANCEL_ACTION.GO_TO_LAST_MENU:
-			MENUS.navigate_menu_back()
+			_go_to_last_menu()
 
 #### INPUT ####
 
