@@ -24,6 +24,7 @@ class_name EventsBase
 signal new_game()
 signal gameover()
 signal win()
+signal game_resumed()
 
 
 #### PATHFINDER ####
@@ -62,6 +63,7 @@ signal dialogue_query(dialogue_index, is_cut_scene)
 
 signal menu_cancel()
 signal goto_menu_root()
+signal menu_entered(menu_name)
 
 
 #### LEVEL NAVIGATION ####

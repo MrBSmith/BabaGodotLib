@@ -35,7 +35,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 	var duration = fade_time / 2 if fade_mode == FADE_MODE.FADE_IN_OUT else fade_time
 	
 	if fade_mode != FADE_MODE.FADE_IN:
-		tween.interpolate_property($ColorRect, "color", Color(0,0,0,0), fade_color,
+		tween.interpolate_property($ColorRect, "color", Color(0.0, 0.0, 0.0, 0.0), fade_color,
 					 duration, Tween.TRANS_LINEAR, Tween.EASE_IN, delay)
 		
 		tween.start()
@@ -43,7 +43,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		emit_signal("transition_middle")
 	
 	if fade_mode != FADE_MODE.FADE_OUT:
-		tween.interpolate_property($ColorRect, "color", fade_color, Color(0,0,0,0),
+		tween.interpolate_property($ColorRect, "color", fade_color, Color(0.0, 0.0, 0.0, 0.0),
 					 duration, Tween.TRANS_LINEAR, Tween.EASE_OUT, delay)
 		
 		tween.start()
@@ -54,6 +54,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 
 func set_to_black() -> void:
 	$ColorRect.set_frame_color(Color.black)
+
 
 func set_to_transparent() -> void:
 	$ColorRect.set_frame_color(Color.transparent)

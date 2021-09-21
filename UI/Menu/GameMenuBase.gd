@@ -1,11 +1,21 @@
 extends Control
 class_name MenuBase
 
+enum CANCEL_ACTION {
+	GO_TO_LAST_MENU,
+	RESUME_GAME,
+	NONE
+}
+
 export var opt_container_path : String = "VBoxContainer"
 
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 onready var buttons_array : Array = []
+
+export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
+
+var last_menu_scene : PackedScene = null
 
 var default_button_state : Array = []
 var is_ready : bool = false
@@ -15,7 +25,6 @@ export var resume_on_cancel : bool = false
 
 #warning-ignore:unused_signal
 signal sub_menu_left
-
 
 #### ACCESSORS ####
 
@@ -100,6 +109,7 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
 		_err = button.connect("focus_changed", self, "_on_menu_option_focus_changed")
 
+
 func feed_buttons_array(option_container: Control):
 	if option_container == null:
 		return
@@ -115,23 +125,29 @@ func load_default_buttons_state():
 		var button_state = button.is_disabled()
 		default_button_state.append(button_state)
 
+
 func set_buttons_disabled(value : bool):
 	for button in buttons_array:
 		button.set_disabled(value)
+
 
 func set_buttons_default_state():
 	for i in range(buttons_array.size()):
 		buttons_array[i].set_disabled(default_button_state[i])
 
-func navigate_sub_menu(menu: Control):
-	menu.set_submenu(true)
-	get_parent().add_child(menu)
+
+func _resume_game():
+	EVENTS.emit_signal("game_resumed")
+	get_tree().set_pause(false)
 	queue_free()
 
-#### VIRTUAL ####
 
 func cancel():
-	pass
+	match(cancel_action):
+		CANCEL_ACTION.RESUME_GAME:
+			_resume_game()
+		CANCEL_ACTION.GO_TO_LAST_MENU:
+			MENUS.navigate_menu_back(self)
 
 #### INPUT ####
 
