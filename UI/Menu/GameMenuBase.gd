@@ -11,6 +11,7 @@ var default_button_state : Array = []
 var is_ready : bool = false
 
 var submenu : bool = false setget set_submenu, is_submenu
+export var resume_on_cancel : bool = false
 
 #warning-ignore:unused_signal
 signal sub_menu_left
