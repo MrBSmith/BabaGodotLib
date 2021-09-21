@@ -147,7 +147,7 @@ func cancel():
 		CANCEL_ACTION.RESUME_GAME:
 			_resume_game()
 		CANCEL_ACTION.GO_TO_LAST_MENU:
-			MENUS.navigate_menu_back(self)
+			MENUS.navigate_menu_back()
 
 #### INPUT ####
 
