@@ -76,6 +76,9 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 	# Setup the wrapping
 	for i in range(nb_buttons):
 		var button : Control = buttons_array[i]
+		if button.is_disabled():
+			continue
+		
 		var prev_id = i - 1
 		var previous_button = buttons_array[prev_id]
 		
@@ -94,12 +97,14 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 			if wrapping:
 				button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
 		else:
+			button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
 			button.set_focus_previous(previous_button.get_path())
 		
 		if button == last_option_unabled:
 			if wrapping:
 				button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
 		else:
+			button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
 			button.set_focus_next(next_button.get_path())
 		
 		# Connect options signals
