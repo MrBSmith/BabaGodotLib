@@ -74,6 +74,23 @@ static func find_first_empty_slot(dir_path: String, max_slots: int) -> int:
 	return -1
 
 
+static func get_save_time(save_dir: String, save_id: int, time_component_array: Array = ["day", "month", "year", "hour", "minute"]) -> String:
+	var save_time_dict = get_save_property_value(save_dir, "time", save_id)
+	var save_time := ""
+	for component in time_component_array:
+		save_time += str(save_time_dict.get(component))
+		var sufix = ""
+		
+		match(component):
+			"day", "month" : sufix = "/"
+			"year": sufix = " "
+			"hour": sufix = "h"
+			"minute": sufix= ""
+		
+		save_time += sufix
+	return save_time
+
+
 static func find_first_save_file(dir_path: String, max_slots: int) -> int :
 	for i in range(max_slots):
 		var slot_path = find_corresponding_save_file(dir_path, i + 1)
