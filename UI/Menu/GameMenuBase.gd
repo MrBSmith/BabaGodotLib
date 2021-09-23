@@ -35,6 +35,7 @@ func is_submenu() -> bool: return submenu
 # Change the color of the option accordingly to their state
 func _ready():
 	is_ready = true
+	EVENTS.emit_signal("menu_entered", name)
 	_setup()
 
 #### LOGIC ####
@@ -143,6 +144,7 @@ func _go_to_last_menu() -> void:
 		EVENTS.emit_signal("navigate_menu_back_query", null, self)
 	else:
 		EVENTS.emit_signal("navigate_menu_back_query", get_parent(), self)
+
 
 func _resume_game():
 	EVENTS.emit_signal("game_resumed")

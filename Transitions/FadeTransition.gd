@@ -17,6 +17,9 @@ signal transition_middle
 func is_class(value: String): return value == "FadeTransition" or .is_class(value)
 func get_class() -> String: return "FadeTransition"
 
+func set_visible(value: bool):
+	$ColorRect.set_visible(value)
+
 
 #### BUILT-IN ####
 
@@ -58,6 +61,7 @@ func set_to_black() -> void:
 
 func set_to_transparent() -> void:
 	$ColorRect.set_frame_color(Color.transparent)
+
 
 #### INPUTS ####
 
