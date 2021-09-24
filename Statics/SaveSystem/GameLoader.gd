@@ -98,6 +98,9 @@ static func find_first_save_file(dir_path: String, max_slots: int) -> int :
 			return i + 1
 	return -1
 
+static func get_saves_count() -> int:
+	return DirNavHelper.fetch_dir_content(GAME.saves_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY).size()
+
 # Get a save's specific property value according to a given property_name
 # Args : saves directory, property_name, save id
 # Output : return the value of the save's asked property

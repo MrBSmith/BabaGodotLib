@@ -25,6 +25,7 @@ signal new_game()
 signal gameover()
 signal win()
 signal game_resumed()
+signal network_game_started()
 
 
 #### PATHFINDER ####
