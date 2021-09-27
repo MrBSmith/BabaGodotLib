@@ -14,6 +14,8 @@ onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 onready var buttons_array : Array = []
 
 export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
+export var focus_first_option_on_ready : bool = true
+
 
 var default_button_state : Array = []
 var is_ready : bool = false
@@ -44,7 +46,11 @@ func _ready():
 # This function exist so it can be overriden in children classes, unlike _ready
 func _setup():
 	connect_menu_options(opt_container)
-	focus_first_option()
+	for option in get_tree().get_nodes_in_group("MenuOption"):
+		var _err = option.connect("focus_changed", self, "_on_menu_option_focus_changed")
+	
+	if focus_first_option_on_ready:
+		focus_first_option()
 
 # Focus the first available option
 func focus_first_option():
@@ -110,7 +116,6 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 		
 		# Connect options signals
 		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
-		_err = button.connect("focus_changed", self, "_on_menu_option_focus_changed")
 
 
 func feed_buttons_array(option_container: Control):

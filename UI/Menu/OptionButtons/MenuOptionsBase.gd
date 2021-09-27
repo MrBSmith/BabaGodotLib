@@ -45,6 +45,8 @@ func is_hidden() -> bool: return hidden
 #### BUILT-IN ####
 
 func _ready() -> void:
+	add_to_group("MenuOption")
+	
 	var _err = connect("focus_entered", self, "_on_focus_entered")
 	_err = connect("focus_exited", self, "_on_focus_exited")
 	_err = connect("pressed", self, "_on_pressed")

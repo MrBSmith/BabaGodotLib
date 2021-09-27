@@ -1,6 +1,7 @@
 extends TextEdit
 class_name TextField
 
+var previous_text : String = ""
 onready var placeholder_text = get_text()
 
 export var placeholder_text_color = Color("80e0e0e0")
@@ -21,6 +22,7 @@ func get_text() -> String:
 func _ready() -> void:
 	var __ = connect("focus_entered", self, "_on_focus_entered")
 	__ = connect("focus_exited", self, "_on_focus_exited")
+	__ = connect("text_changed", self, "_on_text_changed")
 	
 	_set_text_as_placeholder()
 
@@ -40,6 +42,16 @@ func _set_text_as_placeholder() -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_text_changed() -> void:
+	var last_char = text.replace(previous_text, "")
+	if last_char == "	":
+		text = previous_text
+		
+		var next_control = get_node_or_null(focus_next)
+		if next_control != null:
+			next_control.grab_focus()
+
 
 func _on_focus_entered() -> void:
 	if text == placeholder_text:
