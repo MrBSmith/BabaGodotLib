@@ -174,5 +174,5 @@ func _on_menu_option_focus_changed(_button : Button, focus: bool) -> void:
 
 # Virtual method to respond to the signal emited by an option beeing chosen
 # Here you can add the code that tells the game what to do based on what option was chose
-func _on_menu_option_chose(_option) -> void:
+func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
 	pass
