@@ -45,7 +45,7 @@ func _set_text_as_placeholder() -> void:
 
 func _on_text_changed() -> void:
 	var last_char = text.replace(previous_text, "")
-	if last_char == "	":
+	if last_char == "	" && text != "":
 		text = previous_text
 		
 		var next_control = get_node_or_null(focus_next)
