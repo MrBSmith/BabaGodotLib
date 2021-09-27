@@ -1,7 +1,8 @@
+tool
 extends Button
 class_name MenuOptionsBase
-tool
 
+signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
 signal hidden_changed
@@ -41,6 +42,11 @@ func set_hidden(value: bool):
 		hidden = value
 		emit_signal("hidden_changed")
 func is_hidden() -> bool: return hidden
+
+func set_disabled(value: bool):
+	if value != disabled:
+		.set_disabled(value)
+		emit_signal("disabled_changed", disabled)
 
 #### BUILT-IN ####
 

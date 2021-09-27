@@ -11,11 +11,9 @@ export var opt_container_path : String = "VBoxContainer"
 
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
-onready var buttons_array : Array = []
 
 export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
 export var focus_first_option_on_ready : bool = true
-
 
 var default_button_state : Array = []
 var is_ready : bool = false
@@ -40,35 +38,40 @@ func _ready():
 	EVENTS.emit_signal("menu_entered", name)
 	_setup()
 
+
 #### LOGIC ####
 
 # This is called by _ready()
 # This function exist so it can be overriden in children classes, unlike _ready
 func _setup():
-	connect_menu_options(opt_container)
-	for option in get_tree().get_nodes_in_group("MenuOption"):
-		var _err = option.connect("focus_changed", self, "_on_menu_option_focus_changed")
+	_update_options()
 	
 	if focus_first_option_on_ready:
 		focus_first_option()
 
+
+func _update_options() -> void:
+	_setup_menu_options_wrapping()
+	_connect_options_signals()
+
+
 # Focus the first available option
-func focus_first_option():
-	for button in buttons_array:
+func focus_first_option() -> void:
+	if !is_instance_valid(opt_container):
+		return
+	
+	for button in opt_container.get_children():
 		if !button.is_disabled():
 			button.set_focused(true)
 			break
+
 
 # Connect the options in the menu 
 # the wrapping argument determine if the cursor needs to wraps around 
 # Going up on the first option put the focus on the last
 # And going down on the last put the focus on the first
-func connect_menu_options(option_container: Control, wrapping: bool = true):
-	feed_buttons_array(option_container)
-	
-	if len(buttons_array) == 0:
-		return
-	
+func _setup_menu_options_wrapping(wrapping: bool = true):
+	var buttons_array = _fetch_buttons_array()
 	var nb_buttons = buttons_array.size()
 	var first_option_unabled : MenuOptionsBase = null
 	var last_option_unabled : MenuOptionsBase = null
@@ -77,6 +80,7 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 	for i in range(nb_buttons):
 		if !buttons_array[i].is_disabled() && first_option_unabled == null:
 			first_option_unabled = buttons_array[i]
+		
 		if !buttons_array[-i - 1].is_disabled() && last_option_unabled == null:
 			last_option_unabled = buttons_array[-i - 1]
 	
@@ -113,33 +117,47 @@ func connect_menu_options(option_container: Control, wrapping: bool = true):
 		else:
 			button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
 			button.set_focus_next(next_button.get_path())
-		
-		# Connect options signals
-		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
 
 
-func feed_buttons_array(option_container: Control):
-	if option_container == null:
+func _connect_options_signals() -> void:
+	for option in get_tree().get_nodes_in_group("MenuOption"):
+		if !option.is_connected("focus_changed", self, "_on_menu_option_focus_changed"):
+			var _err = option.connect("focus_changed", self, "_on_menu_option_focus_changed")
+	
+	if opt_container == null:
 		return
 	
-	buttons_array = []
-	for child in option_container.get_children():
+	for button in opt_container.get_children():
+		# Connect options signals
+		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
+		_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
+
+
+func _fetch_buttons_array() -> Array:
+	if !is_instance_valid(opt_container):
+		return []
+	
+	var buttons_array = []
+	for child in opt_container.get_children():
 		if child is Button:
 			buttons_array.append(child)
+	
+	return buttons_array
 
 # Stock the default state of every button
 func load_default_buttons_state():
-	for button in buttons_array:
+	for button in _fetch_buttons_array():
 		var button_state = button.is_disabled()
 		default_button_state.append(button_state)
 
 
 func set_buttons_disabled(value : bool):
-	for button in buttons_array:
+	for button in _fetch_buttons_array():
 		button.set_disabled(value)
 
 
 func set_buttons_default_state():
+	var buttons_array = _fetch_buttons_array()
 	for i in range(buttons_array.size()):
 		buttons_array[i].set_disabled(default_button_state[i])
 
@@ -164,11 +182,13 @@ func cancel():
 		CANCEL_ACTION.GO_TO_LAST_MENU:
 			_go_to_last_menu()
 
+
 #### INPUT ####
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		cancel()
+
 
 #### SIGNAL RESPONSES ####
 
@@ -181,3 +201,7 @@ func _on_menu_option_focus_changed(_button : Button, focus: bool) -> void:
 # Here you can add the code that tells the game what to do based on what option was chose
 func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
 	pass
+
+
+func _on_menu_option_disabled_changed(_disabled: bool) -> void:
+	_setup_menu_options_wrapping(opt_container)
