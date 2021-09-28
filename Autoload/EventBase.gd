@@ -26,6 +26,7 @@ signal continue_game()
 signal gameover()
 signal win()
 signal game_resumed()
+signal quit_current_game()
 
 signal save_game(save_id)
 signal load_game(save_id)
