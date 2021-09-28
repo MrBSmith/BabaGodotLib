@@ -163,7 +163,7 @@ func get_bind(origin: WorldMapNode, dest: WorldMapNode) -> LevelNodeBind:
 # Trigger the scene change to enter the level
 func enter_current_level():
 	var current_cursor_level = cursor.get_current_node()
-	GAME.goto_level_by_path(current_cursor_level.get_level_scene_path())
+	EVENTS.emit_signal("go_to_level_by_path", current_cursor_level.get_level_scene_path())
 
 
 func is_level_valid(level : LevelNode) -> bool:

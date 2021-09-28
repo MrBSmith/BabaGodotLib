@@ -127,8 +127,11 @@ func _connect_options_signals() -> void:
 	if opt_container == null:
 		return
 	
+	# Connect options signals
 	for button in opt_container.get_children():
-		# Connect options signals
+		if not button is MenuOptionsBase:
+			continue
+		
 		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
 		_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
 
