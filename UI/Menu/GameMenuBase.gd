@@ -207,4 +207,4 @@ func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
 
 
 func _on_menu_option_disabled_changed(_disabled: bool) -> void:
-	_setup_menu_options_wrapping(opt_container)
+	_setup_menu_options_wrapping()
