@@ -48,6 +48,9 @@ func set_disabled(value: bool):
 		.set_disabled(value)
 		emit_signal("disabled_changed", disabled)
 
+func is_accessible() -> bool:
+	return is_visible() && !is_disabled()
+
 #### BUILT-IN ####
 
 func _ready() -> void:

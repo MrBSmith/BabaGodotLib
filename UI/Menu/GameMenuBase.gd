@@ -78,29 +78,29 @@ func _setup_menu_options_wrapping(wrapping: bool = true):
 	
 	# Find the first option unabled, and the last 
 	for i in range(nb_buttons):
-		if !buttons_array[i].is_disabled() && first_option_unabled == null:
+		if buttons_array[i].is_accessible() && first_option_unabled == null:
 			first_option_unabled = buttons_array[i]
 		
-		if !buttons_array[-i - 1].is_disabled() && last_option_unabled == null:
+		if buttons_array[-i - 1].is_accessible() && last_option_unabled == null:
 			last_option_unabled = buttons_array[-i - 1]
 	
 	# Setup the wrapping
 	for i in range(nb_buttons):
 		var button : Control = buttons_array[i]
-		if button.is_disabled():
+		if button.is_disabled() or !button.is_visible():
 			continue
 		
 		var prev_id = i - 1
 		var previous_button = buttons_array[prev_id]
 		
-		while(previous_button.is_disabled()):
+		while(!previous_button.is_accessible()):
 			prev_id -= 1
 			previous_button = buttons_array[prev_id]
 		
 		var next_id =  wrapi(i + 1, 0, nb_buttons)
 		var next_button = buttons_array[next_id]
 		
-		while(next_button.is_disabled()):
+		while(!next_button.is_accessible()):
 			next_id = wrapi(next_id + 1, 0, nb_buttons)
 			next_button = buttons_array[next_id] 
 		
@@ -134,6 +134,7 @@ func _connect_options_signals() -> void:
 		
 		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
 		_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
+		_err = button.connect("visibility_changed", self, "_on_menu_option_visible_changed")
 
 
 func _fetch_buttons_array() -> Array:
@@ -207,4 +208,8 @@ func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
 
 
 func _on_menu_option_disabled_changed(_disabled: bool) -> void:
+	_setup_menu_options_wrapping()
+
+
+func _on_menu_option_visible_changed() -> void:
 	_setup_menu_options_wrapping()
