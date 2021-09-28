@@ -22,9 +22,13 @@ class_name EventsBase
 # warnings-disable
 
 signal new_game()
+signal continue_game()
 signal gameover()
 signal win()
 signal game_resumed()
+
+signal load_game(save_id)
+
 signal network_game_started()
 signal network_game_ended()
 
