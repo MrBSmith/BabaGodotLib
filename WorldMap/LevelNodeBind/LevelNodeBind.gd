@@ -130,8 +130,7 @@ func _ready() -> void:
 	if owner != null && origin_node_path != "" && destination_node_path != "":
 		set_origin(owner.get_node(origin_node_path))
 		set_destination(owner.get_node(destination_node_path))
-	
-	_update_line()
+
 
 func _process(_delta: float) -> void:
 	if origin != null && destination != null:
