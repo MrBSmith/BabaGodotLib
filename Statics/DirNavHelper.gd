@@ -33,6 +33,21 @@ static func create_dir(dir_path : String):
 static func _get_path_prefix(path: String) -> String:
 	return path.split("/")[0] + "//"
 
+
+static func read_file_line(path: String) -> String:
+	var file = File.new()
+	var err = file.open(path, File.READ_WRITE)
+	
+	if err != OK:
+		push_error("file at path %s couldn't be loaded, error code %d" % [path, err])
+		return ""
+	
+	var line = file.get_line()
+	file.close()
+	
+	return line
+
+
 # Check if the directory at the given path exists or not
 static func is_dir_existing(dir_path : String) -> bool:
 	var dir = Directory.new()
