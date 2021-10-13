@@ -1,8 +1,9 @@
-extends Control
+extends HBoxContainer
 class_name Collectable_HUD_Label
 
 export var maximum_amount : int = 0
 export var collectable_type : String = ""
+
 onready var label = $Label
 onready var base_texture_scale = $Texture.get_scale()
 

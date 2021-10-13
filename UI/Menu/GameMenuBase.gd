@@ -197,7 +197,7 @@ func _input(event: InputEvent) -> void:
 #### SIGNAL RESPONSES ####
 
 # When a button is aimed (with a mouse for exemple)
-func _on_menu_option_focus_changed(_button : Button, focus: bool) -> void:
+func _on_menu_option_focus_changed(_button : Control, focus: bool) -> void:
 	if focus && choice_sound_node != null:
 		choice_sound_node.play()
 
