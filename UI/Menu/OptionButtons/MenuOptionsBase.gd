@@ -1,41 +1,58 @@
 tool
-extends Button
+extends Control
 class_name MenuOptionsBase
+
+onready var button = $HBoxContainer/MarginContainer/Button
+onready var h_box_container = $HBoxContainer
 
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
 signal hidden_changed
+signal text_changed(text)
 
 var is_ready : bool = false
 var focused : bool = false setget set_focused, is_focused
 
 export var hidden : bool = false setget set_hidden, is_hidden
 export var all_caps : bool = false setget set_all_caps
+export var text : String = "Button" setget set_text, get_text 
 
 #### ACCESSSORS ####
 
 func set_focused(value: bool):
-	if value != focused && !is_disabled():
+	if button == null: 
+		return
+	if value != focused && !button.is_disabled():
 		focused = value
 		if focused: 
-			grab_focus()
+			button.grab_focus()
 		if is_ready:
 			emit_signal("focus_changed", self, focused)
 func is_focused() -> bool: return focused
 
 func set_all_caps(value: bool):
+	if button == null: return
 	all_caps = value
 	if all_caps:
-		text = text.to_upper()
+		button.set_text(button.get_text().to_upper())
 	else:
-		text = text.capitalize()
+		button.set_text(button.get_text().capitalize())
 
 func set_text(value: String):
+	var text_changed = text != value
+	text = value
+	if button == null: return
 	if all_caps:
-		text = value.to_upper()
+		button.set_text(value.to_upper())
 	else:
-		text = value
+		button.set_text(value)
+	if text_changed:
+		emit_signal("text_changed", text)
+func get_text() -> String: 
+	if button == null: 
+		return ""
+	return button.get_text()
 
 func set_hidden(value: bool):
 	if value != hidden:
@@ -44,9 +61,13 @@ func set_hidden(value: bool):
 func is_hidden() -> bool: return hidden
 
 func set_disabled(value: bool):
-	if value != disabled:
-		.set_disabled(value)
-		emit_signal("disabled_changed", disabled)
+	if button == null: return
+	if value != button.is_disabled():
+		button.set_disabled(value)
+		emit_signal("disabled_changed", value)
+func is_disabled() -> bool:
+	if button == null: return false
+	return button.is_disabled()
 
 func is_accessible() -> bool:
 	return is_visible() && !is_disabled()
@@ -56,29 +77,42 @@ func is_accessible() -> bool:
 func _ready() -> void:
 	add_to_group("MenuOption")
 	
-	var _err = connect("focus_entered", self, "_on_focus_entered")
-	_err = connect("focus_exited", self, "_on_focus_exited")
-	_err = connect("pressed", self, "_on_pressed")
+	var _err = button.connect("focus_entered", self, "_on_focus_entered")
+	_err = button.connect("focus_exited", self, "_on_focus_exited")
+	_err = button.connect("pressed", self, "_on_pressed")
+	_err = button.connect("mouse_entered", self, "_on_mouse_entered")
+	_err = button.connect("mouse_exited", self, "_on_mouse_exited")
+	_err = button.connect("button_down", self, "_on_button_down")
+	_err = button.connect("button_up", self, "_on_button_up")
+	
+	_err = connect("focus_changed", self, "_on_focus_changed")
 	_err = connect("gui_input", self, "_on_gui_input")
-	_err = connect("mouse_entered", self, "_on_mouse_entered")
-	_err = connect("mouse_exited", self, "_on_mouse_exited")
 	
 	var __ = connect("hidden_changed", self, "_on_hidden_changed")
-	_on_hidden_changed()
-	
 	set_text(text)
+	
+	if !Engine.editor_hint:
+		_on_hidden_changed()
+		emit_signal("focus_changed", self, is_focused())
 	
 	is_ready = true
 
 
 #### LOGIC ####
 
+func set_hover_icons_modulate(color: Color) -> void:
+	for hover_texture in h_box_container.get_children():
+		if hover_texture is TextureRect:
+			hover_texture.set_modulate(color)
+
+#### SIGNAL RESPONSES ####
+
 func _on_gui_input(event : InputEvent): 
 	if event.is_action_pressed("ui_accept") && is_focused():
-		set_pressed(true)
+		button.set_pressed(true)
 
 
-func _on_pressed(): 
+func _on_pressed():
 	emit_signal("option_chose", self)
 
 
@@ -101,11 +135,29 @@ func _on_focus_exited():
 	set_focused(false)
 
 
+func _on_focus_changed(entity: Control, focus: bool) -> void:
+	if !Engine.editor_hint:
+		var button_focus_color = entity.get_color("font_color_hover", "Button")
+		var dest_color = button_focus_color if focus else Color.transparent
+		
+		set_hover_icons_modulate(dest_color)
+
+
 func _on_hidden_changed() -> void:
 	if hidden:
 		set_modulate(Color.transparent)
 	else:
 		set_modulate(Color.white)
 		
-		if is_hovered() && !is_disabled():
+		if button.is_hovered() && !is_disabled():
 			set_focused(true)
+
+
+func _on_button_down() -> void:
+	var pressed_color = button.get_color("font_color_pressed", "Button")
+	set_hover_icons_modulate(pressed_color)
+
+
+func _on_button_up() -> void:
+	var focus_color = button.get_color("font_color_hover", "Button")
+	set_hover_icons_modulate(focus_color)

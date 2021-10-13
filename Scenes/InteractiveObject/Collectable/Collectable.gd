@@ -12,6 +12,8 @@ export(float, 0.0, 1.0) var amount_variance : float = 0.0
 
 export var collectable_name : String = "" setget set_collectable_name, get_collectable_name
 
+var target : Node = null setget set_target, get_target
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "Collectable" or .is_class(value)
@@ -23,6 +25,9 @@ func get_state_name(): return state_machine.get_state_name()
 
 func set_collectable_name(value: String): collectable_name = value
 func get_collectable_name() -> String: return collectable_name
+
+func set_target(value: Node): target = value
+func get_target() -> Node: return target
 
 # FUNCTION OVERRIDE
 func set_interactable(value: bool): 
@@ -47,21 +52,22 @@ func _ready():
 
 #### VIRTUALS ####
 
-func interact():
-	collect()
+#func interact():
+#	collect()
 
 
-func collect():
+func collect(_target: Node):
+	set_target(_target)
 	EVENTS.emit_signal("collect", self)
 
-func follow(target: Node2D):
-	$StatesMachine/Follow.set_target(target)
+
+func follow(_target: Node):
+	set_target(_target)
 	set_state("Follow")
 
 
-func trigger_collect_animation(target: Node2D):
-	$StatesMachine/Collect.set_target(target)
-	
+func trigger_collect_animation(_target: Node):
+	set_target(_target)
 	if !is_ready:
 		default_state = "Collect"
 	else:
@@ -91,11 +97,13 @@ func _on_follow_area_body_entered(body: PhysicsBody2D):
 	if body.is_class("Player"):
 		follow(body)
 
+
 func _on_collect_area_body_entered(body: PhysicsBody2D):
 	if body == null:
 		return
 	if body.is_class("Player"):
-		collect()
+		collect(body)
+
 
 func _on_collect_animation_finished():
 	EVENTS.emit_signal("collectable_amount_collected", self, compute_amount_collected())

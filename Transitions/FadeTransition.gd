@@ -7,6 +7,7 @@ enum FADE_MODE {FADE_IN_OUT, FADE_IN, FADE_OUT}
 
 onready var tween = $Tween
 
+export var start_color := Color.transparent
 export var fade_color := Color.black
 
 signal transition_finished
@@ -24,8 +25,8 @@ func set_visible(value: bool):
 #### BUILT-IN ####
 
 func _ready() -> void:
-	# Set the color rect to fill the screen
 	$ColorRect.set_anchors_preset(Control.PRESET_WIDE)
+	$ColorRect.set_frame_color(start_color)
 
 
 #### VIRTUALS ####
