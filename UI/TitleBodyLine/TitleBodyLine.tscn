@@ -14,14 +14,14 @@ __meta__ = {
 }
 
 [node name="Title" type="Label" parent="."]
-margin_right = 478.0
+margin_right = 318.0
 margin_bottom = 14.0
 size_flags_horizontal = 3
 text = "Title: "
 
 [node name="Body" type="Label" parent="."]
-margin_left = 482.0
-margin_right = 960.0
+margin_left = 322.0
+margin_right = 640.0
 margin_bottom = 14.0
 size_flags_horizontal = 3
 text = "Body"

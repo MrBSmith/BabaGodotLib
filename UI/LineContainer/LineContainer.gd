@@ -46,6 +46,7 @@ func update_visibilty():
 		set_margin(MARGIN_LEFT, default_margin_left)
 		set_modulate(Color.white)
 
+
 func appear():
 	tween.interpolate_property(self, "modulate",
 		Color.transparent, Color.white, transition_duration,
