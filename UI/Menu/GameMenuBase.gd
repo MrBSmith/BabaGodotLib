@@ -71,38 +71,44 @@ func focus_first_option() -> void:
 # Going up on the first option put the focus on the last
 # And going down on the last put the focus on the first
 func _setup_menu_options_wrapping(wrapping: bool = true):
-	var buttons_array = _fetch_buttons_array()
-	var nb_buttons = buttons_array.size()
+	var menu_options_array = _fetch_menu_option_array()
+	var nb_options = menu_options_array.size()
 	var first_option_unabled : MenuOptionsBase = null
 	var last_option_unabled : MenuOptionsBase = null
 	
 	# Find the first option unabled, and the last 
-	for i in range(nb_buttons):
-		if buttons_array[i].is_accessible() && first_option_unabled == null:
-			first_option_unabled = buttons_array[i]
+	for i in range(nb_options):
+		if menu_options_array[i].is_accessible() && first_option_unabled == null:
+			first_option_unabled = menu_options_array[i]
 		
-		if buttons_array[-i - 1].is_accessible() && last_option_unabled == null:
-			last_option_unabled = buttons_array[-i - 1]
+		if menu_options_array[-i - 1].is_accessible() && last_option_unabled == null:
+			last_option_unabled = menu_options_array[-i - 1]
 	
 	# Setup the wrapping
-	for i in range(nb_buttons):
-		var button : Control = buttons_array[i]
-		if button.is_disabled() or !button.is_visible():
+	for i in range(nb_options):
+		var option = menu_options_array[i]
+		var button : Button = menu_options_array[i].get_button()
+		
+		if option.is_disabled() or !option.is_visible():
 			continue
 		
 		var prev_id = i - 1
-		var previous_button = buttons_array[prev_id]
+		var previous_option = menu_options_array[prev_id]
 		
-		while(!previous_button.is_accessible()):
+		while(!previous_option.is_accessible()):
 			prev_id -= 1
-			previous_button = buttons_array[prev_id]
+			previous_option = menu_options_array[prev_id]
 		
-		var next_id =  wrapi(i + 1, 0, nb_buttons)
-		var next_button = buttons_array[next_id]
+		var previous_button = previous_option.get_button()
 		
-		while(!next_button.is_accessible()):
-			next_id = wrapi(next_id + 1, 0, nb_buttons)
-			next_button = buttons_array[next_id] 
+		var next_id =  wrapi(i + 1, 0, nb_options)
+		var next_option = menu_options_array[next_id]
+		
+		while(!next_option.is_accessible()):
+			next_id = wrapi(next_id + 1, 0, nb_options)
+			next_option = menu_options_array[next_id]
+		
+		var next_button = next_option.get_button()
 		
 		if button == first_option_unabled:
 			if wrapping:
@@ -137,33 +143,33 @@ func _connect_options_signals() -> void:
 		_err = button.connect("visibility_changed", self, "_on_menu_option_visible_changed")
 
 
-func _fetch_buttons_array() -> Array:
+func _fetch_menu_option_array() -> Array:
 	if !is_instance_valid(opt_container):
 		return []
 	
-	var buttons_array = []
+	var menu_option_array = []
 	for child in opt_container.get_children():
-		if child is Button:
-			buttons_array.append(child)
+		if child is MenuOptionsBase:
+			menu_option_array.append(child)
 	
-	return buttons_array
+	return menu_option_array
 
 # Stock the default state of every button
 func load_default_buttons_state():
-	for button in _fetch_buttons_array():
+	for button in _fetch_menu_option_array():
 		var button_state = button.is_disabled()
 		default_button_state.append(button_state)
 
 
 func set_buttons_disabled(value : bool):
-	for button in _fetch_buttons_array():
+	for button in _fetch_menu_option_array():
 		button.set_disabled(value)
 
 
 func set_buttons_default_state():
-	var buttons_array = _fetch_buttons_array()
-	for i in range(buttons_array.size()):
-		buttons_array[i].set_disabled(default_button_state[i])
+	var menu_options_array = _fetch_menu_option_array()
+	for i in range(menu_options_array.size()):
+		menu_options_array[i].set_disabled(default_button_state[i])
 
 
 func _go_to_last_menu() -> void:
