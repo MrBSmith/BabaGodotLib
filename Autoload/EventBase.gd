@@ -34,6 +34,7 @@ signal load_game(save_id)
 signal network_game_started()
 signal network_game_ended()
 signal network_client_action(action)
+signal network_actor_moved(pos)
 
 
 #### PATHFINDER ####
