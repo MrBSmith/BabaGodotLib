@@ -7,7 +7,7 @@
 [sub_resource type="StyleBoxEmpty" id=1]
 
 [node name="MenuOptionBase" type="MarginContainer"]
-margin_right = 125.0
+margin_right = 179.0
 margin_bottom = 38.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
@@ -18,8 +18,10 @@ __meta__ = {
 text = ""
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_right = 132.0
+margin_left = 62.0
+margin_right = 117.0
 margin_bottom = 38.0
+size_flags_horizontal = 6
 custom_constants/separation = 6
 __meta__ = {
 "_edit_use_anchors_": false
@@ -37,7 +39,7 @@ __meta__ = {
 
 [node name="MarginContainer" type="MarginContainer" parent="HBoxContainer"]
 margin_left = 20.0
-margin_right = 112.0
+margin_right = 35.0
 margin_bottom = 38.0
 custom_constants/margin_left = 3
 __meta__ = {
@@ -47,23 +49,22 @@ __meta__ = {
 [node name="Button" type="Button" parent="HBoxContainer/MarginContainer"]
 light_mask = 0
 margin_left = 3.0
-margin_right = 92.0
+margin_right = 15.0
 margin_bottom = 38.0
 size_flags_horizontal = 0
 size_flags_vertical = 5
 custom_styles/focus = SubResource( 1 )
 custom_fonts/font = ExtResource( 1 )
 shortcut_in_tooltip = false
-text = "Button"
 flat = true
 __meta__ = {
 "_edit_lock_": true
 }
 
 [node name="HoverTexture2" type="TextureRect" parent="HBoxContainer"]
-margin_left = 118.0
+margin_left = 41.0
 margin_top = 12.0
-margin_right = 132.0
+margin_right = 55.0
 margin_bottom = 26.0
 size_flags_vertical = 6
 texture = ExtResource( 3 )
