@@ -40,7 +40,18 @@ func set_align(value: int) -> void:
 			child.set_align(align)
 func get_align() -> int: return align
 
+func set_title_font_color(color: Color) -> void:
+	$Title.add_color_override("font_color", color)
+func set_body_font_color(color: Color) -> void:
+	$Body.add_color_override("font_color", color)
 
+func set_font(font: DynamicFont) -> void:
+	set_title_font(font)
+	set_body_font(font)
+func set_title_font(font: DynamicFont) -> void:
+	$Title.add_font_override("font", font)
+func set_body_font(font: DynamicFont) -> void:
+	$Body.add_font_override("font", font)
 
 #### BUILT-IN ####
 

@@ -34,7 +34,7 @@ signal load_game(save_id)
 signal network_game_started()
 signal network_game_ended()
 signal network_client_action(action)
-signal network_actor_moved(pos)
+signal network_event(events) #events should be a Dictionary of every events happened. Example: "events":{"event1",:value1,"event2":value2,...}
 
 
 #### PATHFINDER ####
