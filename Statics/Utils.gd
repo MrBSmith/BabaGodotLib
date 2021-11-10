@@ -1,6 +1,39 @@
 extends Object
 class_name Utils
 
+const DIRECTIONS_4 : Dictionary = {
+	"Up": Vector2.UP,
+	"Right": Vector2.RIGHT,
+	"Down": Vector2.DOWN,
+	"Left": Vector2.LEFT
+}
+
+const DIRECTIONS_8 : Dictionary = {
+	"Up": Vector2.UP,
+	"UpRight": Vector2(1, -1),
+	"Right": Vector2.RIGHT,
+	"DownRight": Vector2.ONE,
+	"Down": Vector2.DOWN,
+	"DownLeft": Vector2(-1, 1),
+	"Left": Vector2.LEFT,
+	"UpLeft": Vector2(-1, -1)
+}
+
+
+# Find the name of the given direction and returns it as a String
+static func find_dir_name(dir: Vector2) -> String:
+	var dir_values_array = DIRECTIONS_8.values()
+	var dir_index = dir_values_array.find(dir)
+	
+	if dir_index == -1:
+		return ""
+	
+	var dir_keys_array = DIRECTIONS_8.keys()
+	var dir_key = dir_keys_array[dir_index]
+	
+	return dir_key
+
+
 
 static func range_wrapi(init_val: int, nb_values: int, min_val: int, max_val: int, increment: int = 1) -> Array:
 	var range_array = range(0, nb_values, increment)

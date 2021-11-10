@@ -31,6 +31,7 @@ func _ready() -> void:
 
 func enter_state():
 	if audio_stream_player != null:
+		audio_stream_player.stop()
 		audio_stream_player.play()
 	
 	if animated_sprite == null:
