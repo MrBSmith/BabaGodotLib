@@ -28,6 +28,10 @@ func set_state(state):
 	if state == null or (state is String && state == ""):
 		return
 	
+	if state is String:
+		state = get_node(state)
+	
+	# If the current state is the last of the queue
 	if state_index == state_queue.size() - 1:
 		state_queue.append(state)
 		if state_queue.size() > state_queue_max_size:
@@ -35,8 +39,8 @@ func set_state(state):
 		else:
 			state_index += 1
 	else:
-		for i in range(state_queue.size() - state_index - 1):
-			state_queue.remove(state_index + i + 1)
+		for i in range(state_index + 1, state_queue.size() - 1):
+			state_queue.remove(i)
 		
 		state_queue.append(state)
 		state_index += 1
@@ -61,6 +65,22 @@ func go_to_previous_state():
 		return
 	
 	go_to_queued_state_by_index(state_index - 1)
+
+
+func go_to_previous_non_toggle_state() -> void:
+	if state_index == 0:
+		push_warning("There is no previous state - state_index is currently 0")
+		return
+	
+	for i in range(state_index - 1, 1, -1):
+		var state = state_queue[i]
+		
+		if state.get("toggle_state_mode") == true:
+			continue
+		
+		go_to_queued_state_by_index(i)
+		break
+
 
 
 # Set the state to the next one in the queue

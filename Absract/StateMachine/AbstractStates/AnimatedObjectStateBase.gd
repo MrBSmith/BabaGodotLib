@@ -72,4 +72,7 @@ func _on_animation_finished():
 
 func _on_state_animation_finished() -> void:
 	if toggle_state_mode && is_current_state():
-		states_machine.set_state(states_machine.previous_state)
+		if states_machine is PushdownAutomata:
+			states_machine.go_to_previous_non_toggle_state()
+		else:
+			states_machine.set_state(states_machine.previous_state)
