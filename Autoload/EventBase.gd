@@ -47,8 +47,8 @@ signal send_path(who, path)
 #### INTERACTIONS ####
 
 signal interact()
-signal collect(obj)
-signal collectable_amount_collected(obj, amount)
+signal collect(collectable, collectable_type)
+signal collectable_amount_collected(collectable_type, amount)
 signal collectable_amount_updated(collectable_type, amount)
 signal update_HUD()
 signal approch_collactable(obj)

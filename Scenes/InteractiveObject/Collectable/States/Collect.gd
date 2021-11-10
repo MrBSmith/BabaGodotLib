@@ -1,6 +1,8 @@
 extends StateBase
 class_name Collectable_CollectState
 
+onready var root_scene = owner.owner
+
 export var speed : float = 300.0
 export var acceleration : float = 3.0
 
@@ -21,14 +23,10 @@ func get_class() -> String: return "CollectState"
 #### VIRTUALS ####
 
 func enter_state():
-	owner.set_interactable(false)
-	owner.set_scale(owner.get_scale() / 3)
-	owner.set_as_toplevel(true)
+	root_scene.set_scale(root_scene.get_scale() / 3)
+	root_scene.set_as_toplevel(true)
 	var rdm_angle = deg2rad(rand_range(0.0, 360.0))
 	initial_dir = Vector2(cos(rdm_angle), sin(rdm_angle))
-	
-	if owner.collect_particle != null:
-		owner.collect_particle.set_emitting(true)
 
 
 func exit_state():
@@ -36,19 +34,25 @@ func exit_state():
 
 
 func update_state(delta: float):
+	if owner.target == null:
+		return
+	
 	var target_pos = owner.target.get_global_position()
-	var dir = owner.global_position.direction_to(target_pos)
-	var velocity = ((dir * speed) + (initial_dir * initial_speed)) * delta
+	var dir = root_scene.global_position.direction_to(target_pos)
 	
 	speed += acceleration
 	initial_speed -= initial_speed_damping
 	initial_speed = clamp(initial_speed, 0.0, INF)
 	
-	if owner.global_position.distance_to(target_pos) < speed * delta:
-		owner.set_global_position(target_pos)
+	var velocity = ((dir * speed) + (initial_dir * initial_speed)) * delta
+	var dist = root_scene.global_position.distance_to(target_pos)
+	var vel_len = velocity.length()
+	
+	if dist <= vel_len:
+		root_scene.set_global_position(target_pos)
 		owner.emit_signal("collect_animation_finished")
 	
-	owner.global_position += velocity
+	root_scene.global_position += velocity
 
 
 #### LOGIC ####
