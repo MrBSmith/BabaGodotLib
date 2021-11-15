@@ -49,6 +49,8 @@ func _ready():
 	
 	if animation_player:
 		animation_player.connect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
+	
+	owner.add_to_group("Collectable")
 
 #### VIRTUALS ####
 

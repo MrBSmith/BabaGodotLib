@@ -32,17 +32,18 @@ func set_state(state):
 		state = get_node(state)
 	
 	# If the current state is the last of the queue
-	if state_index == state_queue.size() - 1:
-		state_queue.append(state)
-		if state_queue.size() > state_queue_max_size:
-			state_queue.remove(0)
-		else:
-			state_index += 1
-	else:
+	if state_index != state_queue.size() - 1:
 		for i in range(state_index + 1, state_queue.size() - 1):
 			state_queue.remove(i)
-		
-		state_queue.append(state)
+	
+	append_state_to_queue(state)
+
+
+func append_state_to_queue(state: Object) -> void:
+	state_queue.append(state)
+	if state_queue.size() > state_queue_max_size:
+		state_queue.remove(0)
+	else:
 		state_index += 1
 
 
