@@ -23,6 +23,7 @@ func get_class() -> String: return "CollectState"
 #### VIRTUALS ####
 
 func enter_state():
+	owner.set_disabled(true)
 	root_scene.set_scale(root_scene.get_scale() / 3)
 	root_scene.set_as_toplevel(true)
 	var rdm_angle = deg2rad(rand_range(0.0, 360.0))
@@ -37,7 +38,11 @@ func update_state(delta: float):
 	if owner.target == null:
 		return
 	
-	var target_pos = owner.target.get_global_position()
+	var target = owner.target
+	var target_pos = target.get_global_position()
+	if target.get("rect_pivot_offset"):
+		target_pos += target.rect_pivot_offset
+	
 	var dir = root_scene.global_position.direction_to(target_pos)
 	
 	speed += acceleration

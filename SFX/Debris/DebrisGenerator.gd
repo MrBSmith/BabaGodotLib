@@ -3,6 +3,7 @@ extends Node
 
 ### ADD A ALGO THAT REPLACE THE PATH OF EACH SFX SCENE BY ITS CORRESPONDING LOADED PACKED SCENE ###
 export var sfx_dict : Dictionary = {}
+export var max_debris_per_frame : int = 20
 
 onready var debris = preload("res://BabaGodotLib/SFX/Debris/Debris.tscn")
 
@@ -36,9 +37,14 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 	
 	var row_len = int(sprite_width / square_size)
 	var col_len = int(sprite_height / square_size)
+	var debris_counter : int = 0
 	
 	for i in range(row_len):
 		for j in range(col_len):
+			if debris_counter >= max_debris_per_frame:
+				yield(get_tree(), "idle_frame")
+				debris_counter = 0
+			
 			var debris_node = debris.instance()
 			var debris_sprite = debris_node.get_node("Sprite")
 			var collision_shape = RectangleShape2D.new()
@@ -56,12 +62,13 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
 			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
-			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
 			if body_owner != null:
 				body_owner.call_deferred("add_child", debris_node)
 			else:
 				call_deferred("add_child", debris_node)
+			
+			debris_counter += 1
 
 
 func _on_play_SFX(fx_name: String, pos: Vector2):

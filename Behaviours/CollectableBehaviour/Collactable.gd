@@ -23,7 +23,7 @@ func collect() -> void:
 		return
 	
 	set_target(null)
-	EVENTS.emit_signal("collect", owner, get_collectable_name())
+	EVENTS.emit_signal("collect", self, get_collectable_name())
 	
 	trigger_collect_animation()
 

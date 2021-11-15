@@ -29,7 +29,8 @@ signal collect_animation_finished
 func is_class(value: String): return value == "CollectableBehaviour" or .is_class(value)
 func get_class() -> String: return "CollectableBehaviour"
 
-func set_target(value: Node): target = value
+func set_target(value: Node): 
+	target = value
 func get_target() -> Node: return target
 
 func set_collectable_name(value: String): collectable_name = value
