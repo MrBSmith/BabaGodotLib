@@ -1,6 +1,8 @@
 extends StatesMachine
 class_name PushdownAutomata
 
+export var debug : bool = false
+
 var state_queue : Array = []
 var state_index : int = -1
 
@@ -23,28 +25,42 @@ func get_class() -> String: return "PushdownAutomata"
 #### LOGIC ####
 
 func set_state(state):
-	.set_state(state)
-	
-	if state == null or (state is String && state == ""):
-		return
-	
 	if state is String:
 		state = get_node(state)
+	
+	if state == current_state or state == null:
+		return
+	
+	.set_state(state)
 	
 	# If the current state is the last of the queue
 	if state_index != state_queue.size() - 1:
 		for i in range(state_index + 1, state_queue.size() - 1):
 			state_queue.remove(i)
 	
-	append_state_to_queue(state)
+	_append_state_to_queue(state)
+	
+	if debug:
+		_print_queue()
 
 
-func append_state_to_queue(state: Object) -> void:
+func _append_state_to_queue(state: Object) -> void:
 	state_queue.append(state)
+	
 	if state_queue.size() > state_queue_max_size:
 		state_queue.remove(0)
+		state_index = state_queue.size() - 1
 	else:
 		state_index += 1
+
+
+func _print_queue() -> void:
+	print(" ")
+	
+	for i in range(state_queue.size()):
+		var state = state_queue[i]
+		var sufix = " <-" if i == state_index else ""
+		print(state.name + sufix)
 
 
 # Set the state that is at the id position of the queue
