@@ -1,11 +1,19 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://BabaGodotLib/Behaviours/CollectableBehaviour/CollectableBehaviour.tscn" type="PackedScene" id=1]
+[ext_resource path="res://BabaGodotLib/Behaviours/CollectableBehaviour/CollectableBehaviourAbstract.tscn" type="PackedScene" id=1]
 [ext_resource path="res://BabaGodotLib/Behaviours/CollectableBehaviour/FollowCollectable.gd" type="Script" id=2]
 [ext_resource path="res://BabaGodotLib/Absract/StateMachine/StateBase.gd" type="Script" id=3]
+[ext_resource path="res://BabaGodotLib/Absract/StateMachine/StateMachine.gd" type="Script" id=4]
 
 [node name="FollowCollectable" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
+
+[node name="FollowArea" type="Area2D" parent="." index="2"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FollowArea" index="0"]
+
+[node name="StatesMachine" type="Node2D" parent="." index="3"]
+script = ExtResource( 4 )
 
 [node name="Idle" type="Node" parent="StatesMachine" index="0"]
 script = ExtResource( 3 )
@@ -15,7 +23,3 @@ script = ExtResource( 3 )
 
 [node name="Collect" type="Node" parent="StatesMachine" index="2"]
 script = ExtResource( 3 )
-
-[node name="FollowArea" type="Area2D" parent="." index="2"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="FollowArea" index="0"]

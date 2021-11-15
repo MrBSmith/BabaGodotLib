@@ -19,15 +19,19 @@ func get_class() -> String: return "Collectable"
 #### LOGIC ####
 
 func collect() -> void:
+	if is_disabled():
+		return
+	
 	set_target(null)
-	set_state("Collect")
-	set_interactable(false)
-	EVENTS.emit_signal("collect", owner, collectable_name)
+	EVENTS.emit_signal("collect", owner, get_collectable_name())
 	
 	trigger_collect_animation()
 
 
 func trigger_collect_animation() -> void:
+	if collect_sound:
+		EVENTS.emit_signal("play_spacial_sound_effect", collect_sound, owner.get_global_position())
+	
 	if animation_player.has_animation("Collect"):
 		animation_player.play("Collect")
 	else:
@@ -39,7 +43,7 @@ func compute_amount_collected() -> int:
 
 
 func _collect_success() -> void:
-	EVENTS.emit_signal("collectable_amount_collected", collectable_name, compute_amount_collected())
+	EVENTS.emit_signal("collectable_amount_collected", get_collectable_name(), compute_amount_collected())
 	owner.queue_free()
 
 
@@ -51,7 +55,7 @@ func _collect_success() -> void:
 
 
 func _on_collect_area_body_entered(body: PhysicsBody2D):
-	if body == null:
+	if body == null or is_disabled():
 		return
 	
 	if body.is_class("Player"):
@@ -61,3 +65,7 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 func _on_collect_animation_finished() -> void:
 	_collect_success()
 
+
+func _on_AnimationPlayer_animation_finished(anim_name: String) -> void:
+	if anim_name == "Collect":
+		emit_signal("collect_animation_finished")
