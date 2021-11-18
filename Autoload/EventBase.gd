@@ -31,12 +31,14 @@ signal quit_current_game()
 signal save_game(save_id)
 signal load_game(save_id)
 
+#### NETWORK ####
+
 signal network_game_started()
 signal network_game_ended()
 signal network_client_left()
 signal network_client_action(action)
 signal network_event(events) #events should be a Dictionary of every events happened. Example: "events":{"event1",:value1,"event2":value2,...}
-
+signal network_breakable_destroyed(destroy_informations) # Array that contains breakable_object and actor_destroying if not null
 
 #### PATHFINDER ####
 
