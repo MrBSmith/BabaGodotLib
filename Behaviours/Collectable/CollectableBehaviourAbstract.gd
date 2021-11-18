@@ -1,4 +1,4 @@
-extends Node2D
+extends Behaviour
 class_name CollectableBehaviour
 
 #### Abstract class CollectableBehaviour ####
@@ -6,7 +6,8 @@ class_name CollectableBehaviour
 # This class can be extended and attached to ant node to give 
 # it the behaviour of a collectable
 
-onready var collect_sound = get_node_or_null("AudioStreamPlayer2D")
+onready var collect_sound = get_node_or_null("CollectSound")
+onready var travelling_sound = get_node_or_null("CollectSound")
 onready var animation_player = get_node_or_null("AnimationPlayer")
 onready var collect_area = get_node_or_null("CollectArea")
 

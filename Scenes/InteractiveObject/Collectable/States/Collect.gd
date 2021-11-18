@@ -53,7 +53,7 @@ func update_state(delta: float):
 	initial_speed -= initial_speed_damping
 	initial_speed = clamp(initial_speed, 0.0, INF)
 	
-	var velocity = (dir * speed) * delta
+	var velocity = ((dir * speed) + (initial_dir * initial_speed))  * delta
 	var dist = root_scene.global_position.distance_to(target_pos)
 	var vel_len = velocity.length()
 	

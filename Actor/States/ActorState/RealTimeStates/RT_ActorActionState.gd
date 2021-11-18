@@ -57,9 +57,11 @@ func damage():
 		var average_pos = (body.global_position + action_hitbox_node.global_position) / 2
 		EVENTS.emit_signal("play_SFX", "great_hit", average_pos)
 		
-		if is_obj_interactable(body):
-			body.damage(owner)
-			has_damaged = true
+		if body.is_in_group("Destructible"):
+			var destructible_behaviour = Utils.find_behaviour(body, "Destructible")
+			if destructible_behaviour:
+				destructible_behaviour.damage()
+				has_damaged = true
 
 
 func is_wrong_interaction() -> bool:

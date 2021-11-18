@@ -64,7 +64,6 @@ signal screen_shake(magnitude, duration)
 #### SOUND ####
 
 signal play_sound_effect(stream_player)
-signal play_spacial_sound_effect(stream_player, position)
 
 
 #### DIALOGUES ####

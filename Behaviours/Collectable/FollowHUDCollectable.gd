@@ -19,7 +19,7 @@ func get_class() -> String: return "FollowHUDCollectable"
 
 func trigger_collect_animation() -> void:
 	if collect_sound:
-		EVENTS.emit_signal("play_spacial_sound_effect", collect_sound, owner.get_global_position())
+		EVENTS.emit_signal("play_sound_effect", collect_sound)
 	
 	if animation_player.has_animation("Collect"):
 		animation_player.play("Collect")

@@ -14,7 +14,6 @@ func get_class() -> String: return "SoundEffectFactory"
 
 func _ready() -> void:
 	var __ = EVENTS.connect("play_sound_effect", self, "_on_EVENTS_play_sound_effect")
-	__ = EVENTS.connect("play_spacial_sound_effect", self, "_on_EVENTS_play_spacial_sound_effect")
 
 
 #### VIRTUALS ####
@@ -34,32 +33,19 @@ func play(stream_player : Node) -> void:
 	
 	var new_stream_player = stream_player.duplicate()
 	call_deferred("add_child", new_stream_player)
-	new_stream_player.call_deferred("play")
-	
-	yield(new_stream_player, "finished")
-	new_stream_player.queue_free()
-
-
-func play_spacial(stream_player : AudioStreamPlayer2D, pos: Vector2) -> void:
-	if stream_player == null:
-		push_error("The given stream_player is null")
-		return
-	
-	if not stream_player is AudioStreamPlayer2D:
-		push_error("the given stream_player doesn't have the right type. It has to be either an  AudioStreamPlayer2D")
-		return
-	
-	var new_stream_player = stream_player.duplicate()
-	call_deferred("add_child", new_stream_player)
 	
 	if !new_stream_player.is_inside_tree():
 		yield(new_stream_player, "ready")
 	
-	new_stream_player.set_global_position(pos)
+	if stream_player is AudioStreamPlayer2D:
+		var pos = stream_player.get_global_position()
+		new_stream_player.set_global_position(pos)
+	
 	new_stream_player.call_deferred("play")
 	
 	yield(new_stream_player, "finished")
 	new_stream_player.queue_free()
+
 
 
 #### INPUTS ####
@@ -68,9 +54,8 @@ func play_spacial(stream_player : AudioStreamPlayer2D, pos: Vector2) -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_EVENTS_play_sound_effect(stream_player: AudioStreamPlayer):
-	play(stream_player)
-
-
-func _on_EVENTS_play_spacial_sound_effect(stream_player: AudioStreamPlayer2D, pos: Vector2) -> void:
-	play_spacial(stream_player, pos)
+func _on_EVENTS_play_sound_effect(stream_player):
+	if stream_player is AudioStreamPlayer or stream_player is AudioStreamPlayer2D:
+		play(stream_player)
+	else:
+		push_warning("The given value is of type %s where it shouild be a AudioStreamPlayer or a AudioStreamPlayer2D" % stream_player.get_class())

@@ -1,5 +1,5 @@
 extends RayCast2D
-class_name RayCastBase
+class_name Baba_RayCast2D
 
 # Abstract class for a basic raycast, Searching for a specific target until it find it
 # the signal target_found usually connected by it's parent is emitted whenever
