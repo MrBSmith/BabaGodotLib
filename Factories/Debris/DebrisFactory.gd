@@ -1,25 +1,22 @@
-extends Node
+extends Factory
+class_name DebrisFactory
 
 
-### ADD A ALGO THAT REPLACE THE PATH OF EACH SFX SCENE BY ITS CORRESPONDING LOADED PACKED SCENE ###
-export var sfx_dict : Dictionary = {}
 export var max_debris_per_frame : int = 20
 
-onready var debris = preload("res://BabaGodotLib/SFX/Debris/Debris.tscn")
+onready var debris = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var _err = EVENTS.connect("play_SFX", self, "_on_play_SFX")
-	_err = EVENTS.connect("scatter_object", self, "_on_scatter_object")
+	var _err = EVENTS.connect("scatter_object", self, "_on_scatter_object")
 
 
 
 #### SIGNAL_RESPONSES ####
 
 func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0):
-	var body_owner = body.get_owner()
 	var sprite = body.get_node("Sprite")
 	var texture = sprite.get_texture()
 	var is_region = sprite.is_region()
@@ -63,21 +60,8 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
 			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
-			if body_owner != null:
-				body_owner.call_deferred("add_child", debris_node)
-			else:
-				call_deferred("add_child", debris_node)
+			target.call_deferred("add_child", debris_node)
 			
 			debris_counter += 1
 
 
-func _on_play_SFX(fx_name: String, pos: Vector2):
-	if not fx_name in sfx_dict.keys():
-		print("The fx named " + fx_name + " doesn't exist in the dictionnary")
-		return
-	
-	var fx = load(sfx_dict[fx_name])
-	var fx_node = fx.instance()
-	fx_node.set_global_position(pos)
-	add_child(fx_node)
-	fx_node.play_animation()

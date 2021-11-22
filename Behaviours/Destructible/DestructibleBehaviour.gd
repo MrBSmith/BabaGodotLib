@@ -5,6 +5,7 @@ onready var animation_player = get_node_or_null("AnimationPlayer")
 onready var damage_computer = get_node_or_null("DamageComputer")
 onready var destroy_sound = get_node_or_null("DestroySound")
 onready var approch_area = get_node_or_null("ApprochArea")
+onready var particules = get_node_or_null("Particles2D")
 
 export var max_hp : int = 1
 export var hp : int = max_hp setget set_hp, get_hp
@@ -55,8 +56,12 @@ func destroy() -> void:
 	if destroy_sound:
 		EVENTS.emit_signal("play_sound_effect", destroy_sound)
 	
+	if particules:
+		EVENTS.emit_signal("play_particule_FX", particules, particules.get_global_position())
+	
+	emit_signal("destroy_animation_started")
+	
 	if animation_player && animation_player.has_animation("Destroy"):
-		emit_signal("destroy_animation_started")
 		animation_player.play("Destroy")
 		yield(animation_player, "animation_finished")
 	

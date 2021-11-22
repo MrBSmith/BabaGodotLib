@@ -1,4 +1,4 @@
-extends Node2D
+extends Factory
 class_name SoundEffectFactory
 
 # This class is usefull to trigger sound that have to happen at the destruction of an object
@@ -32,7 +32,7 @@ func play(stream_player : Node) -> void:
 		return
 	
 	var new_stream_player = stream_player.duplicate()
-	call_deferred("add_child", new_stream_player)
+	target.call_deferred("add_child", new_stream_player)
 	
 	if !new_stream_player.is_inside_tree():
 		yield(new_stream_player, "ready")
