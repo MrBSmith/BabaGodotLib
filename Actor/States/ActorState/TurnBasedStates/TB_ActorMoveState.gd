@@ -1,4 +1,4 @@
-extends ActorMoveState
+extends StateBase
 class_name TB_ActorMoveState
 
 #### ACCESSORS ####

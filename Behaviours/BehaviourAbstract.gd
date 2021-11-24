@@ -12,6 +12,10 @@ func get_behaviour_type() -> String: return behaviour_type
 
 #### BUILT-IN ####
 
+func _ready() -> void:
+	yield(owner, "ready")
+	
+	owner.add_to_group(behaviour_type)
 
 
 #### VIRTUALS ####

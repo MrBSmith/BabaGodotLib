@@ -1,6 +1,9 @@
 extends Behaviour
 class_name AwakableBehaviour
 
+signal awake
+signal asleep
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "AwakableBehaviour" or .is_class(value)
@@ -11,6 +14,7 @@ func get_class() -> String: return "AwakableBehaviour"
 
 func _ready() -> void:
 	yield(owner, "ready")
+	
 	var __ = owner.connect("sleeping_state_changed", self, "_on_owner_sleeping_state_changed")
 
 #### VIRTUALS ####
@@ -20,13 +24,26 @@ func _ready() -> void:
 #### LOGIC ####
 
 # Awake this instance, generaly called by a surrounding body when destoyed
-func awake():
+func awake() -> void:
 	if not owner is PhysicsBody2D && owner.get_mode() != RigidBody2D.MODE_STATIC:
 		return
 
 	owner.set_mode(RigidBody2D.MODE_RIGID)
 	owner.set_sleeping(false)
 	owner.set_physics_process(true)
+	
+	emit_signal("awake")
+
+
+func asleep() -> void:
+	if not owner is PhysicsBody2D && owner.get_mode() != RigidBody2D.MODE_RIGID:
+		return
+
+	owner.set_mode(RigidBody2D.MODE_STATIC)
+	owner.set_sleeping(true)
+	owner.set_physics_process(false)
+	
+	emit_signal("asleep")
 
 
 #### INPUTS ####

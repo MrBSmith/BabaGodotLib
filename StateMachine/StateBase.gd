@@ -4,6 +4,8 @@ class_name StateBase
 func get_class() -> String : return "StateBase"
 func is_class(value: String) -> bool: return value == "StateBase" or .is_class(value)
 
+export var toggle_state_mode : bool = false
+
 # Abstract base class for a state in a statemachine
 
 # Defines the behaviour of the entity possesing the statemachine 
@@ -36,3 +38,10 @@ func is_current_state() -> bool:
 		return states_machine.current_state == self && states_machine.is_current_state()
 	else:
 		return states_machine.current_state == self
+
+
+func exit_toggle_state() -> void:
+	if states_machine.is_class("PushdownAutomata"):
+		states_machine.go_to_previous_non_toggle_state()
+	else:
+		states_machine.set_state(states_machine.previous_state)

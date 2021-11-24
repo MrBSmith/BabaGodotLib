@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://BabaGodotLib/Behaviours/Collectable/FollowCollectable.gd" type="Script" id=1]
-[ext_resource path="res://BabaGodotLib/Absract/StateMachine/StateMachine.gd" type="Script" id=2]
-[ext_resource path="res://BabaGodotLib/Absract/StateMachine/StateBase.gd" type="Script" id=3]
+[ext_resource path="res://BabaGodotLib/StateMachine/StateMachine.gd" type="Script" id=2]
+[ext_resource path="res://BabaGodotLib/StateMachine/StateBase.gd" type="Script" id=3]
 [ext_resource path="res://BabaGodotLib/Behaviours/Collectable/CollectableBehaviourAbstract.tscn" type="PackedScene" id=4]
 
 [node name="FollowCollectable" instance=ExtResource( 4 )]

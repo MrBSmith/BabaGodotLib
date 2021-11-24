@@ -11,8 +11,7 @@ func get_class() -> String: return "AwakerBehaviour"
 
 #### BUILT-IN ####
 
-func _ready() -> void:
-	owner.add_to_group("Awaker")
+
 
 #### VIRTUALS ####
 
