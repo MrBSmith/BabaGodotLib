@@ -44,6 +44,10 @@ func _update_animation(state: Node):
 	else:
 		if sprite_frames.has_animation(state_name):
 			animated_sprite.play(state_name)
+		
+		elif state.toggle_state_mode:
+			state.exit_toggle_state()
+
 
 
 
