@@ -1,6 +1,21 @@
 extends Behaviour
 class_name DestructibleBehaviour
 
+# This Behaviour makes its parent destructible
+# The destructible object can be damaged using the damage method
+# when its hp reachs zero, the destroy method will be called
+
+# If it has a DestroySound child (should be a AudioStreamPlayer or a AudioStreamPlayer2D)
+# a play_sound_effect event will be called when the destroy method is called
+
+# If it has a Particles2D child (should be a Particles2D)
+# a play_particule_FX event will be called when the destroy method is called
+
+# Then the destroy_animation_started signal will be called (before the animation starts)
+# If it has a AnimationPlayer and it has a Destroy animation, this animation will be launched
+# then the destroyed signal is called when the animation is over
+
+
 onready var animation_player = get_node_or_null("AnimationPlayer")
 onready var damage_computer = get_node_or_null("DamageComputer")
 onready var destroy_sound = get_node_or_null("DestroySound")
@@ -14,7 +29,6 @@ signal hp_changed(hp_value)
 signal destroy_animation_started()
 signal damaged()
 signal destroyed()
-signal body_approched(body)
 
 #### ACCESSORS ####
 
@@ -82,7 +96,3 @@ func _on_hp_changed(hp_value: int) -> void:
 	
 	if hp_value == 0:
 		destroy()
-
-
-func _on_body_entered(body: Node2D) -> void:
-	emit_signal("body_approched", body)

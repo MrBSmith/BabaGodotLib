@@ -1,6 +1,13 @@
 extends Behaviour
 class_name AwakerBehaviour
 
+# This Behaviour awake bodies that has the Awakable Behaviour and are 
+# inside the AwakeArea when awake_nearby_bodies
+
+# Most of the time you don't have to write any line of code, just define
+# awake_nearby_bodies as an answer for a signal and connect the signal 
+# from the editor and voilà!
+
 onready var awake_area = $AwakeArea
 
 #### ACCESSORS ####

@@ -1,6 +1,11 @@
 extends Behaviour
 class_name AwakableBehaviour
 
+# This Behaviour should always be a child of a RigidBody2D
+# It is usefull mainly in conjontion with an AwakerBehaviour
+
+# It defines how a RigidBody2D can fall asleep or be awaken
+
 signal awake
 signal asleep
 

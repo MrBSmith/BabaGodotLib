@@ -3,7 +3,7 @@ class_name CollectableBehaviour
 
 #### Abstract class CollectableBehaviour ####
 
-# This class can be extended and attached to ant node to give 
+# This class can be extended and attached to any node to give 
 # it the behaviour of a collectable
 
 onready var collect_sound = get_node_or_null("CollectSound")
@@ -15,8 +15,6 @@ export var collectable_name : String = "" setget set_collectable_name, get_colle
 
 export var average_amount : int = 1
 export(float, 0.0, 1.0) var amount_variance : float = 0.0
-
-export var disabled : bool = false setget set_disabled, is_disabled
 
 var target : Node = null setget set_target, get_target
 
@@ -39,8 +37,6 @@ func get_collectable_name() -> String:
 	var col_name = collectable_name if collectable_name != "" or owner == null else owner.get_class()
 	return col_name
 
-func set_disabled(value: bool) -> void: disabled = value
-func is_disabled() -> bool: return disabled
 
 #### BUILT-IN ####
 
@@ -51,8 +47,6 @@ func _ready():
 	
 	if animation_player:
 		animation_player.connect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
-	
-	owner.add_to_group("Collectable")
 
 #### VIRTUALS ####
 

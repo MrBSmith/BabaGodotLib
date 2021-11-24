@@ -1,6 +1,13 @@
 extends Behaviour
 class_name ApproachBehaviour
 
+# This Behaviour is meant to notify when a certain type of body enters/exits its Area2D
+# by sending body_approached and body_moved_away signals
+# wanted_body_class defines the type the body should be in order to trigger the signals
+
+# It can also have a Baba_Raycast2D as a child. In such case the raycast will
+# check if the body is in clear line of sight before sending the body_approached signal
+
 onready var raycast = get_node_or_null("Baba_Raycast2D")
 
 export var wanted_body_class : String = "Player"

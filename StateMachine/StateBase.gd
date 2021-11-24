@@ -40,6 +40,8 @@ func is_current_state() -> bool:
 		return states_machine.current_state == self
 
 
+# Defines the behaviour this state should have when the state is in toggle mode &
+# its animation is finished or doesn't exist: what state it should go to
 func exit_toggle_state() -> void:
 	if states_machine.is_class("PushdownAutomata"):
 		states_machine.go_to_previous_non_toggle_state()
