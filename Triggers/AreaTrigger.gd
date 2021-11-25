@@ -1,7 +1,7 @@
 extends Trigger
 class_name AreaTrigger
 
-export var wanted_class : String = "Player"
+export var wanted_robot : String = "Player"
 
 var instance_triggering : Node2D = null
 
@@ -34,12 +34,12 @@ func _ready() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_area_body_entered(body: Node2D) -> void:
-	if body.is_class(wanted_class) && body != owner:
+	if (body.get_name() == wanted_robot or body.is_class(wanted_robot))  && body != owner:
 		instance_triggering = body
 		trigger()
 
 
 func _on_area_area_entered(area: Area2D) -> void:
-	if area.is_class(wanted_class) && area != owner:
+	if (area.get_name() == wanted_robot or area.is_class(wanted_robot)) && area != owner:
 		instance_triggering = area
 		trigger()

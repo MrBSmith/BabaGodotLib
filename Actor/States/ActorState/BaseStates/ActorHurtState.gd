@@ -1,4 +1,4 @@
-extends TRPG_ActorStateBase
+extends StateBase
 class_name ActorHurtState
 
 signal hurt_feedback_finished
