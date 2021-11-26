@@ -34,19 +34,12 @@ func _ready() -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_collect_obj_event(obj: Collectable):
-	if obj == null or obj.get_collectable_name() != collectable_type:
+func _on_collect_obj_event(behaviour: CollectableBehaviour, col_type: String):
+	if behaviour == null or col_type != collectable_type:
 		return
 	
-	var obj_duplicate = obj.duplicate()
-	var obj_pos = obj.get_global_transform_with_canvas().origin
-	obj_duplicate.connect("collect_animation_finished", self, "_on_obj_collect_animation_finished")
-	owner.call_deferred("add_child", obj_duplicate)
-	
-	obj_duplicate.set_position(obj_pos)
-	obj_duplicate.trigger_collect_animation($Texture)
-	
-	obj.queue_free()
+	behaviour.set_target($Texture)
+
 
 
 func _on_obj_collect_animation_finished():
