@@ -26,6 +26,7 @@ func _ready() -> void:
 func _update_animation(state: Node):
 	var audio_stream_player = state.get_node_or_null("AudioStreamPlayer")
 	var state_name = state.name
+	var previous_state = states_machine.previous_state
 	
 	if audio_stream_player != null:
 		audio_stream_player.stop()
@@ -37,9 +38,14 @@ func _update_animation(state: Node):
 	var sprite_frames = animated_sprite.get_sprite_frames()
 	if sprite_frames == null:
 		return
+	
+	var trans_anim_name = previous_state.name + "To" + state_name if previous_state else ""
 
 	if sprite_frames.has_animation("Start" + state_name):
 		animated_sprite.play("Start" + state_name)
+	
+	elif previous_state && sprite_frames.has_animation(trans_anim_name):
+		animated_sprite.play(trans_anim_name)
 
 	else:
 		if sprite_frames.has_animation(state_name):
@@ -58,22 +64,21 @@ func _on_animation_finished():
 		return
 	
 	var state = get_parent().get_state()
-	var current_state_name = state.name
+	var state_name = state.name
 	
 	var sprite_frames = animated_sprite.get_sprite_frames()
 	var current_animation = animated_sprite.get_animation()
 	
-	if !current_state_name.is_subsequence_ofi(current_animation):
+	if !state_name.is_subsequence_ofi(current_animation):
 		return
 	
-	if !"Start".is_subsequence_ofi(current_animation):
+	if current_animation == "Start" + state_name or ("To" + state_name).is_subsequence_ofi(current_animation):
+		if sprite_frames != null and sprite_frames.has_animation(state_name):
+			animated_sprite.play(state_name)
+		
+	elif current_animation == state_name:
 		if state.toggle_state_mode:
 			state.exit_toggle_state()
-	
-	if current_animation == "Start" + current_state_name:
-		if sprite_frames != null and sprite_frames.has_animation(current_state_name):
-			animated_sprite.play(current_state_name)
-
 
 
 func _on_StatesMachine_state_changed(new_state: Node) -> void:
