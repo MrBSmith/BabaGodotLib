@@ -30,6 +30,9 @@ func _ready() -> void:
 
 # Awake this instance, generaly called by a surrounding body when destoyed
 func awake() -> void:
+	if disabled:
+		return
+	
 	if not owner is PhysicsBody2D && owner.get_mode() != RigidBody2D.MODE_STATIC:
 		return
 
@@ -41,6 +44,9 @@ func awake() -> void:
 
 
 func asleep() -> void:
+	if disabled:
+		return
+
 	if not owner is PhysicsBody2D && owner.get_mode() != RigidBody2D.MODE_RIGID:
 		return
 

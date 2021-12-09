@@ -5,15 +5,20 @@ class_name BuoyableBehaviour
 # Must be attached to a RigidBody2D for it to work
 # You must provide the path of the body's CollisionShape2D for it to work
 
-const DEFAULT_LIQUID_MASS : float = 10000.0
+const DEFAULT_LIQUID_MASS : float = 0.000227202 * 1.069
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 export var draw_obj_polygons := false
 export var draw_intersection_polygons := true
 
+export var submerged_gravity_scale : float = 1.5
+
 export var collision_shape_path : NodePath = ""
 onready var collision_shape : CollisionShape2D = get_node(collision_shape_path)
+
+onready var total_obj_volume = Math.compute_polygon_surface(collision_shape.get_shape().get_points())
+onready var owner_default_gravity_scale = owner.gravity_scale
 
 var liquid_collision_shape : CollisionShape2D = null
 
@@ -37,7 +42,7 @@ func _process(_delta: float) -> void:
 	liquid_polygon = Math.rect_shape_to_polygon(liquid_collision_shape.get_shape(), liquid_collision_shape.get_global_transform())
 	intersect_polygon_array = Geometry.intersect_polygons_2d(body_polygon, liquid_polygon)
 	
-	var submerged_surface = Math.compute_polygon_surface(intersect_polygon_array)
+	var submerged_surface = Math.compute_polygon_surface(intersect_polygon_array[0]) if !intersect_polygon_array.empty() else 0.0
 	
 	if draw_intersection_polygons or draw_obj_polygons:
 		update()
@@ -66,10 +71,14 @@ func _draw() -> void:
 #### LOGIC ####
 
 func _apply_buoyancy(submerged_surface: float) -> void:
+	var submerged_volume_ratio = submerged_surface / total_obj_volume
+	
+	owner.set_gravity_scale(lerp(submerged_gravity_scale, owner_default_gravity_scale, 1.0 - submerged_volume_ratio))
 	var displaced_mass = DEFAULT_LIQUID_MASS * submerged_surface
 	var force = Vector2.UP * displaced_mass * (gravity * owner.gravity_scale)
 	
-	owner.set_applied_force(force)
+	owner.set_applied_force(Vector2.ZERO)
+	owner.add_central_force(force)
 
 
 
