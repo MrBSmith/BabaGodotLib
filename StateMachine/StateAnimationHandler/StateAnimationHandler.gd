@@ -75,8 +75,7 @@ func _on_animation_finished():
 	if current_animation == "Start" + state_name or ("To" + state_name).is_subsequence_ofi(current_animation):
 		if sprite_frames != null and sprite_frames.has_animation(state_name):
 			animated_sprite.play(state_name)
-		
-	elif current_animation == state_name:
+	else:
 		if state.toggle_state_mode:
 			state.exit_toggle_state()
 
