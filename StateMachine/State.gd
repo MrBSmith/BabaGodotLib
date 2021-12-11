@@ -1,8 +1,8 @@
 extends Node
-class_name StateBase
+class_name State
 
-func get_class() -> String : return "StateBase"
-func is_class(value: String) -> bool: return value == "StateBase" or .is_class(value)
+func get_class() -> String : return "State"
+func is_class(value: String) -> bool: return value == "State" or .is_class(value)
 
 export var toggle_state_mode : bool = false
 
@@ -32,7 +32,7 @@ func update_state(_delta):
 	pass
 
 
-# Check if the entity is in this state. Check reccursivly in cas of nested StatesMachines/PushdownAutomata
+# Check if the entity is in this state. Check reccursivly in cas of nested StateMachines/PushdownAutomata
 func is_current_state() -> bool:
 	if states_machine.has_method("is_current_state"):
 		return states_machine.current_state == self && states_machine.is_current_state()

@@ -1,10 +1,10 @@
-extends StateBase
-class_name TRPG_ActorStateBase
+extends State
+class_name TRPG_ActorState
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "TRPG_ActorStateBase" or .is_class(value)
-func get_class() -> String: return "TRPG_ActorStateBase"
+func is_class(value: String): return value == "TRPG_ActorState" or .is_class(value)
+func get_class() -> String: return "TRPG_ActorState"
 
 
 #### BUILT-IN ####

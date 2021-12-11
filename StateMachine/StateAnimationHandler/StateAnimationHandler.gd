@@ -17,7 +17,7 @@ func get_class() -> String: return "StateAnimationHandler"
 func _ready() -> void:
 	yield(owner, "ready")
 	
-	var __ = get_parent().connect("state_changed", self, "_on_StatesMachine_state_changed")
+	var __ = get_parent().connect("state_changed", self, "_on_StateMachine_state_changed")
 	__ = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
 
 #### VIRTUALS ####
@@ -80,5 +80,5 @@ func _on_animation_finished():
 			state.exit_toggle_state()
 
 
-func _on_StatesMachine_state_changed(new_state: Node) -> void:
+func _on_StateMachine_state_changed(new_state: Node) -> void:
 	_update_animation(new_state)

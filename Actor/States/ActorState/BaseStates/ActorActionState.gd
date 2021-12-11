@@ -1,4 +1,4 @@
-extends StateBase
+extends State
 class_name ActorActionState
 
 export var interact_frame : int = 2

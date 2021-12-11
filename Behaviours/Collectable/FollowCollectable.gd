@@ -1,7 +1,7 @@
 extends Collectable
 class_name FollowCollectable
 
-onready var state_machine = get_node("StatesMachine")
+onready var state_machine = get_node("StateMachine")
 
 export var default_state : String = ""
 

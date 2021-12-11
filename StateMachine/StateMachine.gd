@@ -1,8 +1,8 @@
-extends Node2D
-class_name StatesMachine
+extends State
+class_name StateMachine
 
 # An implementation of the Finite State Machine design pattern
-# Each state must inherit StateBase and be a child node of a StatesMachine node
+# Each state must inherit State and be a child node of a StateMachine node
 # The states are distinguished by the name of their corresponding node
 
 # Each state defines the behaviour of the entity possesing this statemachine when the entity is in this state
@@ -12,9 +12,9 @@ class_name StatesMachine
 # The default state is always the first in the tree unless the owner of the scene 
 # has a default_state property (Must be a String corresponding to the name of a State node)
 
-# States Machines can also be nested (Its children are also StatesMachines)
+# States Machines can also be nested (Its children are also StateMachines)
 # In that case the StateMachine behave also as a state, and the enter_state callback is called recursivly
-# Note that nested StatesMachines that are not the current_state of their parent should have their current_state to null
+# Note that nested StateMachines that are not the current_state of their parent should have their current_state to null
 # That is why the exit_state function is setting the current state to null
 
 var current_state : Object = null
@@ -22,7 +22,7 @@ var previous_state : Object = null
 var default_state : Object = null
 export var no_default_state : bool = false
 
-# Usefull only if this instance of StatesMachine is nested (ie its parent is also a StatesMachine)
+# Usefull only if this instance of StateMachine is nested (ie its parent is also a StateMachine)
 # When this state is entered, if this bool is true, reset the child state to the default one
 export var reset_to_default : bool = false
 
@@ -31,10 +31,10 @@ signal state_changing(from_state, to_state)
 
 # Called after the state have changed (After the enter_state callback)
 signal state_changed(state)
-signal substate_changed(state)
+signal state_changed_recursive(state)
 
-func is_class(value: String): return value == "StatesMachine" or .is_class(value)
-func get_class() -> String: return "StatesMachine"
+func is_class(value: String): return value == "StateMachine" or .is_class(value)
+func get_class() -> String: return "StateMachine"
 
 #### BUILT-IN ####
 
@@ -42,20 +42,20 @@ func get_class() -> String: return "StatesMachine"
 func _ready():
 	yield(owner, "ready")
 	
+	var __ = connect("state_changed", self, "_on_state_changed")
+	
+	if get_parent().is_class("StateMachine"):
+		__ = connect("state_changed_recursive", get_parent(), "_on_State_state_changed_recursive")
+	
 	# Get the default_state
 	var owner_default_state_name = owner.get("default_state")
 	var owner_default_state = get_node_or_null(owner_default_state_name) if owner_default_state_name != null else null
 	default_state = get_child(0) if owner_default_state == null else owner_default_state
 	
-	# Set the state to be the default one, unless we are in a nested statesmachine
-	# Nested StatesMachines shouldn't have a current_state if they are not the current_state of its parent
+	# Set the state to be the default one, unless we are in a nested StateMachine
+	# Nested StateMachines shouldn't have a current_state if they are not the current_state of its parent
 	if !is_nested() && !no_default_state:
 		set_state(default_state)
-	
-	# Connect sub-statesmachines
-	for child in get_children():
-		if child.is_class("StatesMachine"):
-			var __ = child.connect("state_changed", self, "_on_substate_state_changed")
 
 
 # Call for the current state process at every frame of the physic process
@@ -84,8 +84,12 @@ func get_state_name() -> String:
 
 # Set current_state at a new state, also set previous state, 
 # and emit a signal to notify the change, to anybody needing it
-# The new_state argument can either be a StateBase or a String representing the name of the targeted State
+# The new_state argument can either be a State or a String representing the name of the targeted State
 func set_state(new_state):
+	# This method can handle only String and States
+	if not new_state is State and not new_state is String and new_state != null:
+		return 
+	
 	# If the given argument is a string, get the node that has the name that correspond
 	if new_state is String:
 		new_state = get_node_or_null(new_state)
@@ -116,23 +120,24 @@ func set_state_by_id(state_id: int):
 	if state == null:
 		if state_id >= get_child_count() or state_id < 0:
 			push_error("The given state_id is out of bound")
-		elif !state.is_class("StateBase"):
+		
+		elif !state.is_class("State"):
 			push_error("The child of the statemachine pointed by the state_id: " + String(state_id)
-			 + " does not inherit StateBase")
+			 + " does not inherit State")
 	else:
 		set_state(state)
 
 
-# Returns true if a state with the given name is a direct child of the statemachine, and inherit StateBase
+# Returns true if a state with the given name is a direct child of the statemachine, and inherit State
 func has_state(state_name: String) -> bool:
 	for state in get_children():
-		if state.is_class("StateBase") && state.name == state_name:
+		if state.is_class("State") && state.name == state_name:
 			return true
 	return false
 
 
 func is_nested() -> bool:
-	return get_parent().is_class("StatesMachine")
+	return get_parent().is_class("StateMachine")
 
 
 # Set state by incrementing its id (id of the node, ie position in the hierachy)
@@ -141,8 +146,8 @@ func increment_state(increment: int = 1, wrapping : bool = true):
 	var id = wrapi(current_state_id + increment, 0, get_child_count()) if wrapping else current_state_id + increment 
 	var state = get_child(id)
 	
-	if state == null or not state is StateBase:
-		while(!state is StateBase):
+	if state == null or not state is State:
+		while(!state is State):
 			if wrapping:
 				id = wrapi(id + increment, 0, get_child_count())
 			else:
@@ -153,14 +158,14 @@ func increment_state(increment: int = 1, wrapping : bool = true):
 	
 	if state == null:
 		print_debug("There is no node at the given id: " + String(id))
-	elif !(state is StateBase):
-		print_debug("The node found at the id: " + String(id) + " does not inherit StateBase")
+	elif !(state is State):
+		print_debug("The node found at the id: " + String(id) + " does not inherit State")
 	else:
 		set_state(state)
 
 
 #### NESTED STATES MACHINES LOGIC ####
-# Applies only if this StatesMachine instance is nested (ie if it has a StatesMachine as a parent)
+# Applies only if this StateMachine instance is nested (ie if it has a StateMachine as a parent)
 
 func enter_state():
 	if (reset_to_default && current_state != default_state) or current_state == null:
@@ -180,7 +185,7 @@ func update_state(delta: float):
 
 func is_current_state() -> bool:
 	var parent = get_parent()
-	if parent is StateBase or (parent.is_class("StatesMachine") && parent.is_nested()):
+	if parent is State or (parent.is_class("StateMachine") && parent.is_nested()):
 		return parent.current_state == self && parent.is_current_state()
 	else:
 		return true
@@ -188,5 +193,9 @@ func is_current_state() -> bool:
 
 #### SIGNAL RESPONSES ####
 
-func _on_substate_state_changed(state: Object):
-	emit_signal("substate_changed", state)
+func _on_state_changed(_state: Node) -> void:
+	emit_signal("state_changed_recursive", current_state)
+
+
+func _on_State_state_changed_recursive(_state: Node) -> void:
+	emit_signal("state_changed_recursive", current_state)

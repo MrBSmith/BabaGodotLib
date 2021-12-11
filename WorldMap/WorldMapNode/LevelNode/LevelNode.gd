@@ -65,9 +65,9 @@ func set_level_name(value: String):
 	$Label.set_text(level_name)
 func get_level_name() -> String: return level_name
 
-func set_state(value): $StatesMachine.set_state(value)
-func get_state() -> StateBase: return $StatesMachine.get_state()
-func get_state_name() -> String: return $StatesMachine.get_state_name()
+func set_state(value): $StateMachine.set_state(value)
+func get_state() -> State: return $StateMachine.get_state()
+func get_state_name() -> String: return $StateMachine.get_state_name()
 
 #### BUILT-IN ####
 

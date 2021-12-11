@@ -1,4 +1,4 @@
-extends StateBase
+extends State
 class_name ActorHurtState
 
 signal hurt_feedback_finished

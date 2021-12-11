@@ -1,4 +1,4 @@
-extends StatesMachine
+extends StateMachine
 class_name PushdownAutomata
 
 export var debug : bool = false

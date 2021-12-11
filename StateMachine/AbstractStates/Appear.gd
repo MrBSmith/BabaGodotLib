@@ -1,4 +1,4 @@
-extends StateBase
+extends State
 class_name AppearState
 
 #### ACCESSORS ####

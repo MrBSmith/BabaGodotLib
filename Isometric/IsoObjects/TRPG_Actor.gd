@@ -1,7 +1,7 @@
 extends TRPG_DamagableObject
 class_name TRPG_Actor
 
-onready var statesmachine = $States
+onready var statemachine = $States
 onready var move_node = $States/Move
 onready var sfx_node = get_node_or_null("SFX")
 
@@ -89,9 +89,9 @@ func get_current_actions(): return current_actions
 func set_current_movements(value : int): current_movements = value
 func get_current_movements(): return current_movements
 
-func set_state(value : String): statesmachine.set_state(value)
-func get_state() -> Object: return statesmachine.get_state()
-func get_state_name() -> String: return statesmachine.get_state_name()
+func set_state(value : String): statemachine.set_state(value)
+func get_state() -> Object: return statemachine.get_state()
+func get_state_name() -> String: return statemachine.get_state_name()
 
 func set_jump_max_height(value : int): jump_max_height = value
 func get_jump_max_height() -> int: return jump_max_height
@@ -211,7 +211,7 @@ func _init():
 func _ready():
 	var _err = connect("cell_changed", self, "_on_cell_changed")
 	_err = connect("action_finished", self, "_on_action_finished")
-	_err = statesmachine.connect("state_changed", self, "_on_state_changed")
+	_err = statemachine.connect("state_changed", self, "_on_state_changed")
 	_err = $States/Hurt.connect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
 	
 	if current_actions == -1: set_current_actions(get_max_actions())
@@ -364,7 +364,7 @@ func set_flip_h_SFX(value: bool) -> void:
 func _on_state_changed(new_state: Object) -> void:
 	emit_signal("state_changed", new_state)
 	
-	var previous_state = statesmachine.previous_state
+	var previous_state = statemachine.previous_state
 	
 	if previous_state != null:
 		if active:
