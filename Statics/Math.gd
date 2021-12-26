@@ -71,3 +71,5 @@ static func rect_shape_to_polygon(rect_shape: RectangleShape2D, trans: Transform
 	)
 
 	return trans.xform(local_coords)
+
+

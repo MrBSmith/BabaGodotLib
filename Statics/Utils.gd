@@ -111,3 +111,42 @@ static func vec2_to_vec3(vec2: Vector2, z: float) -> Vector3:
 
 static func vec2_from_vec3(vec3: Vector3) -> Vector2:
 	return Vector2(vec3.x, vec3.y)
+
+
+static func find_most_top_left_v2(array: PoolVector2Array) -> Vector2:
+	var top_left_v = Vector2.INF
+	for v in array:
+		if v.y < top_left_v.y or (v.y == top_left_v.y && v.x < top_left_v.x):
+			top_left_v = v
+	return top_left_v
+
+
+static func find_most_bottom_right_v2(array: PoolVector2Array) -> Vector2:
+	var bottom_right_v = -Vector2.INF
+	for v in array:
+		if -v.y > bottom_right_v.y or (v.y == bottom_right_v.y && v.x > bottom_right_v.x):
+			bottom_right_v = v
+	return bottom_right_v
+
+
+static func rect2poly(rect: Rect2) -> PoolVector2Array:
+	return PoolVector2Array([
+		rect.position,
+		rect.position + rect.size * Vector2.RIGHT,
+		rect.end,
+		rect.position + rect.size * Vector2.DOWN
+	])
+
+
+# This method takes a polygon representing a rectangle and convert it to Rect2
+# The polygon must have exactly 4 points, and the points must be 
+# disposed as a rectangle or it will result as unexpected behaviours
+static func poly2rect(polygon: PoolVector2Array) -> Rect2:
+	if polygon.size() != 4:
+		push_error("The given polygon doesn't have the right amount of points, it must have exactlty 4 points")
+		return Rect2()
+	
+	var top_left = find_most_top_left_v2(polygon)
+	var bottom_right = find_most_bottom_right_v2(polygon)
+	
+	return Rect2(top_left, bottom_right - top_left)
