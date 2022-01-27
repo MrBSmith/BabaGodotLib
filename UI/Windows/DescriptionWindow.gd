@@ -49,8 +49,8 @@ func add_line(line_data: LineData, line_id: int = -1):
 	var line = null
 	
 	match(line_data.get_class()):
-		"NormalLineData" : line = instanciate_normal_line(line_data)
-		"IconsLineData" : line = instanciate_icon_line(line_data)
+		"NormalLineData" : line = instantiate_normal_line(line_data)
+		"IconsLineData" : line = instantiate_icon_line(line_data)
 	
 	lines_container.add_child(line)
 	line.set_hidden(false)
@@ -62,7 +62,7 @@ func add_line(line_data: LineData, line_id: int = -1):
 		lines_container.move_child(line, line_id)
 
 
-func instanciate_normal_line(line_data: NormalLineData) -> TextLineContainer:
+func instantiate_normal_line(line_data: NormalLineData) -> TextLineContainer:
 	var line : TextLineContainer = text_line_container_scene.instance()
 	
 	line.set_text(line_data.text)
@@ -72,7 +72,7 @@ func instanciate_normal_line(line_data: NormalLineData) -> TextLineContainer:
 	return line
 
 
-func instanciate_icon_line(line_data: LineData):
+func instantiate_icon_line(line_data: LineData):
 	var line : IconsLineContainer = icon_line_container_scene.instance()
 	
 	line.set_icons_array(line_data.get_icons_array())

@@ -149,7 +149,7 @@ func _update_options():
 		# Add needed options
 		if must_option_be_displayed(i):
 			if option_already_displayed == null or !option_already_displayed.is_inside_tree():
-				var option = instanciate_option(data_array[i])
+				var option = instantiate_option(data_array[i])
 				
 				column.add_child(option)
 				option.connect("option_chose", self, "_on_option_chose")
@@ -174,7 +174,7 @@ func _update_columns_size():
 		column.set_size(column_container.get_size() / Vector2(column_container.get_child_count(), 1))
 
 
-func instanciate_option(data_container: OptionDataContainer) -> Button:
+func instantiate_option(data_container: OptionDataContainer) -> Button:
 	var option = menu_option_scene.instance()
 	option.set_text(data_container.name)
 	option.set_amount(data_container.amount)

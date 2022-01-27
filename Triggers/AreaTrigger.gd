@@ -1,14 +1,16 @@
 extends Trigger
 class_name AreaTrigger
+
 func is_class(value: String): return value == "AreaTrigger" or .is_class(value)
 func get_class() -> String: return "AreaTrigger"
 
 onready var areatrigger_node : Area2D = $Area2D
 
-var wanted_robot : String = ""
+export var wanted_robot : String = ""
 var instance_triggering : Node2D = null
 
 #### ACCESSORS ####
+
 
 #### BUILT-IN ####
 
