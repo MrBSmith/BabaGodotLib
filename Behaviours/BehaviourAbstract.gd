@@ -2,7 +2,7 @@ extends Node2D
 class_name Behaviour
 
 # This is an abstract class for a Behaviour
-# Behaviours should be instanced as a child of the node that should behave in a certain way
+# Behaviours should be instantiated as a child of the node that should behave in a certain way
 # It defines how its parent node behaves
 
 # You can know if a certain node has a certain behaviour by calling node.is_in_group() 
