@@ -33,13 +33,15 @@ func _ready() -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_area_body_entered(body: Node2D) -> void:
-	if (body.get_name() == wanted_robot or body.is_class(wanted_robot))  && body != owner:
-		instance_triggering = body
-		trigger()
+func _on_area_body_entered(body: PhysicsBody2D) -> void:
+	if not owner.is_active():
+		if is_instance_valid(body) and (body.get_name() == wanted_robot or body.is_class(wanted_robot))  && body != owner:
+			instance_triggering = body
+			trigger()
 
 
 func _on_area_area_entered(area: Area2D) -> void:
-	if (area.get_name() == wanted_robot or area.is_class(wanted_robot)) && area != owner:
-		instance_triggering = area
-		trigger()
+	if not owner.is_active():
+		if is_instance_valid(area) and (area.get_name() == wanted_robot or area.is_class(wanted_robot)) && area != owner:
+			instance_triggering = area
+			trigger()
