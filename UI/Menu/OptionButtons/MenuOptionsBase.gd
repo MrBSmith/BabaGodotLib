@@ -92,11 +92,11 @@ func _ready() -> void:
 	
 	_err = connect("focus_changed", self, "_on_focus_changed")
 	_err = connect("gui_input", self, "_on_gui_input")
-	_err = connect("hidden_changed", self, "_on_hidden_changed")
 	
 	set_text(text)
 	
 	if !Engine.editor_hint:
+		_err = connect("hidden_changed", self, "_on_hidden_changed")
 		_on_hidden_changed()
 		emit_signal("focus_changed", self, is_focused())
 	
@@ -149,6 +149,7 @@ func _on_focus_changed(entity: Control, focus: bool) -> void:
 
 
 func _on_hidden_changed() -> void:
+	
 	if hidden:
 		set_modulate(Color.transparent)
 	else:

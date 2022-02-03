@@ -20,6 +20,18 @@ const DIRECTIONS_8 : Dictionary = {
 }
 
 
+static func dict_find_key(dict: Dictionary, wanted_key: String, case_sensitive: bool = true) -> int:
+	for i in range(dict.keys().size()):
+		var key = dict.keys()[i]
+		if case_sensitive:
+			if key == wanted_key:
+				return i
+		else:
+			if key.nocasecmp_to(wanted_key) == 0:
+				return i
+	return -1
+
+
 # Find the name of the given direction and returns it as a String
 static func find_dir_name(dir: Vector2) -> String:
 	var dir_values_array = DIRECTIONS_8.values()
