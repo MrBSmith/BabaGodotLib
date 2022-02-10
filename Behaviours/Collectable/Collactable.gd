@@ -58,7 +58,7 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 	if body == null or is_disabled():
 		return
 	
-	if body.is_class("Player"):
+	if body.is_class("Player") or body.is_class("Character"):
 		collect()
 
 

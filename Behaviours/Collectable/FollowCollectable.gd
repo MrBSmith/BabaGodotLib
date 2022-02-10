@@ -51,6 +51,6 @@ func _on_follow_area_body_entered(body: Node):
 	if is_disabled():
 		return
 	
-	if body.is_class("Player"):
+	if body.is_class("Player") or body.is_class("Character"):
 		follow_target(body)
 
