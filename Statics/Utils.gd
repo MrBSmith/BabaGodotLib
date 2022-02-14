@@ -20,6 +20,8 @@ const DIRECTIONS_8 : Dictionary = {
 }
 
 
+# Finds the given wanted_key in the given dict and returns its id
+# You can operate a case sensitive search or not based on case_sensitive value
 static func dict_find_key(dict: Dictionary, wanted_key: String, case_sensitive: bool = true) -> int:
 	for i in range(dict.keys().size()):
 		var key = dict.keys()[i]
@@ -30,6 +32,12 @@ static func dict_find_key(dict: Dictionary, wanted_key: String, case_sensitive: 
 			if key.nocasecmp_to(wanted_key) == 0:
 				return i
 	return -1
+
+
+# Finds the first key that matches the given value in the given Dictionary and returns it
+static func dict_find_key_by_value(dict: Dictionary, value) -> String:
+	var id = dict.values().find(value)
+	return dict.keys()[id]
 
 
 # Find the name of the given direction and returns it as a String
