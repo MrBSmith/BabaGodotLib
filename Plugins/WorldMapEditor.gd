@@ -61,14 +61,16 @@ func handles(obj: Object) -> bool:
 		if obj.get_binds_count() > 0:
 			generate_button("Delete Binds")
 		
-	elif obj is WorldMapBackgroundElement:
-		generate_button("Previous Texture")
-		generate_button("Next Texture")
-		generate_button("Random Texture")
 		
 	elif obj is LevelNodeBind:
 		generate_button("Reroll Bind Gen")
 	
+	# Handles Background elements
+	elif obj is Sprite:
+		generate_button("Previous Texture")
+		generate_button("Next Texture")
+		generate_button("Random Texture")
+
 	return is_object_handled(obj)
 
 
@@ -166,17 +168,17 @@ func _on_delete_binds_button_pressed():
 
 
 func _on_previous_texture_button_pressed():
-	if current_node_selected is WorldMapBackgroundElement:
+	if current_node_selected is Sprite:
 		current_node_selected.increment_texture_index(-1)
 
 
 func _on_next_texture_button_pressed():
-	if current_node_selected is WorldMapBackgroundElement:
+	if current_node_selected is Sprite:
 		current_node_selected.increment_texture_index(1)
 
 
 func _on_random_texture_button_pressed():
-	if current_node_selected is WorldMapBackgroundElement:
+	if current_node_selected is Sprite:
 		current_node_selected.randomise_texture()
 
 func _on_reroll_bind_gen_button_pressed():
