@@ -262,11 +262,11 @@ func world_to_layer_2D_cell(pos : Vector2, layer_id : int = 0) -> Vector2:
 # Return the actor or obstacle placed on the given cell
 # Works also if the cell is one of the cell the body of the object is in
 # Return null if the cell is empty
-func get_damagable_on_cell(cell: Vector3) -> TRPG_DamagableObject:
+func get_damagable_on_cell(cell: Vector3) -> Object:
 	var damagable_array = get_tree().get_nodes_in_group("IsoObject")
 	
 	for object in damagable_array:
-		if not object is TRPG_DamagableObject:
+		if not object.is_class("TRPG_DamagableObject"):
 			continue
 		
 		if object.is_dead():
