@@ -170,3 +170,28 @@ static func poly2rect(polygon: PoolVector2Array) -> Rect2:
 	var bottom_right = find_most_bottom_right_v2(polygon)
 	
 	return Rect2(top_left, bottom_right - top_left)
+
+
+# Sums the distance between each points of the line to get its total lenght
+# If to_id is -1 compute the line's total length
+# If to_id is a valid id, compute the line's length from line[0] to line[to_id]
+static func compute_line_length(line : PoolVector2Array, to_id : int =  -1) -> float:
+	var previous_point := Vector2.INF
+	var total_dist : float = 0.0
+	var max_id = line.size() if to_id == -1 else to_id + 1
+	
+	for i in range(max_id):
+		var point = line[i]
+		if previous_point != Vector2.INF:
+			total_dist += previous_point.distance_to(point)
+		
+		previous_point = point
+	return total_dist
+
+
+static func find_line_nearest_point(point: Vector2, line: PoolVector2Array) -> Vector2:
+	var nearest_point = Vector2.INF
+	for line_point in line:
+		if point.distance_to(line_point) < point.distance_to(nearest_point):
+			nearest_point = line_point
+	return nearest_point
