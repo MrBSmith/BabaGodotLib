@@ -18,7 +18,8 @@ onready var cursor = $Interactives/Cursor
 
 export var tileset : TileSet = null setget set_tileset, get_tileset
 
-var layer_scene = preload("res://BabaGodotLib/Isometric/IsoMap/IsoMapLayer.tscn")
+export var layer_scene_path : String = ""
+onready var layer_scene = load(layer_scene_path)
 
 var layers_array : Array setget , get_layers_array
 
