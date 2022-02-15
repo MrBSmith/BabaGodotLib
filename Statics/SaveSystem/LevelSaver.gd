@@ -18,7 +18,7 @@ static func serialize_level_properties(property_dict: Dictionary, current_node :
 
 
 # Convert the data to a JSON file
-static func save_level_properties_as_json(property_dict: Dictionary, dir: String, level : Level):
+static func save_level_properties_as_json(property_dict: Dictionary, dir: String, level):
 	var dict_to_json : Dictionary = {}
 	serialize_level_properties(property_dict, level, dict_to_json)
 	

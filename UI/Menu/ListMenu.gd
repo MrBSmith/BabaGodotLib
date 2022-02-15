@@ -79,9 +79,6 @@ func _setup():
 	if !is_ready:
 		yield(self, "ready")
 	_update_whole_display()
-	
-	for column in column_container.get_children():
-		connect_menu_options(column, false)
 
 
 func add_sub_menu(data_array: Array, menu: Node = menu_root):

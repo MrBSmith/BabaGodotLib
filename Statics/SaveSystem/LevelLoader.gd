@@ -3,7 +3,7 @@ class_name LevelLoader
 
 
 # Load the .json level save, deserialize it, then apply the fetched properties to the level
-static func build_level_from_loaded_properties(dir: String, level : Level):
+static func build_level_from_loaded_properties(dir: String, level):
 	if !level.is_inside_tree():
 		yield(level, "tree_entered")
 	
