@@ -16,7 +16,6 @@ func _ready():
 	SFX_node = owner.get_node_or_null("SFX")
 
 
-
 #### VIRTUALS ####
 
 func enter_state():
@@ -31,6 +30,7 @@ func exit_state():
 	if SFX_node != null:
 		SFX_node.play_SFX("JumpDust", false)
 		SFX_node.reset_SFX("JumpDust")
+
 
 #### LOGIC ####
 

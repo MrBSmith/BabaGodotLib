@@ -55,7 +55,8 @@ func set_visibility(value: int):
 #### BUILT-IN FUNCTIONS ####
 
 func _ready() -> void:
-	yield(owner, "ready")
+	if owner != null:
+		yield(owner, "ready")
 	
 	var _err = EVENTS.connect("unfocus_all_iso_object_query", self, "_on_unfocus_all_iso_object_query")
 	_err = $Tween.connect("flash_finished", self, "_on_hurt_flash_finished")

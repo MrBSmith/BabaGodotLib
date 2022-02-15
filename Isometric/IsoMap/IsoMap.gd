@@ -14,7 +14,6 @@ enum SLOPE_TYPE {
 }
 
 onready var pathfinding = $Pathfinding
-onready var layer_0_node = $Layer
 onready var cursor = $Interactives/Cursor
 
 export var tileset : TileSet = null setget set_tileset, get_tileset
@@ -65,6 +64,10 @@ func _ready():
 		return
 	
 	_fetch_layers()
+	
+	if get_layer(0) == null:
+		add_layer(0)
+	
 	for layer in layers_array:
 		set_layer_tileset_recursive(layer)
 	
@@ -173,12 +176,13 @@ func add_layer(height: float) -> void:
 	var nb_layers_to_add = height - highest_layer_z
 	
 	for i in range(nb_layers_to_add):
-		var layer = layer_scene.instance()
-		layers_array.append(layer)
+		var layer = layer_scene.instance(PackedScene.GEN_EDIT_STATE_INSTANCE)
+		layers_array.insert(int(round(height)), layer)
 		call_deferred("add_child", layer)
+		layer.call_deferred("set_owner", self)
 		var layer_pos = Vector2.UP * (highest_layer_z + i + 1) * GAME.TILE_SIZE 
 		layer.set_position(layer_pos)
-		set_layer_tileset_recursive(layer)
+		call_deferred("set_layer_tileset_recursive", layer)
 
 
 func get_highest_layer_z() -> int:
@@ -289,7 +293,7 @@ func array2D_to_grid_cells(line2D: Array) -> PoolVector3Array:
 
 # Take a cell and return its world position
 func cell_to_world(cell: Vector3) -> Vector2:
-	var pos = layer_0_node.map_to_world(Vector2(cell.x, cell.y))
+	var pos = layers_array[0].map_to_world(Vector2(cell.x, cell.y))
 	pos.y -= cell.z * 16 - 8
 	return pos
 
@@ -413,7 +417,7 @@ func is_occupied_by_obstacle(cell: Vector3) -> bool:
 # Return the highest cell in the grid at the given world position
 # Can optionaly find it, starting from a given layer (To ignore higher layers)
 func get_pos_highest_cell(pos: Vector2, max_layer: int = 0) -> Vector3:
-	var ground_0_cell_2D = layer_0_node.world_to_map(pos)
+	var ground_0_cell_2D = layers_array[0].world_to_map(pos)
 	
 	var nb_grounds = layers_array.size()
 	if max_layer == 0 or max_layer > nb_grounds:

@@ -368,7 +368,7 @@ func _on_state_changed(new_state: Object) -> void:
 	
 	if previous_state != null:
 		if active:
-			if previous_state is TRPG_ActionState:
+			if previous_state.name in ["Attack", "Move", "Skill"]:
 				emit_signal("action_finished", previous_state.name)
 		
 		if previous_state.name == "Hurt":

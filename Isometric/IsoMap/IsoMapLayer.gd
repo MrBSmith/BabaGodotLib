@@ -114,7 +114,7 @@ func _on_tile_rect_added(rect: Rect2) -> void:
 		for j in range(rect.size.x):
 			var cell = Vector2(rect.position.x + j, rect.position.y + i)
 			_update_walls(cell)
-#			_update_tile_neighbours(cell)
+			_update_tile_neighbours(cell)
 	
 	._on_tile_rect_added(rect)
 

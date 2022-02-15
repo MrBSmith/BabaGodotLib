@@ -5,6 +5,7 @@ export var animated_sprite_path : NodePath
 onready var animated_sprite : AnimatedSprite = get_node(animated_sprite_path)
 onready var states_machine = get_parent()
 
+var object_direction := Vector2.ZERO
 
 #### ACCESSORS ####
 
@@ -23,10 +24,11 @@ func _ready() -> void:
 #### VIRTUALS ####
 
 
-func _update_animation(state: Node):
+func _update_animation(state: Node) -> void:
 	var audio_stream_player = state.get_node_or_null("AudioStreamPlayer")
 	var state_name = state.name
 	var previous_state = states_machine.previous_state
+	var dir_name = Utils.find_dir_name(object_direction)
 	
 	if audio_stream_player != null:
 		audio_stream_player.stop()
@@ -39,17 +41,19 @@ func _update_animation(state: Node):
 	if sprite_frames == null:
 		return
 	
-	var trans_anim_name = previous_state.name + "To" + state_name if previous_state else ""
+	var anim_name = state_name + dir_name
+	var start_anim_name = "Start" + anim_name
+	var trans_anim_name = previous_state.name + "To" + anim_name if previous_state else ""
 
-	if sprite_frames.has_animation("Start" + state_name):
-		animated_sprite.play("Start" + state_name)
+	if sprite_frames.has_animation(start_anim_name):
+		animated_sprite.play(start_anim_name)
 	
 	elif previous_state && sprite_frames.has_animation(trans_anim_name):
 		animated_sprite.play(trans_anim_name)
 
 	else:
-		if sprite_frames.has_animation(state_name):
-			animated_sprite.play(state_name)
+		if sprite_frames.has_animation(anim_name):
+			animated_sprite.play(anim_name)
 		
 		elif state.toggle_state_mode:
 			state.exit_toggle_state()
@@ -82,3 +86,8 @@ func _on_animation_finished():
 
 func _on_StateMachine_state_changed(new_state: Node) -> void:
 	_update_animation(new_state)
+
+
+func _on_direction_changed(dir: Vector2) -> void:
+	object_direction = dir
+	_update_animation(states_machine.get_state())
