@@ -22,9 +22,10 @@ onready var destroy_sound = get_node_or_null("DestroySound")
 onready var approch_area = get_node_or_null("ApprochArea")
 onready var particules = get_node_or_null("Particles2D")
 
-export var max_hp : int = 1
+export var max_hp : int = 1 setget set_max_hp
 export var hp : int = max_hp setget set_hp, get_hp
 
+signal max_hp_changed(max_hp_value)
 signal hp_changed(hp_value)
 signal destroy_animation_started()
 signal damaged()
@@ -34,6 +35,15 @@ signal destroyed()
 
 func is_class(value: String): return value == "DestructibleBehaviour" or .is_class(value)
 func get_class() -> String: return "DestructibleBehaviour"
+
+func set_max_hp(value: int) -> void:
+	if value != max_hp:
+		if value < 0:
+			push_error("The given max_hp %d isn't valid. The max hp value can't be less than 0" % value)
+			return
+		
+		max_hp = value
+		emit_signal("max_hp_changed", max_hp)
 
 func set_hp(value: int) -> void:
 	if value != hp:
@@ -50,6 +60,9 @@ func _ready() -> void:
 		__ = approch_area.connect("body_entered", self, "_on_body_entered")
 	
 	owner.add_to_group("Destructible")
+	
+	emit_signal("hp_changed", hp)
+	emit_signal("max_hp_changed", max_hp)
 
 
 
