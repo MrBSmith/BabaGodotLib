@@ -2,7 +2,7 @@ extends Node
 class_name StateAnimationHandler
 
 export var animated_sprite_path : NodePath
-onready var animated_sprite : AnimatedSprite = get_node(animated_sprite_path)
+onready var animated_sprite : AnimatedSprite = get_node_or_null(animated_sprite_path)
 onready var states_machine = get_parent()
 
 var object_direction := Vector2.ZERO
@@ -19,7 +19,9 @@ func _ready() -> void:
 	yield(owner, "ready")
 	
 	var __ = get_parent().connect("state_changed", self, "_on_StateMachine_state_changed")
-	__ = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
+	
+	if animated_sprite:
+		__ = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
 
 #### VIRTUALS ####
 
