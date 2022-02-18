@@ -11,9 +11,8 @@ func get_class() -> String: return "Cooldown"
 #### BUILT-IN ####
 
 func _ready() -> void:
-	if Engine.editor_hint:
-		autostart = false
-		one_shot = true
+	autostart = false
+	one_shot = true
 
 
 #### VIRTUALS ####

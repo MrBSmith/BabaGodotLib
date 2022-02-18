@@ -35,10 +35,10 @@ func exit_state():
 
 
 func update_state(delta: float):
-	if owner.target == null:
+	if owner.get_target() == null:
 		return
 	
-	var target = owner.target
+	var target = owner.get_target()
 	var target_global_pos = target.get_global_position()
 	var camera = get_current_camera2D()
 	var camera_top_left_corner = camera.get_camera_screen_center() - GAME.window_size / 2

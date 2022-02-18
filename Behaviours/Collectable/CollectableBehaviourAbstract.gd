@@ -16,7 +16,7 @@ export var collectable_name : String = "" setget set_collectable_name, get_colle
 export var average_amount : int = 1
 export(float, 0.0, 1.0) var amount_variance : float = 0.0
 
-var target : Node = null setget set_target, get_target
+var target_weakref : WeakRef = null
 
 #warning-ignore:unused_signal
 signal interactable_changed
@@ -28,9 +28,12 @@ signal collect_animation_finished
 func is_class(value: String): return value == "CollectableBehaviour" or .is_class(value)
 func get_class() -> String: return "CollectableBehaviour"
 
-func set_target(value: Node): 
-	target = value
-func get_target() -> Node: return target
+func set_target(value: Node): target_weakref = weakref(value)
+func get_target() -> Node: 
+	if target_weakref != null:
+		return target_weakref.get_ref()
+	else: 
+		return null
 
 func set_collectable_name(value: String): collectable_name = value
 func get_collectable_name() -> String:
@@ -47,6 +50,7 @@ func _ready():
 	
 	if animation_player:
 		animation_player.connect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
+
 
 #### VIRTUALS ####
 
@@ -68,6 +72,7 @@ func compute_amount_collected() -> int:
 
 func collect_success() -> void:
 	pass
+
 
 #### INPUTS ####
 

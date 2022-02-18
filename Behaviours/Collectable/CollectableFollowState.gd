@@ -20,11 +20,13 @@ func update_state(delta: float):
 	if !is_instance_valid(obj) or !obj.is_inside_tree():
 		return
 	
-	if owner.target != null:
+	var target = owner.get_target()
+	
+	if target != null:
 		owner.speed += owner.acceleration
 		
 		var obj_pos = obj.get_position()
-		var target_pos = owner.target.get_position()
+		var target_pos = target.get_position()
 		var target_dir = obj_pos.direction_to(target_pos)
 		var velocity = target_dir * owner.speed * delta
 		
