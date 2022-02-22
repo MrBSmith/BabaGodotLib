@@ -12,6 +12,7 @@ export(PROFILES_PRESET) var default_profile_id
 var profiles_array: Array = []
 var current_profile_id : int = default_profile_id setget set_current_profile_id, get_current_profile_id
 
+
 #### ACCESSORS ####
 
 func get_selected_profile() -> Dictionary: return profiles_array[current_profile_id]
@@ -25,6 +26,7 @@ func set_current_profile_id(value: int) -> void:
 	emit_signal('profile_changed', profile)
 
 func get_current_profile() -> InputProfile: return profiles_array[current_profile_id]
+
 
 #### BUILT-IN ####
 
@@ -49,8 +51,7 @@ func map_current_profile() -> void:
 		remap_action_key(action_name, profile[action_name])
 	
 	if get_current_profile_id() == PROFILES_PRESET.CUSTOM:
-		if get_current_profile().dict == _get_default_custom_profile().dict:
-			EVENTS.emit_signal("save_custom_input_profile", profile)
+		EVENTS.emit_signal("save_custom_input_profile", profile)
 
 
 # Takes a Dictionary of actions, and check if it matches one of the profiles contained in the profiles_array
@@ -123,22 +124,9 @@ func erase_action_keys(action_name: String):
 		InputMap.action_erase_event(action_name, event)
 
 
-func _get_default_custom_profile() -> InputProfile:
-	var input_profile_config_file = ConfigFile.new()
-	var err = input_profile_config_file.load(GAME.DEFAULT_INPUT_PATH)
-	var profile = null
-	
-	if err == OK:
-		var dict = Dictionary()
-		for key in input_profile_config_file.get_section_keys("custom"):
-			dict[key] = input_profile_config_file.get_value("custom", key)
-		
-		profile = InputProfile.new(dict, true)
-	
-	return profile
-
 
 #### INPUT ####
+
 
 #### SIGNALS RESPONSES ####
 
