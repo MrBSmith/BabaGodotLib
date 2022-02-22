@@ -10,6 +10,10 @@ var initial_dir = Vector2.ZERO
 export var initial_speed = 1000.0
 export var initial_speed_damping = 200.0
 
+var window_width = ProjectSettings.get_setting("display/window/size/width")
+var window_height = ProjectSettings.get_setting("display/window/size/height")
+var window_size = Vector2(window_width, window_height)
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "CollectState" or .is_class(value)
@@ -41,7 +45,7 @@ func update_state(delta: float):
 	var target = owner.get_target()
 	var target_global_pos = target.get_global_position()
 	var camera = get_current_camera2D()
-	var camera_top_left_corner = camera.get_camera_screen_center() - GAME.window_size / 2
+	var camera_top_left_corner = camera.get_camera_screen_center() - window_size / 2
 	var target_pos = camera_top_left_corner + target_global_pos
 	
 	if target.get("rect_pivot_offset"):
@@ -74,6 +78,7 @@ func get_current_camera2D() -> Camera2D:
 		if camera is Camera2D and camera.current:
 			return camera
 	return null
+
 
 #### LOGIC ####
 
