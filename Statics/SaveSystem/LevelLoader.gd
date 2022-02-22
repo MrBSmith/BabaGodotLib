@@ -2,19 +2,10 @@ extends Node
 class_name LevelLoader
 
 
-# Load the .json level save, deserialize it, then apply the fetched properties to the level
-static func build_level_from_loaded_properties(dir: String, level):
-	if !level.is_inside_tree():
-		yield(level, "tree_entered")
-	
-	var level_properties : Dictionary = _load_level_properties_from_json(dir)
-	level.apply_loaded_properties(level_properties)
-
-
 # Load the json file corresponding to the given level_name
 # Return a dictionary containing every objects with their path as a key and a property dict as value
 # The property dict contains each property name as key and property value as value
-static func _load_level_properties_from_json(dir: String) -> Dictionary:
+static func load_level_properties_from_json(dir: String) -> Dictionary:
 	var loaded_level_properties : Dictionary = {}
 	var loaded_objects : Dictionary = _deserialize_level_properties(dir)
 	for object_dict in loaded_objects.keys():
@@ -50,7 +41,6 @@ static func _deserialize_level_properties(file_path : String) -> Dictionary:
 	load_file.close()
 	
 	return parsed_data
-
 
 
 # Get the type of a value string (vector2 bool float or int) by checking its content

@@ -7,7 +7,7 @@ static func serialize_level_properties(property_dict: Dictionary, current_node :
 	var classes_to_scan_array = property_dict.keys()
 	for child in current_node.get_children():
 		for node_class in classes_to_scan_array:
-			if child.is_class(node_class):
+			if child.is_class(node_class) or child.is_in_group(node_class):
 				var object_properties = get_object_properties(property_dict, child, node_class)
 				
 				dict_to_fill[child.get_path()] = object_properties
@@ -17,8 +17,9 @@ static func serialize_level_properties(property_dict: Dictionary, current_node :
 			serialize_level_properties(property_dict, child, dict_to_fill)
 
 
+
 # Convert the data to a JSON file
-static func save_level_properties_as_json(property_dict: Dictionary, dir: String, level):
+static func save_level_properties_as_json(property_dict: Dictionary, dir: String, level: Node):
 	var dict_to_json : Dictionary = {}
 	serialize_level_properties(property_dict, level, dict_to_json)
 	
