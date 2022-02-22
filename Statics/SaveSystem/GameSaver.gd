@@ -23,13 +23,16 @@ static func save_game_in_slot(save_dir_path: String, slot_id : int, data: Dictio
 
 # Feed a configuration file by giving a dictionary
 # Modify the cfg found at the cfg_path, or create it if nothing was found
-static func save_properties_in_cfg(cfg_path: String, data: Dictionary) -> int: # -> GlobalScope Error
+static func save_properties_in_cfg(cfg_path: String, data: Dictionary, properties_to_write : Array = []) -> int: # -> GlobalScope Error
 	var config_file = ConfigFile.new()
+	
+	if properties_to_write.empty():
+		properties_to_write = data.keys()
 	
 	if DirNavHelper.is_file_existing(cfg_path):
 		config_file.load(cfg_path)
 	
-	for section in data.keys():
+	for section in properties_to_write:
 		for property in data[section].keys():
 			var value = data[section][property]
 			config_file.set_value(section, property, value)

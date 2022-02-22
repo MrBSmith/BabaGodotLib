@@ -35,8 +35,10 @@ func get_current_profile() -> InputProfile: return profiles_array[current_profil
 #### LOGIC ####
 
 func map_input_profile(profile: InputProfile) -> void:
-	for action_name in profile.keys():
-		remap_action_key(action_name, profile[action_name])
+	for action_name in profile.dict.keys():
+		remap_action_key(action_name, profile.dict[action_name])
+	
+	EVENTS.emit_signal("save_custom_input_profile", profile.dict)
 
 
 func change_custom_profile_key(action_name: String, key_array : Array = []) -> void:
@@ -46,12 +48,7 @@ func change_custom_profile_key(action_name: String, key_array : Array = []) -> v
 
 
 func map_current_profile() -> void:
-	var profile = get_current_profile().dict
-	for action_name in profile.keys():
-		remap_action_key(action_name, profile[action_name])
-	
-	if get_current_profile_id() == PROFILES_PRESET.CUSTOM:
-		EVENTS.emit_signal("save_custom_input_profile", profile)
+	map_input_profile(get_current_profile())
 
 
 # Takes a Dictionary of actions, and check if it matches one of the profiles contained in the profiles_array
@@ -90,21 +87,45 @@ func fetch_current_actions(actions_to_fetch := PoolStringArray()) -> Dictionary:
 
 # Fetch all data contained in the default_profile_file located at given path and hydrate profiles_array with it 
 func fetch_default_profiles_data(default_profile_file_path: String) -> void:
+	profiles_array = _fetch_input_profile_from_file(default_profile_file_path)
+
+
+# Fetch input relative data form the file at the given path located in the given sections and returns an array of profiles found
+# Each section have to correspond to a profile, if sections_to_read is empty, each sections of the file will be considered a profile
+func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array = []) -> Array:
 	var input_profile_config_file = ConfigFile.new()
-	var err = input_profile_config_file.load(default_profile_file_path)
+	var err = input_profile_config_file.load(file_path)
+	
+	if sections_to_read.empty():
+		sections_to_read = input_profile_config_file.get_sections()
 	
 	if err == OK:
-		for section_name in input_profile_config_file.get_sections():
+		var input_profile_array = []
+		
+		for section_name in sections_to_read:
 			var dict = Dictionary()
 			for key in input_profile_config_file.get_section_keys(section_name):
 				dict[key] = input_profile_config_file.get_value(section_name, key)
 			
 			var is_custom_profile = section_name == "custom"
-			profiles_array.append(InputProfile.new(dict, is_custom_profile))
+			input_profile_array.append(InputProfile.new(dict, is_custom_profile))
+		
+		return input_profile_array 
+		
 	else:
 		push_error("Failed to load input profile config file. Error code : " + str(err))
-		return
-	return
+		return []
+
+
+# Fetch the player's default_profile file content, then map the profile fetched
+func map_player_default_profile(players_settings_file_path: String) -> void:
+	var profile_array = _fetch_input_profile_from_file(players_settings_file_path, ["controls"])
+	var players_input_profile = null if profile_array.empty() else profile_array[0]
+	
+	if players_input_profile == null:
+		push_error("The player's input profile couldn't be fetched in the file located: " % [players_settings_file_path])
+	
+	map_input_profile(players_input_profile)
 
 
 # This function will remove the current keys in the given action from the settings and add a new key instead

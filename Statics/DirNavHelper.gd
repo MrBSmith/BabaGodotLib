@@ -123,7 +123,7 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 	if dir.open(temp_save_dir) == OK:
 		var err = dir.list_dir_begin(true, true)
-		if err != OK: print_debug("dir navigation error code: " + String(err))
+		if err != OK: push_error("dir navigation error code: " + String(err))
 		var file = dir.get_next()
 
 		if !is_dir_existing(dest_dir_savedlevels_path):
@@ -133,7 +133,7 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 		while file != "":
 			err = dir.copy(temp_save_dir + "/" + file, dest_dir_savedlevels_path + "/" + file)
-			if err != OK: print_debug("dir copy error code: " + String(err))
+			if err != OK: push_error("dir copy error code: " + String(err))
 			file = dir.get_next()
 
 		dir.list_dir_end()
