@@ -16,8 +16,12 @@ func event():
 # Pass any number of arguments stored in the arguments_array to this method
 func method_call():
 	# Check for an empty field, send an error if there is one
-	if target_name == "" or method_name == "":
-		print("ERROR : The event %s has an undefined target and/or method to call" % name)
+	if target_name == "":
+		push_error("The event %s has no target_name to call" % name)
+		return
+	
+	elif method_name == "":
+		push_error("The event %s has no method to call" % name)
 		return
 	
 	# Get the target(s) and store it in target_array
@@ -36,6 +40,9 @@ func method_call():
 		if target.has_method(method_name) or GDScript:
 			var call_def_funcref := funcref(target, method_name)
 			call_def_funcref.call_funcv(arguments_array)
+		
+		else:
+			push_error("The event's %s target has no method called %s" % [name, method_name])
 	
 	# Queue free this event if it should be
 	if queue_free_after_trigger:
