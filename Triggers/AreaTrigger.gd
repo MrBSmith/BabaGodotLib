@@ -21,11 +21,14 @@ func _ready() -> void:
 	if is_instance_valid(areatrigger_node):
 		var __ = areatrigger_node.connect("body_entered", self, "_on_area_body_entered")
 		__ = areatrigger_node.connect("area_entered", self, "_on_area_area_entered")
-		
+
+
 func setup() -> void:
 	if both_players:
 		var __ = areatrigger_node.connect("body_exited", self, "_on_area_body_exited")
 		__ = areatrigger_node.connect("area_exited", self, "_on_area_area_exited")
+
+
 
 #### VIRTUALS ####
 
@@ -42,10 +45,10 @@ func setup() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_area_body_entered(body: PhysicsBody2D) -> void:
-	if !is_instance_valid(body):
+	if !is_instance_valid(body) or not body is ActorBase:
 		return
 
-	if (body.get_name() == wanted_robot or body.is_class(wanted_robot))  && body != owner:
+	if (body.get_name() == wanted_robot or body.is_class(wanted_robot) or wanted_robot == "") && body != owner:
 		instance_triggering = body
 		if triggerable:
 			trigger()
@@ -65,12 +68,14 @@ func _on_area_area_entered(area: Area2D) -> void:
 		else:
 			triggerable = true
 
+
 func _on_area_body_exited(body: PhysicsBody2D) -> void:
 	if !is_instance_valid(body):
 		return
 	
 	if (body.get_name() == wanted_robot or body.is_class(wanted_robot)) and body != owner:
 		triggerable = false
+
 
 func _on_area_area_exited(area: Area2D) -> void:
 	if !is_instance_valid(area):

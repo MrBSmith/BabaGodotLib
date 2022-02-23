@@ -51,7 +51,7 @@ func _exit_tree() -> void:
 #### LOGIC ####
 
 
-func init_cursor_position(level_node: LevelNode):
+func init_cursor_position(level_node: LevelNode) -> void:
 	var level = get_node_or_null(cursor_start_level_path) if level_node == null else level_node
 	
 	if level == null:

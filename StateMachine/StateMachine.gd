@@ -64,7 +64,12 @@ func _physics_process(delta):
 		return
 	var state_name = current_state.update_state(delta)
 	if state_name:
-		set_state(get_node(state_name))
+		var state = get_node_or_null(state_name)
+		
+		if state:
+			set_state(state)
+		else:
+			push_error("Couldn't find a state named: %s " % state_name)
 
 
 #### LOGIC ####
