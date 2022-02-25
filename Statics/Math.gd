@@ -33,6 +33,12 @@ static func clamp_v(val: Vector2, min_val: Vector2, max_val: Vector2) -> Vector2
 	 return Vector2(clamp(val.x, min_val.x, max_val.x),
 					clamp(val.y, min_val.y, max_val.y))
 
+# Compare the two given vec2's angle and check if their difference is lesser than max_angle_diff
+static func compare_dir(dir1: Vector2, dir2: Vector2, max_angle_diff: float) -> bool:
+	if dir1 in [Vector2.ZERO, Vector2.INF] or dir2 in [Vector2.ZERO, Vector2.INF]:
+		return false
+	
+	return abs(dir1.angle() - dir2.angle()) <= max_angle_diff
 
 #### GEOMETRY ####
 
