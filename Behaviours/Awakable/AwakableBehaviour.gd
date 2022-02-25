@@ -49,7 +49,10 @@ func asleep() -> void:
 
 	if not owner is PhysicsBody2D && owner.get_mode() != RigidBody2D.MODE_RIGID:
 		return
-
+	
+	if !owner.can_sleep:
+		return
+	
 	owner.set_mode(RigidBody2D.MODE_STATIC)
 	owner.set_sleeping(true)
 	owner.set_physics_process(false)
