@@ -19,16 +19,16 @@ onready var states_machine = get_parent()
 
 
 # Called when the current state of the state machine is set to this node
-func enter_state():
+func enter_state() -> void:
 	pass
 
 # Called when the current state of the state machine is switched to another one
-func exit_state():
+func exit_state() -> void:
 	pass
 
 # Called every frames, for real time behaviour
 # Use a return "State_node_name" or return Node_reference to change the current state of the state machine at a given time
-func update_state(_delta):
+func update_state(_delta: float) -> void:
 	pass
 
 
