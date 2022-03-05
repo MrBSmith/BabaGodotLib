@@ -19,22 +19,6 @@ func _ready():
 			child.connect("triggered", self, "_on_trigger_triggered")
 
 
-## Each time an area is triggered, check if every area is triggered
-## If it is the case, call the event
-#func on_area_triggered(_body):
-#	if are_every_area_triggered():
-#		event()
-#
-#
-## Check if every area have been triggered, return true if yes, false if not
-#func are_every_area_triggered() -> bool:
-#	var value = true
-#	for area in triggers_area_array:
-#		if !area.is_triggered():
-#			value = false
-#
-#	return value
-
 
 # Here is what happens when every area has been triggered
 func event():

@@ -139,32 +139,71 @@ static func rect2poly(rect: Rect2) -> PoolVector2Array:
 
 static func circle2poly(radius: float) -> PoolVector2Array:
 	var points_array = PoolVector2Array()
-	for i in range(20):
-		var angle = deg2rad((360 / 20) * i)
+	var nb_points = 20
+	for i in range(nb_points):
+		var angle = deg2rad((360 / nb_points) * i)
 		var point = angle_to_v2(angle) * radius
 		points_array.append(point)
 	
 	return points_array
 
 
-static func shape_to_poly(shape: Shape2D, global_transform: Transform) -> PoolVector2Array:
+static func capsule2poly(height: float, radius: float) -> PoolVector2Array:
+	var rect = Rect2(Vector2.ZERO, Vector2(radius * 2, height))
+	var points_array = rect2poly(rect)
+	
+	var top_circle_center = Vector2(radius, 0)
+	var bottom_circle_center = Vector2(radius, height)
+	
+	var nb_circle_points = 20
+	for i in range(nb_circle_points):
+		var angle = deg2rad((360 / nb_circle_points) * i)
+		var point = angle_to_v2(angle) * radius
+		
+		if i == 0 or i == nb_circle_points / 2:
+			continue
+
+		if i < nb_circle_points / 2:
+			point += bottom_circle_center
+			points_array.insert(2 + i, point)
+		else:
+			point += top_circle_center
+			points_array.insert(i - nb_circle_points / 2, point)
+	
+	return points_array
+
+
+static func shape2poly(shape: Shape2D, global_transform: Transform) -> PoolVector2Array:
 	if shape is RectangleShape2D:
 		var rect = Rect2(Vector2.ZERO, shape.get_extents() * 2)
-		return global_transform.xform(rect2poly(rect))
+		return xform(global_transform, rect2poly(rect))
 	
 	elif shape is CircleShape2D:
-		return global_transform.xform(circle2poly(shape.radius))
+		var poly = circle2poly(shape.radius)
+		return xform(global_transform, poly)
 	
-	if shape is ConvexPolygonShape2D:
-		return global_transform.xform(shape.get_points())
+	elif shape is ConvexPolygonShape2D:
+		return xform(global_transform, shape.get_points())
 	
-	if shape is ConcavePolygonShape2D:
-		return global_transform.xform(shape.get_segments())
+	elif shape is ConcavePolygonShape2D:
+		return xform(global_transform, shape.get_segments())
 	
-	if shape is CapsuleShape2D:
-		return PoolVector2Array()
+	elif shape is CapsuleShape2D:
+		return xform(global_transform, capsule2poly(shape.height, shape.radius))
+	
+	elif shape is SegmentShape2D:
+		return xform(global_transform, PoolVector2Array([shape.a, shape.b]))
 	
 	return PoolVector2Array()
+
+
+static func xform(transform: Transform2D, v2_array: PoolVector2Array) -> PoolVector2Array:
+	var result_array = PoolVector2Array()
+	
+	for v in v2_array:
+		result_array.append(transform.xform(v))
+	
+	return result_array
 
 
 # Sums the distance between each points of the line to get its total lenght

@@ -58,7 +58,7 @@ signal checkpoint_reached(level, checkpoint_id)
 
 #### SFX ####
 
-signal play_SFX(fx_name, pos)
+signal play_SFX(fx_name, pos, state_dict)
 signal scatter_object(body, nb_debris, impulse_force)
 signal screen_shake(magnitude, duration)
 
