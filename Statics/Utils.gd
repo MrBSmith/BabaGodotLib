@@ -40,6 +40,13 @@ static func dict_find_key_by_value(dict: Dictionary, value) -> String:
 	return dict.keys()[id]
 
 
+static func array_get_rdm_element(array: Array):
+	if array.empty():
+		return null
+	
+	return array[randi() % array.size()]
+
+
 # Find the name of the given direction and returns it as a String
 static func find_dir_name(dir: Vector2) -> String:
 	var dir_values_array = DIRECTIONS_8.values()
