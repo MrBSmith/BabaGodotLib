@@ -46,7 +46,6 @@ func set_gauge_value(value: int, instantanious: bool = false):
 		value_change_feedback(gauge_value, value)
 	
 	gauge_value = value
-
 func get_gauge_value() -> int: return gauge_value
 
 func set_gauge_max_value(value: int): 
@@ -55,7 +54,6 @@ func set_gauge_max_value(value: int):
 	gauge_max_value = value
 	gauge.set_max(gauge_max_value)
 	feedback_gauge.set_max(gauge_max_value)
-
 func get_gauge_max_value() -> int: return gauge_max_value
 
 func set_gauge_color(value: Color):
@@ -78,7 +76,6 @@ func set_background_texture(value: Texture):
 	
 	background_texture = value
 	feedback_gauge.set_under_texture(value)
-
 func get_background_texture() -> Texture: return background_texture
 
 func set_gauge_texture(value: Texture):
@@ -88,7 +85,6 @@ func set_gauge_texture(value: Texture):
 	gauge_texture = value
 	feedback_gauge.set_progress_texture(value)
 	gauge.set_progress_texture(value)
-
 func get_gauge_texture() -> Texture: return gauge_texture
 
 #### BUILT-IN ####
