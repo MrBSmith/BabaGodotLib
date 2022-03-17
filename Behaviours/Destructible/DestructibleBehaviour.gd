@@ -60,10 +60,6 @@ func _ready() -> void:
 		__ = approch_area.connect("body_entered", self, "_on_body_entered")
 	
 	owner.add_to_group("Destructible")
-	
-	emit_signal("hp_changed", hp)
-	emit_signal("max_hp_changed", max_hp)
-
 
 
 #### VIRTUALS ####

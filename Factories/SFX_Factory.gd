@@ -21,7 +21,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func play_SFX(fx_name: String, pos: Vector2) -> void:
+func play_SFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> void:
 	if not fx_name in sfx_dict.keys():
 		print("The fx named " + fx_name + " doesn't exist in the dictionnary")
 		return
@@ -29,8 +29,14 @@ func play_SFX(fx_name: String, pos: Vector2) -> void:
 	var fx = load(sfx_dict[fx_name])
 	var fx_node = fx.instance()
 	fx_node.set_global_position(pos)
+	
+	for key in state_dict.keys():
+		fx_node.set(key, state_dict[key])
+	
 	add_child(fx_node)
 	fx_node.play_animation()
+
+
 
 #### INPUTS ####
 
@@ -38,5 +44,5 @@ func play_SFX(fx_name: String, pos: Vector2) -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_play_SFX(fx_name: String, pos: Vector2) -> void:
-	play_SFX(fx_name, pos)
+func _on_play_SFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> void:
+	play_SFX(fx_name, pos, state_dict)
