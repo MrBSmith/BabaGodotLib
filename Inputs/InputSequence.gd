@@ -1,26 +1,20 @@
 extends Node
 class_name InputSequence
 
-var action_buffer := PoolStringArray()
+var action_buffer : Array = []
 
-export var keyword_sequence : PoolStringArray = []
+export var action_sequence : Array = []
 export var target_node_path : NodePath
 export var method : String = ""
 export var arguments : Array = []
 export var input_time_threshold : float = 1.0
 
-# A list of keywords the action MUST have or it will be discarded
-export var action_filter_keyword : PoolStringArray = []
-
-# When an action has a keyword filter in it, all other actions must have the same one for the sequence to be triggered
-export var keep_same_filter : bool = false
-
 export var print_logs := false
+
+export var matching_inputs_array : Array = []
 
 onready var cooldown = Cooldown.new()
 onready var target_node = owner if target_node_path.is_empty() or target_node_path == null else get_node(target_node_path)
-
-var buffered_filter_keyword : String = "" 
 
 #### ACCESSORS ####
 
@@ -42,27 +36,65 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func action(action: String) -> void:
-	if _must_action_be_filtered(action) or !cooldown.is_inside_tree() or !target_node:
+func action(event: InputEvent) -> void:
+	if !cooldown.is_inside_tree() or !target_node:
 		return
 	
-	if keyword_sequence.empty():
-		push_warning("The keyword_sequence array is empty; the sequence can never be fullfiled")
+	if action_sequence.empty():
+		push_warning("The action_sequence array is empty; the sequence can never be fullfiled")
 		return
 	
-	if action_buffer.empty():
-		if keyword_sequence[0].is_subsequence_of(action):
+	# Check if the event correseponds to the next wanted InputEvent in the action_sequence
+	# If it does, append to the buffer
+	var new_input_id = action_buffer.size()
+	
+	if action_sequence[new_input_id].input_event_corresponds(event):
+		
+		if new_input_id != 0:
+			var matching_ids = _get_matching_ids_array(new_input_id)
+			if print_logs && matching_ids.empty():
+				print("No matching ids")
+
+			if !is_input_matching(event, matching_ids):
+				return
+		
+		if action_buffer.empty():
 			cooldown.start()
-		else:
-			return
+			if print_logs:
+				print("action sequence started")
+		
+		if print_logs:
+			print(action_sequence[new_input_id].actions_array)
+		
+		action_buffer.append(event)
 	
-	action_buffer.append(action)
+	# Check if the sequence is valid
+	if action_buffer.size() == action_sequence.size():
+		trigger()
 	
-	if action_buffer.size() == keyword_sequence.size():
-		if _is_sequence_valid():
-			trigger()
-		else:
-			abort()
+	elif action_buffer.size() > action_sequence.size():
+		push_error("The action buffer is longer the the action sequence, aborting")
+		abort()
+
+
+func is_input_matching(event: InputEvent, match_ids_array: PoolIntArray) -> bool:
+	for id in match_ids_array:
+		if id < action_buffer.size():
+			var matching_event = action_buffer[id]
+			
+			var event_actions = Utils.input_find_matching_actions(event)
+			var matching_event_actions = Utils.input_find_matching_actions(matching_event)
+			
+			if event_actions != matching_event_actions:
+				return false
+	return true
+
+
+func _get_matching_ids_array(id: int) -> PoolIntArray:
+	for input_ids_array in matching_inputs_array:
+		if id in input_ids_array:
+			return input_ids_array
+	return PoolIntArray()
 
 
 func abort() -> void:
@@ -84,30 +116,7 @@ func trigger() -> void:
 
 func _reset_sequence() -> void:
 	cooldown.stop()
-	action_buffer = PoolStringArray()
-	buffered_filter_keyword = ""
-
-
-func _must_action_be_filtered(action: String) -> bool:
-	for keyword in action_filter_keyword:
-		if keep_same_filter && buffered_filter_keyword != "":
-			if buffered_filter_keyword.is_subsequence_of(action):
-				return false
-		else:
-			if keyword.is_subsequence_of(action):
-				buffered_filter_keyword = keyword
-				return false
-	return true
-
-
-func _is_sequence_valid() -> bool:
-	if action_buffer.size() != keyword_sequence.size():
-		return false
-	
-	for i in range(action_buffer.size()):
-		if !keyword_sequence[i].is_subsequence_of(action_buffer[i]):
-			return false
-	return true
+	action_buffer = []
 
 
 #### INPUTS ####
