@@ -132,3 +132,14 @@ static func trim_image(image: Image) -> Image:
 	return output_img
 
 
+
+#### INPUTS ####
+
+static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
+	var matching_actions = PoolStringArray()
+	
+	for action in InputMap.get_actions():
+		if InputMap.action_has_event(action, event):
+			matching_actions.append(action)
+	
+	return matching_actions
