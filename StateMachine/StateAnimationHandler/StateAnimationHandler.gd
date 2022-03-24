@@ -29,6 +29,9 @@ func _ready() -> void:
 
 
 func _update_animation(state: Node) -> void:
+	if state == null:
+		return
+	
 	var audio_stream_player = state.get_node_or_null("AudioStreamPlayer")
 	var state_name = state.name
 	var previous_state = states_machine.previous_state
@@ -76,6 +79,10 @@ func _on_animation_finished():
 		return
 	
 	var state = get_parent().get_state()
+	
+	if state == null:
+		return
+	
 	var state_name = state.name
 	
 	var sprite_frames = animated_sprite.get_sprite_frames()
