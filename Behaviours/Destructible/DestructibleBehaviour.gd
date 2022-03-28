@@ -25,6 +25,10 @@ onready var particules = get_node_or_null("Particles2D")
 export var max_hp : int = 1 setget set_max_hp
 export var hp : int = max_hp setget set_hp, get_hp
 
+export var free_when_destroyed := true
+
+var is_destroyed := false
+
 signal max_hp_changed(max_hp_value)
 signal hp_changed(hp_value)
 signal destroy_animation_started()
@@ -76,6 +80,10 @@ func damage() -> void:
 
 
 func destroy() -> void:
+	if is_destroyed:
+		push_warning("This object has already been destroyed")
+		return
+	
 	if destroy_sound:
 		EVENTS.emit_signal("play_sound_effect", destroy_sound)
 	
@@ -89,7 +97,11 @@ func destroy() -> void:
 		yield(animation_player, "animation_finished")
 	
 	emit_signal("destroyed")
-	owner.queue_free()
+	
+	if free_when_destroyed:
+		owner.queue_free()
+	else:
+		is_destroyed = true
 
 
 #### INPUTS ####

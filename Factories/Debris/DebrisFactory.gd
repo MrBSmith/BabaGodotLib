@@ -16,11 +16,13 @@ func _ready() -> void:
 
 #### SIGNAL_RESPONSES ####
 
-func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0):
-	var sprite = body.get_node("Sprite")
+func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0, no_clip := false):
+	var sprite = body.get_node("Sprite") if not body is Sprite else body 
 	var texture = sprite.get_texture()
 	var is_region = sprite.is_region()
 	var texture_origin = sprite.get_region_rect().position if is_region else Vector2.ZERO
+	var z = body.get_z_index()
+	var z_as_relative = body.is_z_relative()
 	
 	var sprite_width : float = texture.get_width() if !is_region else sprite.get_region_rect().size.x
 	var sprite_height : float = texture.get_height() if !is_region else sprite.get_region_rect().size.y
@@ -44,10 +46,11 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			
 			var debris_node = debris.instance()
 			var debris_sprite = debris_node.get_node("Sprite")
-			var collision_shape = RectangleShape2D.new()
-			collision_shape.set_extents((Vector2.ONE * square_size) / 2)
 			
-			debris_node.get_node("CollisionShape2D").set_shape(collision_shape)
+			if !no_clip:
+				var collision_shape = RectangleShape2D.new()
+				collision_shape.set_extents((Vector2.ONE * square_size) / 2)
+				debris_node.get_node("CollisionShape2D").set_shape(collision_shape)
 			
 			var global_pos = Vector2(body_origin.x + i * square_size, body_origin.y + j * square_size)
 			debris_node.set_global_position(global_pos)
@@ -60,6 +63,8 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
 			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
+			debris_node.set_z_index(z)
+			debris_node.set_z_as_relative(z_as_relative)
 			target.call_deferred("add_child", debris_node)
 			
 			debris_counter += 1
