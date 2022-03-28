@@ -44,5 +44,5 @@ func _on_parent_frame_changed() -> void:
 	set_frame(get_parent().get_frame())
 
 
-func _on_parent_animation_changed(anim: String = "", backwards: bool = false) -> void:
-	play(anim, backwards)
+func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -> void:
+	set_animation(anim)

@@ -53,22 +53,17 @@ func _update_animation(state: Node) -> void:
 	var trans_anim_name = previous_state.name + "To" + anim_name if previous_state else ""
 
 	if sprite_frames.has_animation(start_anim_name):
-		_play_animation(start_anim_name)
+		animated_sprite.play(start_anim_name)
 	
 	elif previous_state && sprite_frames.has_animation(trans_anim_name):
-		_play_animation(trans_anim_name)
+		animated_sprite.play(trans_anim_name)
 
 	else:
 		if sprite_frames.has_animation(anim_name):
-			_play_animation(anim_name)
+			animated_sprite.play(anim_name)
 		
 		elif state.toggle_state_mode:
 			state.exit_toggle_state()
-
-
-
-func _play_animation(anim: String) -> void:
-	animated_sprite.propagate_call("play", [anim])
 
 
 
@@ -93,7 +88,7 @@ func _on_animation_finished():
 	
 	if current_animation == "Start" + state_name or ("To" + state_name).is_subsequence_ofi(current_animation):
 		if sprite_frames != null and sprite_frames.has_animation(state_name):
-			_play_animation(state_name)
+			animated_sprite.play(state_name)
 	else:
 		if state.toggle_state_mode:
 			state.exit_toggle_state()
