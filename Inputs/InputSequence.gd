@@ -56,6 +56,8 @@ func action(event: InputEvent) -> void:
 				print("No matching ids")
 
 			if !is_input_matching(event, matching_ids):
+				if print_logs: print("The sequence didn't match, aborting")
+				abort()
 				return
 		
 		if action_buffer.empty():
