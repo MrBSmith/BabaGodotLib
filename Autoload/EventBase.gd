@@ -30,6 +30,7 @@ signal quit_current_game()
 
 signal save_game(save_id)
 signal load_game(save_id)
+signal save_level_query(level)
 
 #### NETWORK ####
 
@@ -54,7 +55,7 @@ signal collectable_amount_collected(collectable_type, amount)
 signal collectable_amount_updated(collectable_type, amount)
 signal update_HUD()
 signal approch_collactable(obj)
-signal checkpoint_reached(level, checkpoint_id)
+signal checkpoint_reached(checkpoint_id)
 
 #### SFX ####
 
