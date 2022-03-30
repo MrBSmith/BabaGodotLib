@@ -8,8 +8,15 @@ uniform float masked_opacity : hint_range(0.0, 1.0) = 0.0;
 uniform float frequency = 1.0;
 uniform sampler2D mask_texture;
 
+uniform float deform_speed = 1.0;
+uniform float deform_freq = 0.0;
+uniform vec2 deform_amp = vec2(0.1, 0.0);
+
 void fragment(){
-	vec4 color = texture(TEXTURE, UV);
+	vec2 sin_movement = deform_amp * vec2(sin(TIME * vec2(deform_speed, 0.0) * 2.0 * PI));
+	vec2 offset = sin_movement * sin(UV.y * deform_freq * 2.0 * PI);
+	
+	vec4 color = texture(TEXTURE, offset + UV);
 	vec4 mask_texture_color = texture(mask_texture, UV);
 	vec4 mask_color;
 	
