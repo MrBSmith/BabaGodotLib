@@ -5,9 +5,9 @@
 
 [resource]
 shader = ExtResource( 2 )
-shader_param/masked_opacity = 0.414
+shader_param/masked_opacity = 0.4
 shader_param/frequency = 6.0
-shader_param/deform_speed = 1.0
-shader_param/deform_freq = 0.0
+shader_param/deform_speed = 0.0
+shader_param/deform_freq = 4.0
 shader_param/deform_amp = Vector2( 0.1, 0 )
 shader_param/mask_texture = ExtResource( 1 )

@@ -4,12 +4,12 @@ const vec4 WHITE = vec4(0.0, 0.0, 0.0, 1.0);
 const vec4 BLACK = vec4(1.0);
 const float PI = 3.14159265358979323846;
 
-uniform float masked_opacity : hint_range(0.0, 1.0) = 0.0;
-uniform float frequency = 1.0;
+uniform float masked_opacity : hint_range(0.0, 1.0) = 0.4;
+uniform float frequency = 6.0;
 uniform sampler2D mask_texture;
 
-uniform float deform_speed = 1.0;
-uniform float deform_freq = 0.0;
+uniform float deform_speed = 0.0;
+uniform float deform_freq = 4.0;
 uniform vec2 deform_amp = vec2(0.1, 0.0);
 
 void fragment(){
