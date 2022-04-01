@@ -5,6 +5,8 @@ class_name MenuOptionsBase
 onready var _button = $HBoxContainer/MarginContainer/Button setget , get_button
 onready var h_box_container = $HBoxContainer
 
+onready var hover_textures = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]
+
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
 signal option_chose(menu_option)
@@ -65,6 +67,7 @@ func set_disabled(value: bool):
 	if !is_ready:
 		yield(self, "ready")
 	if value != _button.is_disabled():
+		disabled = value
 		_button.set_disabled(value)
 		emit_signal("disabled_changed", value)
 func is_disabled() -> bool:
@@ -90,6 +93,7 @@ func _ready() -> void:
 	_err = _button.connect("button_down", self, "_on_button_down")
 	_err = _button.connect("button_up", self, "_on_button_up")
 	
+	_err = connect("disabled_changed", self, "_on_disabled_changed")
 	_err = connect("focus_changed", self, "_on_focus_changed")
 	_err = connect("gui_input", self, "_on_gui_input")
 	
@@ -167,3 +171,9 @@ func _on_button_down() -> void:
 func _on_button_up() -> void:
 	var focus_color = _button.get_color("font_color_hover", "Button")
 	set_hover_icons_modulate(focus_color)
+
+
+func _on_disabled_changed(_value: bool) -> void:
+	for texture in hover_textures:
+		var alpha = int(!disabled)
+		texture.self_modulate.a = alpha
