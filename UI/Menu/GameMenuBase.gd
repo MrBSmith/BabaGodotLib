@@ -15,6 +15,8 @@ export var opt_container_path : String = "VBoxContainer"
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 
+onready var options_array = _fetch_menu_option_array() setget set_options_array
+
 export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
 export var focus_first_option_on_ready : bool = true
 
@@ -25,6 +27,7 @@ var submenu : bool = false setget set_submenu, is_submenu
 
 #warning-ignore:unused_signal
 signal sub_menu_left
+signal options_array_changed
 
 #### ACCESSORS ####
 
@@ -32,12 +35,19 @@ func set_submenu(value: bool) -> void: submenu = value
 func is_submenu() -> bool: return submenu
 
 
+func set_options_array(value: Array) -> void:
+	if options_array != value:
+		options_array = value
+		emit_signal("options_array_changed", options_array)
+
 #### BUILT-IN ####
 
 # Check the options when the scenes is ready, to get sure at least one of them is clickable
 # Change the color of the option accordingly to their state
 func _ready() -> void:
 	is_ready = true
+	var __ = connect("options_array_changed", self, "_on_options_array_changed")
+	
 	EVENTS.emit_signal("menu_entered", name)
 	_setup()
 
@@ -80,42 +90,41 @@ func focus_first_option() -> void:
 # Going up on the first option put the focus on the last
 # And going down on the last put the focus on the first
 func _setup_menu_options_wrapping(wrapping: bool = true) -> void:
-	var menu_options_array = _fetch_menu_option_array()
-	var nb_options = menu_options_array.size()
+	var nb_options = options_array.size()
 	var first_option_unabled : MenuOptionsBase = null
 	var last_option_unabled : MenuOptionsBase = null
 	
 	# Find the first option unabled, and the last 
 	for i in range(nb_options):
-		if menu_options_array[i].is_accessible() && first_option_unabled == null:
-			first_option_unabled = menu_options_array[i]
+		if options_array[i].is_accessible() && first_option_unabled == null:
+			first_option_unabled = options_array[i]
 		
-		if menu_options_array[-i - 1].is_accessible() && last_option_unabled == null:
-			last_option_unabled = menu_options_array[-i - 1]
+		if options_array[-i - 1].is_accessible() && last_option_unabled == null:
+			last_option_unabled = options_array[-i - 1]
 	
 	# Setup the wrapping
 	for i in range(nb_options):
-		var option = menu_options_array[i]
-		var button : Button = menu_options_array[i].get_button()
+		var option = options_array[i]
+		var button : Button = options_array[i].get_button()
 		
 		if option.is_disabled() or !option.is_visible():
 			continue
 		
 		var prev_id = i - 1
-		var previous_option = menu_options_array[prev_id]
+		var previous_option = options_array[prev_id]
 		
 		while(!previous_option.is_accessible()):
 			prev_id -= 1
-			previous_option = menu_options_array[prev_id]
+			previous_option = options_array[prev_id]
 		
 		var previous_button = previous_option.get_button()
 		
 		var next_id =  wrapi(i + 1, 0, nb_options)
-		var next_option = menu_options_array[next_id]
+		var next_option = options_array[next_id]
 		
 		while(!next_option.is_accessible()):
 			next_id = wrapi(next_id + 1, 0, nb_options)
-			next_option = menu_options_array[next_id]
+			next_option = options_array[next_id]
 		
 		var next_button = next_option.get_button()
 		
@@ -143,13 +152,14 @@ func _connect_options_signals() -> void:
 		return
 	
 	# Connect options signals
-	for button in opt_container.get_children():
+	for button in options_array:
 		if not button is MenuOptionsBase:
 			continue
 		
-		var _err = button.connect("option_chose", self, "_on_menu_option_chose")
-		_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
-		_err = button.connect("visibility_changed", self, "_on_menu_option_visible_changed")
+		if !button.is_connected("option_chose", self, "_on_menu_option_chose"):
+			var _err = button.connect("option_chose", self, "_on_menu_option_chose")
+			_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
+			_err = button.connect("visibility_changed", self, "_on_menu_option_visible_changed")
 
 
 func _fetch_menu_option_array() -> Array:
@@ -210,9 +220,8 @@ func set_buttons_disabled(value : bool):
 
 
 func set_buttons_default_state():
-	var menu_options_array = _fetch_menu_option_array()
-	for i in range(menu_options_array.size()):
-		menu_options_array[i].set_disabled(default_button_state[i])
+	for i in range(options_array.size()):
+		options_array[i].set_disabled(default_button_state[i])
 
 
 func _go_to_last_menu() -> void:
@@ -261,4 +270,8 @@ func _on_menu_option_disabled_changed(_disabled: bool) -> void:
 
 
 func _on_menu_option_visible_changed() -> void:
-	_setup_menu_options_wrapping()
+	_update_options()
+
+
+func _on_options_array_changed(_array: Array) -> void:
+	_update_options()
