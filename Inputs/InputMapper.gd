@@ -123,7 +123,7 @@ func map_player_default_profile(players_settings_file_path: String) -> void:
 	var players_input_profile = null if profile_array.empty() else profile_array[0]
 	
 	if players_input_profile == null:
-		push_error("The player's input profile couldn't be fetched in the file located: " % [players_settings_file_path])
+		push_error("The player's input profile couldn't be fetched in the file located: %s" % players_settings_file_path)
 	
 	map_input_profile(players_input_profile)
 
