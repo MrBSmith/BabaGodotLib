@@ -28,8 +28,10 @@ func set_focused(value: bool):
 		return
 	if value != focused && !_button.is_disabled():
 		focused = value
-		if focused: 
+		if focused:
 			_button.grab_focus()
+		else:
+			_button.release_focus()
 		if is_ready:
 			emit_signal("focus_changed", self, focused)
 func is_focused() -> bool: return focused

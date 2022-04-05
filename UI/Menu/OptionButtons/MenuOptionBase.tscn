@@ -15,6 +15,7 @@ script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+text = ""
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_left = 23.0
