@@ -1,6 +1,26 @@
 extends Node
 class_name GameSaver
 
+# A static class that saves the game in it current state
+# Use save_game_in_slot() to create a folder in the given path container a .cfg file storing the data of the game
+# Alternatively you can use save_game() if you already know the path of the save folder
+
+# If you know the path of the .cfg file in the folder, you can write the data of the save in it using
+# save_properties_in_cfg
+
+# modify_save_property() is usefull when you want to change a property in the .cfg file without rewriting all its content
+
+
+# The save folder must be structured like the following:
+# saves/
+# 	save1/
+# 		settings.cfg
+# 		...
+# 	save2/
+# 		settings.cfg
+#		...etc
+
+
 # Update the settings dictionnary then
 # save settings into a config file at the given slot path, create the directory if it doesn't exist
 static func save_game(path : String, data: Dictionary):
@@ -18,7 +38,6 @@ static func save_game_in_slot(save_dir_path: String, slot_id : int, data: Dictio
 	var slot_name = save_name + String(slot_id) if slot_path == "" else slot_path.split("/")[-2]
 	
 	save_game(save_dir_path + "/" + slot_name, data)
-
 
 
 # Feed a configuration file by giving a dictionary

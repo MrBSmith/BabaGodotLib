@@ -1,7 +1,21 @@
 extends Node
 class_name GameLoader
 
+# A static class, usefull for loading game data
 
+# The save folder must be structured like the following:
+# saves/
+# 	save1/
+# 		settings.cfg
+# 		...
+# 	save2/
+# 		settings.cfg
+#		...etc
+
+
+# Load the content of the .cfg save file located in the save_dir_path folder. 
+# The method will fetch the right save based on its slot_id
+# It will then apply audio & controls settings; and feed the given progression node with the progression data
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node) -> void:
 	var config_file = load_save_config_file(save_dir_path, slot_id)
 	var input_mapper = InputMapper.new()
@@ -25,7 +39,8 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 					progression.set(key, value)
 
 
-# Load the settings found in the ConfigFile settings.cfg at given path (default res://saves/save1/2/3
+# Create a ConfigFile object out of the settings.cfg found in the save folder corresponding to the given slot_id.
+# the dir argument must be the path to the folder containing all the saves
 static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	var save_path : String = find_corresponding_save_file(dir, slot_id)
 	if save_path == "":
@@ -35,6 +50,7 @@ static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	return load_config_file(save_path)
 
 
+# Create a ConfigFile object out of the settings.cfg found at given path and returns it
 static func load_config_file(cfg_file_path: String) -> ConfigFile:
 	var config_file = ConfigFile.new()
 	var error = config_file.load(cfg_file_path)
@@ -61,11 +77,16 @@ static func find_corresponding_save_file(dir_path: String, save_id : int) -> Str
 	return ""
 
 
+# Returns the path of the save with the given save_id
+# the dir argument must be the path to the folder containing all the saves
 static func find_save_slot(dir_path: String, save_id : int) -> String:
 	var cfg_file_path = find_corresponding_save_file(dir_path, save_id)
 	return cfg_file_path.replacen("/settings.cfg", "")
 
 
+# Loops trough every save folder, and finds the first one to be empty/inexistant
+# Returns its id
+# Returns -1 if every solt is taken
 static func find_first_empty_slot(dir_path: String, max_slots: int) -> int:
 	for i in range(max_slots):
 		var slot_path = find_corresponding_save_file(dir_path, i + 1)
@@ -74,6 +95,9 @@ static func find_first_empty_slot(dir_path: String, max_slots: int) -> int:
 	return -1
 
 
+# Parses the save time of the save with given id
+# Returns it expressed as a string formated like following:
+# "day/month/year hour h minute"
 static func get_save_time(save_dir: String, save_id: int, time_component_array: Array = ["day", "month", "year", "hour", "minute"]) -> String:
 	var save_time_dict = get_save_property_value(save_dir, "time", save_id)
 	var save_time := ""
@@ -91,7 +115,8 @@ static func get_save_time(save_dir: String, save_id: int, time_component_array: 
 	return save_time
 
 
-static func find_first_save_file(dir_path: String, max_slots: int) -> int :
+# Finds the first slot id that doesn't have a corresponding save and returns it
+static func find_first_save_file_id(dir_path: String, max_slots: int) -> int:
 	for i in range(max_slots):
 		var slot_path = find_corresponding_save_file(dir_path, i + 1)
 		if slot_path != "":
@@ -99,6 +124,7 @@ static func find_first_save_file(dir_path: String, max_slots: int) -> int :
 	return -1
 
 
+# Returns the number of save dir
 static func get_saves_count(saves_path: String) -> int:
 	return DirNavHelper.fetch_dir_content(saves_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY).size()
 
