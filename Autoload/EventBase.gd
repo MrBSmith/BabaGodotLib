@@ -57,9 +57,9 @@ signal update_HUD()
 signal approch_collactable(obj)
 signal checkpoint_reached(checkpoint_id)
 
-#### SFX ####
+#### VFX ####
 
-signal play_SFX(fx_name, pos, state_dict)
+signal play_VFX(fx_name, pos, state_dict)
 signal scatter_object(body, nb_debris, impulse_force)
 signal screen_shake(magnitude, duration)
 

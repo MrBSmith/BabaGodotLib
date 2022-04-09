@@ -1,7 +1,7 @@
 extends State
 class_name ActorJumpState
 
-var SFX_node : Node
+var VFX_node : Node
 
 #### ACCESSORS ####
 
@@ -13,7 +13,7 @@ func get_class() -> String: return "ActorJumpState"
 
 func _ready():
 	yield(owner, "ready")
-	SFX_node = owner.get_node_or_null("SFX")
+	VFX_node = owner.get_node_or_null("VFX")
 
 
 #### VIRTUALS ####
@@ -22,14 +22,23 @@ func enter_state():
 	.enter_state()
 	
 	# Genreate the jump dust
-	if owner.is_on_floor() && SFX_node != null:
-		SFX_node.play_SFX("JumpDust", true, owner.global_position)
+	if owner.is_on_floor() && VFX_node != null:
+		VFX_node.play_VFX("JumpDust", true)
 
 
 func exit_state():
-	if SFX_node != null:
-		SFX_node.play_SFX("JumpDust", false)
-		SFX_node.reset_SFX("JumpDust")
+	if VFX_node != null:
+		VFX_node.play_VFX("JumpDust", false)
+		VFX_node.reset_VFX("JumpDust")
+
+
+func update_state(_delta):
+	if owner.is_on_floor() or owner.ignore_gravity:
+		return "Idle"
+	
+	elif owner.velocity.y > 0:
+		return "Fall"
+
 
 
 #### LOGIC ####

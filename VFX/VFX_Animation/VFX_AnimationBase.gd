@@ -1,5 +1,5 @@
 extends AnimatedSprite
-class_name SFX_AnimationBase
+class_name VFX_AnimationBase
 
 func _ready():
 	var _err = connect("animation_finished", self, "on_animation_finished")
