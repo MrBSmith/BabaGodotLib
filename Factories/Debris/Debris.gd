@@ -1,8 +1,7 @@
 extends RigidBody2D
 
-func _ready():
-	var _err = $AnimationPlayer.connect("animation_finished", self, "on_animation_finished")
 
-func on_animation_finished(animation : String):
-	if animation == "FadeOut":
+func _process(_delta: float) -> void:
+	modulate.a = lerp(modulate.a, 0.0, 0.05)
+	if is_equal_approx(modulate.a, 0.0):
 		queue_free()
