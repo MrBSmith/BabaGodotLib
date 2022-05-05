@@ -22,6 +22,10 @@ var previous_state : Object = null
 var default_state : Object = null
 export var no_default_state : bool = false
 
+# If a state is not interruptable; the set_state call will buffer the state instead of changing it
+# Whenever the state is exited, the state will be changed to the buffered one
+var buffered_state : Object = null
+
 # Usefull only if this instance of StateMachine is nested (ie its parent is also a StateMachine)
 # When this state is entered, if this bool is true, reset the child state to the default one
 export var reset_to_default : bool = false
@@ -30,8 +34,10 @@ export var reset_to_default : bool = false
 signal state_changing(from_state, to_state)
 
 # Called after the state have changed (After the enter_state callback)
-signal state_changed(state)
-signal state_changed_recursive(state)
+signal state_entered(state)
+signal state_exited(state)
+
+signal state_entered_recursive(state)
 
 func is_class(value: String): return value == "StateMachine" or .is_class(value)
 func get_class() -> String: return "StateMachine"
@@ -42,10 +48,10 @@ func get_class() -> String: return "StateMachine"
 func _ready():
 	yield(owner, "ready")
 	
-	var __ = connect("state_changed", self, "_on_state_changed")
+	var __ = connect("state_entered", self, "_on_state_entered")
 	
 	if get_parent().is_class("StateMachine"):
-		__ = connect("state_changed_recursive", get_parent(), "_on_State_state_changed_recursive")
+		__ = connect("state_entered_recursive", get_parent(), "_on_State_state_entered_recursive")
 	
 	# Get the default_state
 	var owner_default_state_name = owner.get("default_state")
@@ -90,7 +96,7 @@ func get_state_name() -> String:
 # Set current_state at a new state, also set previous state, 
 # and emit a signal to notify the change, to anybody needing it
 # The new_state argument can either be a State or a String representing the name of the targeted State
-func set_state(new_state):
+func set_state(new_state, force: bool = false):
 	# This method can handle only String and States
 	if not new_state is State and not new_state is String and new_state != null:
 		return 
@@ -103,8 +109,19 @@ func set_state(new_state):
 	if new_state == current_state:
 		return
 	
+	# Check if the change of state is forced or not; meaning, it we should ignore non-interuptable states
+	if !force:
+		
+		# If we are trying to change the state but the current_state isn't interuptable
+		# We buffer the state instead and connect the state_animation_finished of the current state
+		# Then when the state_animation_finished signal will be received, the buffered state shall be applied
+		if current_state != null && current_state.mode == MODE.NON_INTERRUPTABLE:
+			buffered_state = new_state
+			return
+	
 	# Use the exit state function of the current state
 	if current_state != null:
+		emit_signal("state_exited", current_state)
 		current_state.exit_state()
 	
 	previous_state = current_state
@@ -114,9 +131,8 @@ func set_state(new_state):
 	
 	# Use the enter_state function of the current state
 	if new_state != null && (!is_nested() or new_state.is_current_state()):
+		emit_signal("state_entered", current_state)
 		current_state.enter_state()
-
-	emit_signal("state_changed", current_state)
 
 
 # Set the state based on the id of the state (id of the node, ie position in the hierachy)
@@ -198,9 +214,15 @@ func is_current_state() -> bool:
 
 #### SIGNAL RESPONSES ####
 
-func _on_state_changed(_state: Node) -> void:
-	emit_signal("state_changed_recursive", current_state)
+func _on_state_entered(_state: Node) -> void:
+	emit_signal("state_entered_recursive", current_state)
 
 
-func _on_State_state_changed_recursive(_state: Node) -> void:
-	emit_signal("state_changed_recursive", current_state)
+func _on_State_state_entered_recursive(_state: Node) -> void:
+	emit_signal("state_entered_recursive", current_state)
+
+
+func _on_non_interuptable_state_animation_finished() -> void:
+	if buffered_state != null:
+		set_state(buffered_state, true)
+		buffered_state = null

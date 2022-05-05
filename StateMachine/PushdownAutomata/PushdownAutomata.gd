@@ -92,7 +92,7 @@ func go_to_previous_non_toggle_state() -> void:
 	for i in range(state_index - 1, 1, -1):
 		var state = state_queue[i]
 		
-		if state.get("toggle_state_mode") == true:
+		if state.mode == MODE.TOGGLE:
 			continue
 		
 		go_to_queued_state_by_index(i)

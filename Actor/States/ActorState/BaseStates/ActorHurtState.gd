@@ -45,5 +45,5 @@ func _on_flash_finished() -> void:
 
 
 func _on_hurt_feedback_finished() -> void:
-	if toggle_state_mode && is_current_state():
+	if mode == MODE.TOGGLE && is_current_state():
 		states_machine.set_state(states_machine.previous_state)

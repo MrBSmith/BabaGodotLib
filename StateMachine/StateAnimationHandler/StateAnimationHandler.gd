@@ -20,7 +20,7 @@ func get_class() -> String: return "StateAnimationHandler"
 func _ready() -> void:
 	yield(owner, "ready")
 	
-	var __ = get_parent().connect("state_changed", self, "_on_StateMachine_state_changed")
+	var __ = get_parent().connect("state_entered", self, "_on_StateMachine_state_entered")
 	
 	if animated_sprite:
 		__ = animated_sprite.connect("animation_finished", self, "_on_animation_finished")
@@ -61,9 +61,9 @@ func _update_animation(state: Node) -> void:
 	else:
 		if sprite_frames.has_animation(anim_name):
 			animated_sprite.play(anim_name)
-		
-		elif state.toggle_state_mode:
-			state.exit_toggle_state()
+		else:
+			yield(get_tree(), "idle_frame")
+			state.exit()
 
 
 
@@ -90,11 +90,11 @@ func _on_animation_finished():
 		if sprite_frames != null and sprite_frames.has_animation(state_name):
 			animated_sprite.play(state_name)
 	else:
-		if state.toggle_state_mode:
-			state.exit_toggle_state()
+		if state.mode != State.MODE.DEFAULT:
+			state.exit()
 
 
-func _on_StateMachine_state_changed(new_state: Node) -> void:
+func _on_StateMachine_state_entered(new_state: Node) -> void:
 	_update_animation(new_state)
 
 

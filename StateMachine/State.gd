@@ -1,10 +1,19 @@
 extends Node
 class_name State
 
+enum MODE {
+	DEFAULT,
+	TOGGLE,
+	NON_INTERRUPTABLE
+}
+
+
 func get_class() -> String : return "State"
 func is_class(value: String) -> bool: return value == "State" or .is_class(value)
 
-export var toggle_state_mode : bool = false
+export(MODE) var mode = MODE.DEFAULT
+
+signal state_animation_finished
 
 # Abstract base class for a state in a statemachine
 
@@ -17,6 +26,16 @@ export var toggle_state_mode : bool = false
 
 onready var states_machine = get_parent()
 
+
+#### BUILT-IN ####
+
+func _ready() -> void:
+	if mode == MODE.NON_INTERRUPTABLE:
+		var __ = connect("state_animation_finished", states_machine, "_on_non_interuptable_state_animation_finished")
+
+
+
+#### CALLBACKS ####
 
 # Called when the current state of the state machine is set to this node
 func enter_state() -> void:
@@ -32,6 +51,20 @@ func update_state(_delta: float) -> void:
 	pass
 
 
+#### LOGIC ###
+
+func exit() -> void:
+	match(mode):
+		MODE.TOGGLE: 
+			if states_machine.is_class("PushdownAutomata"):
+				states_machine.go_to_previous_non_toggle_state()
+			else:
+				states_machine.set_state(states_machine.previous_state)
+		
+		MODE.NON_INTERRUPTABLE: 
+			emit_signal("state_animation_finished")
+
+
 # Check if the entity is in this state. Check reccursivly in cas of nested StateMachines/PushdownAutomata
 func is_current_state() -> bool:
 	if states_machine.has_method("is_current_state"):
@@ -39,11 +72,3 @@ func is_current_state() -> bool:
 	else:
 		return states_machine.current_state == self
 
-
-# Defines the behaviour this state should have when the state is in toggle mode &
-# its animation is finished or doesn't exist: what state it should go to
-func exit_toggle_state() -> void:
-	if states_machine.is_class("PushdownAutomata"):
-		states_machine.go_to_previous_non_toggle_state()
-	else:
-		states_machine.set_state(states_machine.previous_state)

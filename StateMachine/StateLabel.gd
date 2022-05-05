@@ -13,7 +13,7 @@ func get_class() -> String: return "StateLabel"
 
 func _ready() -> void:
 	yield(get_parent(), "ready")
-	var __ = get_parent().connect("state_changed_recursive", self, "_on_StateMachine_state_changed_recursive")
+	var __ = get_parent().connect("state_entered_recursive", self, "_on_StateMachine_state_entered_recursive")
 	
 	_update_text(get_parent().current_state)
 
@@ -35,5 +35,5 @@ func get_state_name_recursive(state: Node) -> String:
 			return state.name
 
 
-func _on_StateMachine_state_changed_recursive(state: Node) -> void:
+func _on_StateMachine_state_entered_recursive(state: Node) -> void:
 	_update_text(state)
