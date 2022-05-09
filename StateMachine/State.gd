@@ -7,11 +7,12 @@ enum MODE {
 	NON_INTERRUPTABLE
 }
 
-
 func get_class() -> String : return "State"
 func is_class(value: String) -> bool: return value == "State" or .is_class(value)
 
 export(MODE) var mode = MODE.DEFAULT
+
+export var connexions_array : Array = []
 
 signal state_animation_finished
 
