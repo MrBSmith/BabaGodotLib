@@ -24,7 +24,7 @@ func get_class() -> String: return "PushdownAutomata"
 
 #### LOGIC ####
 
-func set_state(state):
+func set_state(state, force: bool = false):
 	if state is String:
 		state = get_node(state)
 	

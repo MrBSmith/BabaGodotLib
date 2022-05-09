@@ -1,3 +1,4 @@
+tool
 extends Node
 class_name State
 
@@ -13,6 +14,8 @@ func is_class(value: String) -> bool: return value == "State" or .is_class(value
 export(MODE) var mode = MODE.DEFAULT
 
 export var connexions_array : Array = []
+
+var graph_position := Vector2.ZERO
 
 signal state_animation_finished
 
@@ -33,10 +36,17 @@ onready var states_machine = get_parent()
 func _ready() -> void:
 	if mode == MODE.NON_INTERRUPTABLE:
 		var __ = connect("state_animation_finished", states_machine, "_on_non_interuptable_state_animation_finished")
-
+	
+	if states_machine != null && states_machine.is_class("StateMachine"):
+		states_machine.emit_signal("state_added", self)
 
 
 #### CALLBACKS ####
+
+func _exit_tree() -> void:
+	if states_machine != null && states_machine.is_class("StateMachine"):
+		states_machine.emit_signal("state_removed", self)
+
 
 # Called when the current state of the state machine is set to this node
 func enter_state() -> void:

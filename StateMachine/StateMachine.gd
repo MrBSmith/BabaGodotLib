@@ -1,3 +1,4 @@
+tool
 extends State
 class_name StateMachine
 
@@ -35,9 +36,12 @@ signal state_changing(from_state, to_state)
 
 # Called after the state have changed (After the enter_state callback)
 signal state_entered(state)
+signal state_entered_recursive(state)
+
 signal state_exited(state)
 
-signal state_entered_recursive(state)
+signal state_added(state)
+signal state_removed(state)
 
 func is_class(value: String): return value == "StateMachine" or .is_class(value)
 func get_class() -> String: return "StateMachine"
@@ -46,6 +50,10 @@ func get_class() -> String: return "StateMachine"
 
 # Set the state to the first of the list
 func _ready():
+	if Engine.editor_hint:
+		set_physics_process(false)
+		return
+	
 	yield(owner, "ready")
 	
 	var __ = connect("state_entered", self, "_on_state_entered")
@@ -155,6 +163,19 @@ func has_state(state_name: String) -> bool:
 		if state.is_class("State") && state.name == state_name:
 			return true
 	return false
+
+
+# Returns an array containing all the states children of this FSM
+# If the recursive argument is true, this function will fetch states recursivly, meaning also nested states 
+func fetch_states(array: Array, recursive: bool = false):
+	for child in get_children():
+		if child is State && not child in array:
+			array.append(child)
+			
+			if recursive && child.is_class("StateMachine"):
+				child.fetch_states(array, true)
+	
+	return array
 
 
 func is_nested() -> bool:
