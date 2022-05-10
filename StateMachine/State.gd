@@ -14,8 +14,7 @@ func is_class(value: String) -> bool: return value == "State" or .is_class(value
 export(MODE) var mode = MODE.DEFAULT
 
 export var connexions_array : Array = []
-
-var graph_position := Vector2.ZERO
+export var graph_position := Vector2.ZERO
 
 signal state_animation_finished
 

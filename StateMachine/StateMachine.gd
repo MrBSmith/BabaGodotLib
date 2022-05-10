@@ -157,6 +157,10 @@ func set_state_by_id(state_id: int):
 		set_state(state)
 
 
+func get_state_by_name(state_name: String) -> Node:
+	return get_node(state_name)
+
+
 # Returns true if a state with the given name is a direct child of the statemachine, and inherit State
 func has_state(state_name: String) -> bool:
 	for state in get_children():
