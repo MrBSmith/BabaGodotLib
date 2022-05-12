@@ -40,7 +40,9 @@ signal state_entered_recursive(state)
 
 signal state_exited(state)
 
+#warning-ignore:unused_signal
 signal state_added(state)
+#warning-ignore:unused_signal
 signal state_removed(state)
 
 func is_class(value: String): return value == "StateMachine" or .is_class(value)
@@ -76,14 +78,12 @@ func _ready():
 func _physics_process(delta):
 	if current_state == null:
 		return
-	var state_name = current_state.update_state(delta)
-	if state_name:
-		var state = get_node_or_null(state_name)
-		
-		if state:
-			set_state(state)
-		else:
-			push_error("Couldn't find a state named: %s " % state_name)
+	
+	current_state.update_state(delta)
+	
+	var new_state = current_state.check_exit_conditions()
+	if new_state:
+		set_state(new_state)
 
 
 #### LOGIC ####

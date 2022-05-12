@@ -13,7 +13,7 @@ func is_class(value: String) -> bool: return value == "State" or .is_class(value
 
 export(MODE) var mode = MODE.DEFAULT
 
-export var connexions_array : Array = []
+export var connexions_array : Array
 export var graph_position := Vector2.ZERO
 
 signal state_animation_finished
@@ -38,6 +38,8 @@ func _ready() -> void:
 	
 	if states_machine != null && states_machine.is_class("StateMachine"):
 		states_machine.emit_signal("state_added", self)
+	
+	get_script().set_local_to_scene(true)
 
 
 #### CALLBACKS ####
@@ -61,6 +63,14 @@ func update_state(_delta: float) -> void:
 	pass
 
 
+func check_exit_conditions() -> Object:
+	for connexion in connexions_array:
+		if are_all_conditions_verified(connexion):
+			var state = owner.get_node(connexion.to)
+			return state
+	return null
+
+
 #### LOGIC ###
 
 func exit() -> void:
@@ -82,3 +92,72 @@ func is_current_state() -> bool:
 	else:
 		return states_machine.current_state == self
 
+
+func add_connexion(to: State) -> void:
+	if !find_connexion(to).empty():
+		print("connexion already exists, aborting")
+		return
+	
+	var connexion = {
+		"to": str(owner.get_path_to(to)),
+		"conditions": []
+	}
+	
+	if connexions_array.empty():
+		connexions_array = [connexion]
+	else:
+		connexions_array.append(connexion)
+	
+	print("connexion added. %s -> %s" % [name, to.name])
+
+
+func remove_connexion(to: State) -> void:
+	var connexion_id = find_connexion_id(to)
+	connexions_array.remove(connexion_id)
+
+
+func find_connexion(to: State) -> Dictionary:
+	for con in connexions_array:
+		if con["to"] == str(owner.get_path_to(to)):
+			return con
+	return {}
+
+
+func find_connexion_id(to: State) -> int:
+	var connexion = find_connexion(to)
+	return connexions_array.find(connexion)
+
+
+func connexion_add_condition(connexion: Dictionary, str_condition: String, target_path: NodePath) -> void:
+	var condition = {
+		"condition": str_condition,
+		"target_path": target_path
+	}
+
+	connexion["condition"].append(condition)
+
+
+func connexion_find_condition_index(connexion: Dictionary, str_condition: String, target_path: NodePath) -> int:
+	for i in range(connexion["conditions"].size()):
+		var cond = connexion["conditions"][i]
+		if cond["condition"] == str_condition && cond["target_path"] == target_path:
+			return i
+	return -1
+
+
+func are_all_conditions_verified(connexion: Dictionary) -> bool:
+	for condition in connexion["conditions"]:
+		if !is_condition_verified(condition):
+			return false
+	return true
+
+
+func is_condition_verified(condition: Dictionary) -> bool:
+	var target = get_node(condition["target_path"])
+	var cond = condition["condition"]
+	var value = target.call(cond) if target.has_method(cond) else target.get(cond)
+	
+	if value is bool:
+		return value
+	
+	return false
