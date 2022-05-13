@@ -63,9 +63,13 @@ func update_state(_delta: float) -> void:
 	pass
 
 
-func check_exit_conditions() -> Object:
+func check_exit_conditions(event_trigger: String = "process") -> Object:
 	for connexion in connexions_array:
-		if are_all_conditions_verified(connexion):
+		var event = connexion_find_event(connexion, event_trigger)
+		if event.empty():
+			continue
+		
+		if are_all_conditions_verified(event):
 			var state = owner.get_node(connexion.to)
 			return state
 	return null
@@ -100,7 +104,7 @@ func add_connexion(to: State) -> void:
 	
 	var connexion = {
 		"to": str(owner.get_path_to(to)),
-		"conditions": []
+		"events": []
 	}
 	
 	if connexions_array.empty():
@@ -128,25 +132,50 @@ func find_connexion_id(to: State) -> int:
 	return connexions_array.find(connexion)
 
 
-func connexion_add_condition(connexion: Dictionary, str_condition: String, target_path: NodePath) -> void:
+func connexion_find_event(connexion: Dictionary, event_trigger: String) -> Dictionary:
+	for event in connexion["events"]:
+		if event["trigger"] == event_trigger:
+			return event
+	return {}
+
+
+func connexion_add_event(connexion: Dictionary, trigger : String = "process") -> Dictionary:
+	if !connexion_find_event(connexion, trigger).empty():
+		push_warning("Couldn't create a new event, an event with the tirgger %s already exists" % trigger)
+		return {}
+	
+	var event = {
+		"trigger": trigger,
+		"conditions": []
+	}
+	
+	connexion["events"].append(event)
+	return event
+
+
+func connexion_add_condition(connexion: Dictionary, event_trigger: String = "process", str_condition: String = "", target_path: NodePath = get_path_to(owner)) -> void:
 	var condition = {
 		"condition": str_condition,
 		"target_path": target_path
 	}
+	
+	var event = connexion_find_event(connexion, event_trigger)
+	if event.empty():
+		event = connexion_add_event(connexion, event_trigger)
+	
+	event["conditions"].append(condition)
 
-	connexion["condition"].append(condition)
 
-
-func connexion_find_condition_index(connexion: Dictionary, str_condition: String, target_path: NodePath) -> int:
-	for i in range(connexion["conditions"].size()):
-		var cond = connexion["conditions"][i]
+func event_find_condition_index(event : Dictionary, str_condition := "", target_path: NodePath = get_path_to(owner)) -> int:
+	for i in range(event["conditions"].size()):
+		var cond = event["conditions"][i]
 		if cond["condition"] == str_condition && cond["target_path"] == target_path:
 			return i
 	return -1
 
 
-func are_all_conditions_verified(connexion: Dictionary) -> bool:
-	for condition in connexion["conditions"]:
+func are_all_conditions_verified(event: Dictionary) -> bool:
+	for condition in event["conditions"]:
 		if !is_condition_verified(condition):
 			return false
 	return true
