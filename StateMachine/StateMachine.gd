@@ -210,6 +210,13 @@ func increment_state(increment: int = 1, wrapping : bool = true):
 		set_state(state)
 
 
+func get_animation_handler() -> StateAnimationHandler:
+	for child in get_children():
+		if child is StateAnimationHandler:
+			return child
+	return null
+
+
 #### NESTED STATES MACHINES LOGIC ####
 # Applies only if this StateMachine instance is nested (ie if it has a StateMachine as a parent)
 

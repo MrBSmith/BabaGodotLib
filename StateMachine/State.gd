@@ -139,13 +139,14 @@ func connexion_find_event(connexion: Dictionary, event_trigger: String) -> Dicti
 	return {}
 
 
-func connexion_add_event(connexion: Dictionary, trigger : String = "process") -> Dictionary:
+func connexion_add_event(connexion: Dictionary, trigger : String = "process", emitter_path: String = str(get_path_to(owner))) -> Dictionary:
 	if !connexion_find_event(connexion, trigger).empty():
 		push_warning("Couldn't create a new event, an event with the tirgger %s already exists" % trigger)
 		return {}
 	
 	var event = {
 		"trigger": trigger,
+		"emitter_path": emitter_path,
 		"conditions": []
 	}
 	
@@ -153,17 +154,19 @@ func connexion_add_event(connexion: Dictionary, trigger : String = "process") ->
 	return event
 
 
-func connexion_add_condition(connexion: Dictionary, event_trigger: String = "process", str_condition: String = "", target_path: NodePath = get_path_to(owner)) -> void:
+func connexion_add_condition(connexion: Dictionary, event_dict: Dictionary = {}, str_condition: String = "", target_path: NodePath = get_path_to(owner)) -> void:
 	var condition = {
 		"condition": str_condition,
 		"target_path": target_path
 	}
 	
-	var event = connexion_find_event(connexion, event_trigger)
-	if event.empty():
-		event = connexion_add_event(connexion, event_trigger)
+	if event_dict.empty():
+		if connexion["events"].empty():
+			connexion_add_event(connexion)
+		
+		event_dict = connexion["events"][0]
 	
-	event["conditions"].append(condition)
+	event_dict["conditions"].append(condition)
 
 
 func event_find_condition_index(event : Dictionary, str_condition := "", target_path: NodePath = get_path_to(owner)) -> int:

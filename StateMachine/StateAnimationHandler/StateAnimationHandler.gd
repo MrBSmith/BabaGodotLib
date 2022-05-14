@@ -1,3 +1,4 @@
+tool
 extends Node
 class_name StateAnimationHandler
 
@@ -18,6 +19,9 @@ func get_class() -> String: return "StateAnimationHandler"
 #### BUILT-IN ####
 
 func _ready() -> void:
+	if Engine.editor_hint:
+		return
+	
 	yield(owner, "ready")
 	
 	var __ = get_parent().connect("state_entered", self, "_on_StateMachine_state_entered")
