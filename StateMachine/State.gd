@@ -75,6 +75,29 @@ func check_exit_conditions(event_trigger: String = "process") -> Object:
 	return null
 
 
+func connect_connexions_events(listener: Node, disconnect: bool = false) -> void:
+	for connexion in connexions_array:
+		for event in connexion["events"]:
+			var trigger = event["trigger"]
+			
+			if trigger == "process":
+				continue
+			
+			var emitter_path = event["emitter_path"]
+			var emitter = get_node_or_null(emitter_path)
+			
+			if emitter == null:
+				push_error("event emitter can't be found at path %s" % emitter_path)
+			else:
+				if emitter.has_signal(trigger):
+					if disconnect:
+						var __ = emitter.disconnect(trigger, listener, "_on_current_state_event")
+					else:
+						var __ = emitter.connect(trigger, listener, "_on_current_state_event", [connexion, event])
+				else:
+					push_error("The emitter found a path %s has no signal named %s" % [emitter_path, trigger])
+
+
 #### LOGIC ###
 
 func exit() -> void:
@@ -162,9 +185,9 @@ func connexion_add_condition(connexion: Dictionary, event_dict: Dictionary = {},
 	
 	if event_dict.empty():
 		if connexion["events"].empty():
-			connexion_add_event(connexion)
-		
-		event_dict = connexion["events"][0]
+			event_dict = connexion_add_event(connexion)
+		else:
+			event_dict = connexion["events"][0]
 	
 	event_dict["conditions"].append(condition)
 

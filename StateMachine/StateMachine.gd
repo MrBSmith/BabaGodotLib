@@ -82,7 +82,7 @@ func _physics_process(delta):
 	current_state.update_state(delta)
 	
 	var new_state = current_state.check_exit_conditions()
-	if new_state:
+	if new_state != null:
 		set_state(new_state)
 
 
@@ -129,6 +129,7 @@ func set_state(new_state, force: bool = false):
 	
 	# Use the exit state function of the current state
 	if current_state != null:
+		current_state.connect_connexions_events(self, true)
 		emit_signal("state_exited", current_state)
 		current_state.exit_state()
 	
@@ -139,6 +140,7 @@ func set_state(new_state, force: bool = false):
 	
 	# Use the enter_state function of the current state
 	if new_state != null && (!is_nested() or new_state.is_current_state()):
+		current_state.connect_connexions_events(self)
 		emit_signal("state_entered", current_state)
 		current_state.enter_state()
 
@@ -258,3 +260,13 @@ func _on_non_interuptable_state_animation_finished() -> void:
 	if buffered_state != null:
 		set_state(buffered_state, true)
 		buffered_state = null
+
+
+func _on_current_state_event(connexion: Dictionary, event: Dictionary) -> void:
+	if are_all_conditions_verified(event):
+		var dest_state = owner.get_node_or_null(connexion["to"])
+		
+		if dest_state == null:
+			push_error("The connexion event & conditions are fullfiled, but the destination state couldn't be find, aborting")
+		else:
+			set_state(dest_state)
