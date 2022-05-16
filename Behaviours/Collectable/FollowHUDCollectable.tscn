@@ -1,12 +1,23 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://BabaGodotLib/Behaviours/Collectable/FollowHUDCollectable.gd" type="Script" id=1]
 [ext_resource path="res://BabaGodotLib/Behaviours/Collectable/FollowCollectable.tscn" type="PackedScene" id=2]
 [ext_resource path="res://BabaGodotLib/Behaviours/Collectable/Collect.gd" type="Script" id=3]
+[ext_resource path="res://addons/StateGraph/StateMachine/State.gd" type="Script" id=4]
+[ext_resource path="res://addons/StateGraph/StateMachine/StateMachine.gd" type="Script" id=5]
 
 [node name="FollowHUDCollectable" instance=ExtResource( 2 )]
 script = ExtResource( 1 )
 
+[node name="StateMachine" parent="." index="3"]
+script = ExtResource( 5 )
+standalone_trigger = {
+}
+
+[node name="Idle" parent="StateMachine" index="0"]
+script = ExtResource( 4 )
+standalone_trigger = {
+}
+
 [node name="Collect" parent="StateMachine" index="2"]
 script = ExtResource( 3 )
-speed = 600.0
