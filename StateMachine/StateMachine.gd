@@ -27,6 +27,8 @@ export var no_default_state : bool = false
 # Whenever the state is exited, the state will be changed to the buffered one
 var buffered_state : Object = null
 
+var standalone_triggers_states = []
+
 # Usefull only if this instance of StateMachine is nested (ie its parent is also a StateMachine)
 # When this state is entered, if this bool is true, reset the child state to the default one
 export var reset_to_default : bool = false
@@ -72,6 +74,19 @@ func _ready():
 	# Nested StateMachines shouldn't have a current_state if they are not the current_state of its parent
 	if !is_nested() && !no_default_state:
 		set_state(default_state)
+	
+	# Connect all state's standalone triggers
+	for child in get_children():
+		if child is State:
+			if !child.standalone_trigger.has("events"):
+				continue
+			
+			for event in child.standalone_trigger["events"]:
+				if event["trigger"] == "process":
+					standalone_triggers_states.append(child)
+				else:
+					var emitter = child.get_node_or_null(event["emitter_path"])
+					__ = emitter.connect(event["trigger"], self, "_on_standalone_trigger_event", [child, event])
 
 
 # Call for the current state process at every frame of the physic process
@@ -80,6 +95,11 @@ func _physics_process(delta):
 		return
 	
 	current_state.update_state(delta)
+	
+	for state in standalone_triggers_states:
+		for event in state.standalone_trigger["events"]:
+			if event["trigger"] == "process" && state.are_all_conditions_verified(event):
+				set_state(state)
 	
 	var new_state = current_state.check_exit_conditions()
 	if new_state != null:
@@ -262,11 +282,16 @@ func _on_non_interuptable_state_animation_finished() -> void:
 		buffered_state = null
 
 
-func _on_current_state_event(connexion: Dictionary, event: Dictionary) -> void:
-	if are_all_conditions_verified(event):
+func _on_current_state_event(state: State, connexion: Dictionary, event: Dictionary) -> void:
+	if state.are_all_conditions_verified(event):
 		var dest_state = owner.get_node_or_null(connexion["to"])
 		
 		if dest_state == null:
 			push_error("The connexion event & conditions are fullfiled, but the destination state couldn't be find, aborting")
 		else:
 			set_state(dest_state)
+
+
+func _on_standalone_trigger_event(state: State, event: Dictionary) -> void:
+	if state.are_all_conditions_verified(event):
+		set_state(state)

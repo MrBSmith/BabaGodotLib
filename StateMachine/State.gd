@@ -14,17 +14,21 @@ func is_class(value: String) -> bool: return value == "State" or .is_class(value
 export(MODE) var mode = MODE.DEFAULT
 
 export var connexions_array : Array
+export var standalone_trigger : Dictionary
+
 export var graph_position := Vector2.ZERO
 
 signal state_animation_finished
+signal standalone_trigger_added
+signal standalone_trigger_removed
 
 # Abstract base class for a state in a statemachine
 
 # Defines the behaviour of the entity possesing the statemachine 
 # when the entity is in this state
 
-# The enter_state is called every time the state is entered and exit_state when its exited
-# the update_state of the currrent state is called every physics tick,  
+# The enter_state is called every time the state is entered and exit_state when it's exited
+# the update_state method of the currrent state is called every physics tick,  
 # by the physics_process of the StateMachine 
 
 onready var states_machine = get_parent()
@@ -65,7 +69,7 @@ func update_state(_delta: float) -> void:
 
 func check_exit_conditions(event_trigger: String = "process") -> Object:
 	for connexion in connexions_array:
-		var event = connexion_find_event(connexion, event_trigger)
+		var event = trigger_find_event(connexion, event_trigger)
 		if event.empty():
 			continue
 		
@@ -93,7 +97,7 @@ func connect_connexions_events(listener: Node, disconnect: bool = false) -> void
 					if disconnect:
 						var __ = emitter.disconnect(trigger, listener, "_on_current_state_event")
 					else:
-						var __ = emitter.connect(trigger, listener, "_on_current_state_event", [connexion, event])
+						var __ = emitter.connect(trigger, listener, "_on_current_state_event", [self, connexion, event], CONNECT_REFERENCE_COUNTED)
 				else:
 					push_error("The emitter found a path %s has no signal named %s" % [emitter_path, trigger])
 
@@ -126,6 +130,7 @@ func add_connexion(to: State) -> void:
 		return
 	
 	var connexion = {
+		"type": "connexion",
 		"to": str(owner.get_path_to(to)),
 		"events": []
 	}
@@ -143,6 +148,23 @@ func remove_connexion(to: State) -> void:
 	connexions_array.remove(connexion_id)
 
 
+func add_standalone_trigger() -> void:
+	if standalone_trigger.empty():
+		standalone_trigger = {
+			"type": "standalone_trigger",
+			"events": []
+		}
+		
+		emit_signal("standalone_trigger_added")
+	else:
+		push_error("Can't add a standalone trigger, the state %s already has one" % name)
+
+
+func remove_standalone_trigger() -> void:
+	standalone_trigger = {}
+	emit_signal("standalone_trigger_removed")
+
+
 func find_connexion(to: State) -> Dictionary:
 	for con in connexions_array:
 		if con["to"] == str(owner.get_path_to(to)):
@@ -155,37 +177,39 @@ func find_connexion_id(to: State) -> int:
 	return connexions_array.find(connexion)
 
 
-func connexion_find_event(connexion: Dictionary, event_trigger: String) -> Dictionary:
-	for event in connexion["events"]:
+func trigger_find_event(trigger: Dictionary, event_trigger: String) -> Dictionary:
+	for event in trigger["events"]:
 		if event["trigger"] == event_trigger:
 			return event
 	return {}
 
 
-func connexion_add_event(connexion: Dictionary, trigger : String = "process", emitter_path: String = str(get_path_to(owner))) -> Dictionary:
-	if !connexion_find_event(connexion, trigger).empty():
+func trigger_add_event(trigger: Dictionary, event_trigger : String = "process", emitter_path: String = str(get_path_to(owner))) -> Dictionary:
+	if !trigger_find_event(trigger, event_trigger).empty():
 		push_warning("Couldn't create a new event, an event with the tirgger %s already exists" % trigger)
 		return {}
 	
 	var event = {
-		"trigger": trigger,
+		"type": "event",
+		"trigger": event_trigger,
 		"emitter_path": emitter_path,
 		"conditions": []
 	}
 	
-	connexion["events"].append(event)
+	trigger["events"].append(event)
 	return event
 
 
-func connexion_add_condition(connexion: Dictionary, event_dict: Dictionary = {}, str_condition: String = "", target_path: NodePath = get_path_to(owner)) -> void:
+func trigger_add_condition(connexion: Dictionary, event_dict: Dictionary = {}, str_condition: String = "", target_path: NodePath = get_path_to(owner)) -> void:
 	var condition = {
+		"type": "condition",
 		"condition": str_condition,
 		"target_path": target_path
 	}
 	
 	if event_dict.empty():
 		if connexion["events"].empty():
-			event_dict = connexion_add_event(connexion)
+			event_dict = trigger_add_event(connexion)
 		else:
 			event_dict = connexion["events"][0]
 	
@@ -207,12 +231,7 @@ func are_all_conditions_verified(event: Dictionary) -> bool:
 	return true
 
 
-func is_condition_verified(condition: Dictionary) -> bool:
-	var target = get_node(condition["target_path"])
-	var cond = condition["condition"]
-	var value = target.call(cond) if target.has_method(cond) else target.get(cond)
-	
-	if value is bool:
-		return value
-	
-	return false
+func is_condition_verified(condition_dict: Dictionary) -> bool:
+	var target = get_node(condition_dict["target_path"])
+	var condition = condition_dict["condition"]
+	return ConditionInterpretor.inquire_condition(condition, target)
