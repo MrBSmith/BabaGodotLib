@@ -132,6 +132,38 @@ static func trim_image(image: Image) -> Image:
 	return output_img
 
 
+static func fetch(node: Node, wanted_class: String) -> Array:
+	var array = []
+	for child in node.get_children():
+		if child.is_class(wanted_class):
+			array.append(child)
+	return array
+
+
+static func fetch_recursive(node: Node, wanted_class: String, array: Array) -> void:
+	for child in node.get_children():
+		if child.is_class(wanted_class) && not child in array:
+			array.append(child)
+		
+		if child.get_child_count() > 0:
+			fetch_recursive(child, wanted_class, array)
+
+
+static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
+	var array = []
+	for child in node.get_children():
+		var file_path = child.filename
+		
+		if file_path == "":
+			continue
+		
+		var file_name = file_path.split("/")[-1]
+		
+		if file_name == scene_name + ".tscn":
+			array.append(child)
+	
+	return array
+
 
 #### INPUTS ####
 
