@@ -94,7 +94,11 @@ func fetch_default_profiles_data(default_profile_file_path: String) -> void:
 # Each section have to correspond to a profile, if sections_to_read is empty, each sections of the file will be considered a profile
 func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array = []) -> Array:
 	var input_profile_config_file = ConfigFile.new()
-	var err = input_profile_config_file.load(file_path)
+	
+	var prefix = DirNavHelper._get_path_prefix(file_path)
+	var file_path_prefix = prefix if prefix != "" else "res://"
+	var complete_file_path = file_path_prefix + file_path
+	var err = input_profile_config_file.load(complete_file_path)
 	
 	if sections_to_read.empty():
 		sections_to_read = input_profile_config_file.get_sections()
@@ -118,8 +122,8 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 
 
 # Fetch the player's default_profile file content, then map the profile fetched
-func map_player_default_profile(players_settings_file_path: String) -> void:
-	var profile_array = _fetch_input_profile_from_file(players_settings_file_path, ["controls"])
+func map_player_default_profile(players_settings_file_path: String, sections: Array = []) -> void:
+	var profile_array = _fetch_input_profile_from_file(players_settings_file_path, sections)
 	var players_input_profile = null if profile_array.empty() else profile_array[0]
 	
 	if players_input_profile == null:

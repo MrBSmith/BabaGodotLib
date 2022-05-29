@@ -31,7 +31,10 @@ static func create_dir(dir_path : String):
 
 
 static func _get_path_prefix(path: String) -> String:
-	return path.split("/")[0] + "//"
+	if "//" in path:
+		return path.split("/")[0] + "//"
+	else:
+		return ""
 
 
 static func read_file_line(path: String) -> String:
@@ -60,8 +63,13 @@ static func is_dir_existing(dir_path : String) -> bool:
 static func is_file_existing(file_path: String) -> bool:
 	var dir = Directory.new()
 	var prefix = _get_path_prefix(file_path)
-	dir.open(prefix)
-	return dir.file_exists(file_path)
+	var dir_path = prefix if prefix != "" else "res://"
+	
+	if dir.open(dir_path) == OK:
+		return dir.file_exists(file_path)
+	else:
+		push_error("couldn't open dir at path %s" % dir_path)
+		return false
 
 
 # Check if the give directory is empty or not
