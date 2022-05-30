@@ -177,10 +177,11 @@ static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
 	return matching_actions
 
 
-static func key_find_matching_actions(key_scancode: int) -> PoolStringArray:
+static func key_find_matching_actions(key_scancode: int, action_names : Array = []) -> PoolStringArray:
 	var matching_actions = PoolStringArray()
+	var actions_array = action_names if !action_names.empty() else InputMap.get_actions()
 	
-	for action in InputMap.get_actions():
+	for action in actions_array:
 		for event in InputMap.get_action_list(action):
 			if event is InputEventKey && event.scancode == key_scancode:
 				matching_actions.append(action)
