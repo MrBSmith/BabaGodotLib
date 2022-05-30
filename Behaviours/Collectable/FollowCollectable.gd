@@ -23,7 +23,6 @@ func _ready() -> void:
 	var __ = $FollowArea.connect("body_entered", self, "_on_follow_area_body_entered")
 
 
-
 #### VIRTUALS ####
 
 

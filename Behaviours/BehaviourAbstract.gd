@@ -33,8 +33,6 @@ func is_disabled() -> bool: return disabled
 #### BUILT-IN ####
 
 func _ready() -> void:
-	yield(owner, "ready")
-	
 	owner.add_to_group(behaviour_type)
 
 
