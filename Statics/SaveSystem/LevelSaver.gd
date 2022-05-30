@@ -3,18 +3,17 @@ class_name LevelSaver
 
 
 # Find recursivly every wanted nodes, and extract their wanted properties
-static func serialize_level_properties(property_dict: Dictionary, current_node : Node, dict_to_fill : Dictionary):
+static func serialize_level_properties(property_dict: Dictionary, node : Node, dict_to_fill : Dictionary):
 	var classes_to_scan_array = property_dict.keys()
-	for child in current_node.get_children():
-		for node_class in classes_to_scan_array:
-			if child.is_class(node_class) or child.is_in_group(node_class):
-				var object_properties = get_object_properties(property_dict, child, node_class)
-				
-				dict_to_fill[child.get_path()] = object_properties
-				continue
-		
-		if child.get_child_count() != 0:
-			serialize_level_properties(property_dict, child, dict_to_fill)
+	for node_class in classes_to_scan_array:
+		if node.is_class(node_class) or node.is_in_group(node_class):
+			var object_properties = get_object_properties(property_dict, node, node_class)
+			
+			dict_to_fill[node.get_path()] = object_properties
+			break
+	
+	for child in node.get_children():
+		serialize_level_properties(property_dict, child, dict_to_fill)
 
 
 

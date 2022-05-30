@@ -2,30 +2,6 @@ extends Node
 class_name LevelLoader
 
 
-# Load the json file corresponding to the given level_name
-# Return a dictionary containing every objects with their path as a key and a property dict as value
-# The property dict contains each property name as key and property value as value
-static func load_level_properties_from_json(dir: String) -> Dictionary:
-	var loaded_level_properties : Dictionary = {}
-	var loaded_objects : Dictionary = _deserialize_level_properties(dir)
-	for object_dict in loaded_objects.keys():
-		var property_dict : Dictionary = {}
-		for keys in loaded_objects[object_dict].keys():
-			if keys == "name":
-				continue
-			var property_value
-			var string_property_value = String(loaded_objects[object_dict][keys])
-			match _get_string_value_type(string_property_value):
-				"Vector2" : property_value = _get_vector_from_string(string_property_value)
-				"int"  : property_value = int(string_property_value)
-				"float" : property_value = float(string_property_value)
-				"bool" : property_value = _get_bool_from_string(string_property_value)
-			property_dict[keys] = property_value
-		loaded_level_properties[object_dict] = property_dict
-	
-	return loaded_level_properties
-
-
 # Get the .json file, and convert it to a usable dictionary of property
 static func _deserialize_level_properties(file_path : String) -> Dictionary:
 	var level_properties  : String = ""
