@@ -165,6 +165,13 @@ static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
 	return array
 
 
+
+#### STRINGS ####
+
+static func to_snake(string: String) -> String:
+	return string.to_lower().replacen(" ", "_")
+
+
 #### INPUTS ####
 
 static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
