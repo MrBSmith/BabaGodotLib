@@ -23,8 +23,8 @@ margin_bottom = 360.0
 
 [node name="AmountLabel" type="Label" parent="." index="3"]
 margin_left = 8.0
-margin_top = 173.0
+margin_top = 170.0
 margin_right = 8.0
-margin_bottom = 186.0
+margin_bottom = 189.0
 custom_fonts/font = ExtResource( 1 )
 valign = 1

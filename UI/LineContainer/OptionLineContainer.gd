@@ -54,16 +54,16 @@ func _ready() -> void:
 func _update_alignment():
 	._update_alignment()
 	
-	if amount == int(INF) && icon_texture == null:
-		set_alignment(BoxContainer.ALIGN_END)
-		option_button.set_text_align(Button.ALIGN_RIGHT)
-	else:
-		set_alignment(BoxContainer.ALIGN_BEGIN)
-		option_button.set_text_align(Button.ALIGN_LEFT)
-	
-	if get_alignment() == BoxContainer.ALIGN_BEGIN:
-		default_margin_left = 0.0
-		set_margin(MARGIN_LEFT, default_margin_left)
+#	if amount == int(INF) && icon_texture == null:
+#		set_alignment(BoxContainer.ALIGN_END)
+#		option_button.set_text_align(Button.ALIGN_RIGHT)
+#	else:
+#		set_alignment(BoxContainer.ALIGN_BEGIN)
+#		option_button.set_text_align(Button.ALIGN_LEFT)
+#
+#	if get_alignment() == BoxContainer.ALIGN_BEGIN:
+#		default_margin_left = 0.0
+#		set_margin(MARGIN_LEFT, default_margin_left)
 
 
 #### INPUTS ####

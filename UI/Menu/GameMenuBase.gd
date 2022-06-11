@@ -7,8 +7,8 @@ enum CANCEL_ACTION {
 	NONE
 }
 
-onready var menu_option_base_scene : PackedScene = preload("res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn")
-onready var screen_title_option_base : PackedScene = null
+export var menu_option_scene : PackedScene
+export var screen_title_option_base : PackedScene
 
 export var opt_container_path : String = "VBoxContainer"
 
