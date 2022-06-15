@@ -11,7 +11,7 @@ export var hover_texture : Texture setget set_hover_texture
 
 export(int, FLAGS, "Left", "Right") var hover_texture_flags = TEXTURE_FLAGS.LEFT | TEXTURE_FLAGS.RIGHT setget set_hover_texture_flags
 
-onready var _button = $HBoxContainer/MarginContainer/Button setget , get_button
+onready var _button = $HBoxContainer/Button setget , get_button
 onready var h_box_container = $HBoxContainer
 
 onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]

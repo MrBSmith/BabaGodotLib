@@ -11,14 +11,11 @@ margin_bottom = 38.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 text = ""
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 62.0
-margin_right = 117.0
+margin_left = 63.0
+margin_right = 115.0
 margin_bottom = 38.0
 size_flags_horizontal = 6
 custom_constants/separation = 6
@@ -36,19 +33,10 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer"]
-margin_left = 20.0
-margin_right = 35.0
-margin_bottom = 38.0
-custom_constants/margin_left = 3
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Button" type="Button" parent="HBoxContainer/MarginContainer"]
+[node name="Button" type="Button" parent="HBoxContainer"]
 light_mask = 0
-margin_left = 3.0
-margin_right = 15.0
+margin_left = 20.0
+margin_right = 32.0
 margin_bottom = 38.0
 size_flags_horizontal = 0
 size_flags_vertical = 5
@@ -60,9 +48,9 @@ __meta__ = {
 }
 
 [node name="HoverTexture2" type="TextureRect" parent="HBoxContainer"]
-margin_left = 41.0
+margin_left = 38.0
 margin_top = 12.0
-margin_right = 55.0
+margin_right = 52.0
 margin_bottom = 26.0
 size_flags_vertical = 6
 texture = ExtResource( 3 )

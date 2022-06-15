@@ -1,10 +1,20 @@
+tool
 extends TextLineContainer
 class_name OptionLineContainer
 
-onready var option_button = $MenuOptionBase
+enum ALIGN {
+	LEFT,
+	CENTER,
+	RIGHT
+}
+
+onready var option = $MenuOptionBase
+onready var option_button = $MenuOptionBase/HBoxContainer/Button
 
 signal option_chose(option_ref)
 signal focus_changed(entity, focus)
+
+export(ALIGN) var align : int = ALIGN.CENTER
 
 #### ACCESSORS ####
 
@@ -15,7 +25,7 @@ func get_class() -> String: return "OptionLineContainer"
 func set_hidden(value: bool):
 	.set_hidden(value)
 	
-	if value == false && option_button.is_focused():
+	if value == false && option.is_focused():
 		emit_signal("focus_changed", option_button, option_button.is_focused())
 
 
@@ -42,8 +52,11 @@ func set_all_caps(value: bool):
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = option_button.connect("option_chose", self, "_on_button_option_chose")
-	__ = option_button.connect("focus_changed", self, "_on_focus_changed")
+	var __ = option.connect("option_chose", self, "_on_button_option_chose")
+	__ = option.connect("focus_changed", self, "_on_focus_changed")
+	
+	option_button.set_text_align(align)
+	option.size_flags_horizontal = 2
 
 #### VIRTUALS ####
 
@@ -54,16 +67,16 @@ func _ready() -> void:
 func _update_alignment():
 	._update_alignment()
 	
-#	if amount == int(INF) && icon_texture == null:
-#		set_alignment(BoxContainer.ALIGN_END)
-#		option_button.set_text_align(Button.ALIGN_RIGHT)
-#	else:
-#		set_alignment(BoxContainer.ALIGN_BEGIN)
-#		option_button.set_text_align(Button.ALIGN_LEFT)
-#
-#	if get_alignment() == BoxContainer.ALIGN_BEGIN:
-#		default_margin_left = 0.0
-#		set_margin(MARGIN_LEFT, default_margin_left)
+	if amount == int(INF) && icon_texture == null:
+		set_alignment(BoxContainer.ALIGN_END)
+		option_button.set_text_align(Button.ALIGN_RIGHT)
+	else:
+		set_alignment(BoxContainer.ALIGN_BEGIN)
+		option_button.set_text_align(Button.ALIGN_LEFT)
+
+	if get_alignment() == BoxContainer.ALIGN_BEGIN:
+		default_margin_left = 0.0
+		set_margin(MARGIN_LEFT, default_margin_left)
 
 
 #### INPUTS ####
@@ -72,8 +85,8 @@ func _update_alignment():
 
 #### SIGNAL RESPONSES ####
 
-func _on_button_option_chose(option: MenuOptionsBase):
-	emit_signal("option_chose", option)
+func _on_button_option_chose(_option: MenuOptionsBase):
+	emit_signal("option_chose", _option)
 
 
 func _on_focus_changed(button: Button, focused: bool):
