@@ -1,15 +1,12 @@
 extends MenuBase
 class_name ListMenu
 
-export var description_window_path : String = "res://BabaGodotLib/UI/Windows/DescritpionWindow.tscn"
-export var menu_option_scene_path : String = "res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn"
 export var option_v_separation : int = INF 
 export var column_container_path : String = "HBoxContainer"
+export var description_window_scene : PackedScene
 
 onready var menu_root = $MenuRoot
 onready var column_container = get_node_or_null(column_container_path)
-onready var menu_option_scene = load(menu_option_scene_path)
-onready var description_window_scene = load(description_window_path)
 onready var current_menu = null setget set_current_menu, get_current_menu
 
 export var max_lines : int = 3 setget set_max_lines, get_max_lines

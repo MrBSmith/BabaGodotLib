@@ -2,10 +2,19 @@ tool
 extends Control
 class_name MenuOptionsBase
 
-onready var _button = $HBoxContainer/MarginContainer/Button setget , get_button
+enum TEXTURE_FLAGS {
+	LEFT = 1,
+	RIGHT = 2
+}
+
+export var hover_texture : Texture setget set_hover_texture
+
+export(int, FLAGS, "Left", "Right") var hover_texture_flags = TEXTURE_FLAGS.LEFT | TEXTURE_FLAGS.RIGHT setget set_hover_texture_flags
+
+onready var _button = $HBoxContainer/Button setget , get_button
 onready var h_box_container = $HBoxContainer
 
-onready var hover_textures = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]
+onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]
 
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
@@ -82,6 +91,21 @@ func is_accessible() -> bool:
 func get_button() -> Button:
 	return _button
 
+func set_hover_texture(value: Texture) -> void:
+	hover_texture = value
+	
+	if !is_inside_tree():
+		yield(self, "ready")
+	
+	for sprite in hover_sprites:
+		sprite.set_texture(hover_texture)
+func set_hover_texture_flags(value: int) -> void:
+	hover_texture_flags = value
+	
+	$HBoxContainer/HoverTexture.set_visible(hover_texture_flags & TEXTURE_FLAGS.LEFT)
+	$HBoxContainer/HoverTexture2.set_visible(hover_texture_flags & TEXTURE_FLAGS.RIGHT)
+
+
 #### BUILT-IN ####
 
 func _ready() -> void:
@@ -112,9 +136,11 @@ func _ready() -> void:
 #### LOGIC ####
 
 func set_hover_icons_modulate(color: Color) -> void:
-	for hover_texture in h_box_container.get_children():
-		if hover_texture is TextureRect:
-			hover_texture.set_modulate(color)
+	for child in h_box_container.get_children():
+		if child is TextureRect:
+			child.set_modulate(color)
+
+
 
 #### SIGNAL RESPONSES ####
 
@@ -176,6 +202,6 @@ func _on_button_up() -> void:
 
 
 func _on_disabled_changed(_value: bool) -> void:
-	for texture in hover_textures:
+	for sprite in hover_sprites:
 		var alpha = int(!disabled)
-		texture.self_modulate.a = alpha
+		sprite.self_modulate.a = alpha

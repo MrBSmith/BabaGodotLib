@@ -7,8 +7,8 @@ enum CANCEL_ACTION {
 	NONE
 }
 
-onready var menu_option_base_scene : PackedScene = preload("res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionBase.tscn")
-onready var screen_title_option_base : PackedScene = null
+export var menu_option_scene : PackedScene
+export var screen_title_option_base : PackedScene
 
 export var opt_container_path : String = "VBoxContainer"
 
@@ -178,14 +178,14 @@ func _fetch_menu_option_array() -> Array:
 # or directly in child of the optioncontainer.
 # Specify : menu option base scene, upper node name, hidden, all caps, text and disabled
 # !new_button_text parameter can contains spaces!
-func _instantiate_new_menu_button(menu_option_scene : PackedScene = null,\
+func _instantiate_new_menu_button(option_scene : PackedScene = null,\
 								option_upper_node_name : String = "",\
 								new_button_hidden : bool = true,\
 								new_button_allcaps : bool = false,\
 								new_button_text : String = "",\
 								new_button_disabled : bool = false) -> void:
 	if new_button_text != "":
-		var new_button = menu_option_scene.instance()
+		var new_button = option_scene.instance()
 		
 		# set name of the button by replacing spaces with void character (" " => "")
 		# so that there is no space in the tree, but correctly displayed with spaces in game
