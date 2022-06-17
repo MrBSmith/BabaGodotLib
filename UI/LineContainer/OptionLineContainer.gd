@@ -26,7 +26,7 @@ func set_hidden(value: bool):
 	.set_hidden(value)
 	
 	if value == false && option.is_focused():
-		emit_signal("focus_changed", option_button, option_button.is_focused())
+		emit_signal("focus_changed", option_button, option.is_focused())
 
 
 func set_text(value: String):

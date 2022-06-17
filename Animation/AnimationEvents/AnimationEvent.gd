@@ -15,10 +15,10 @@ class_name AnimationEvent
 # The method called shall be in the target_method variable and arguments can be passed
 
 export var animation_name : String = ""
-export var subsequence_anim_name : bool = false
+export var anim_name_as_subsequence : bool = false
 export var trigger_frames := PoolIntArray()
 
-export var target_node_path : String = ""
+export var target_node_path : NodePath
 export var target_method : String = ""
 export var arguments : Array = []
 
@@ -47,7 +47,12 @@ func _ready() -> void:
 #### LOGIC ####
 
 func trigger_event() -> void:
-	var target = owner.get_node(target_node_path)
+	var target = get_node_or_null(target_node_path)
+	
+	if target == null:
+		push_error("The target node can't be found at path %s" % str(target_node_path))
+		return
+	
 	target.callv(target_method, arguments)
 
 
@@ -61,7 +66,7 @@ func _on_animation_frame_changed() -> void:
 	var animation = parent.get_animation()
 	var frame = parent.get_frame()
 	
-	if (subsequence_anim_name && animation_name.is_subsequence_ofi(animation)) or \
+	if (anim_name_as_subsequence && animation_name.is_subsequence_ofi(animation)) or \
 			animation_name == animation:
 		if frame in trigger_frames:
 			trigger_event()
