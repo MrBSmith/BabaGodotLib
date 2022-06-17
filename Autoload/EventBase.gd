@@ -32,6 +32,8 @@ signal save_game(save_id)
 signal load_game(save_id)
 signal save_level_query(level)
 
+signal game_setting_changed(setting_name, value)
+
 #### NETWORK ####
 
 signal network_game_started()
