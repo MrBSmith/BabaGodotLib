@@ -132,6 +132,13 @@ static func trim_image(image: Image) -> Image:
 	return output_img
 
 
+static func fetch_first(node: Node, wanted_class: String) -> Node:
+	for child in node.get_children():
+		if child.is_class(wanted_class):
+			return child
+	return null
+
+
 static func fetch(node: Node, wanted_class: String) -> Array:
 	var array = []
 	for child in node.get_children():
