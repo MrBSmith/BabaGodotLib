@@ -2,6 +2,7 @@ extends Behaviour
 class_name ActivableBehaviour
 
 export var active : bool = false setget set_active, is_active 
+export(float, 0.0, 999.0, 0.1) var active_change_cooldown : float = 0.0
 
 signal active_changed(active)
 
@@ -11,8 +12,12 @@ func is_class(value: String): return value == "ActivableBehaviour" or .is_class(
 func get_class() -> String: return "ActivableBehaviour"
 
 func set_active(value: bool) -> void:
-	if value != active:
+	if value != active && !$Cooldown.is_running():
 		active = value
+		
+		if !is_equal_approx(active_change_cooldown, 0.0):
+			$Cooldown.start(active_change_cooldown)
+		
 		emit_signal("active_changed", active)
 func is_active() -> bool: return active
 
