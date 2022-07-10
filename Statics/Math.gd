@@ -206,6 +206,42 @@ static func xform(transform: Transform2D, v2_array: PoolVector2Array) -> PoolVec
 	return result_array
 
 
+static func circle_to_circle_intersection(p0: Vector2, r0: float, p1: Vector2, r1: float) -> PoolVector2Array:
+	var points = PoolVector2Array()
+	var d = p0.distance_to(p1)
+	
+	# The circles have no intersection at all
+	if d > r0 + r1 or d < abs(r0 - r1):
+		return points
+	
+	# The circle are the same: abort because it would return an infinity of points
+	if is_equal_approx(d, 0.0) && is_equal_approx(r0, r1):
+		push_warning("The two given circles have approximatly the same position & size; aborting")
+		return points
+	
+	var a = (pow(r0, 2.0) - pow(r1, 2.0) + pow(d, 2.0)) / (2.0 * d)
+	var p2 = p0 + a * (p1 - p0) / d
+	
+	# The circles have only one intersection
+	if is_equal_approx(a, r0):
+		points.append(p2)
+		return points 
+	
+	var h = sqrt(pow(r0, 2.0) - pow(a, 2.0))
+	var dx = p1.x - p0.x
+	var dy = p1.y - p0.y
+	var rx = -dy * (h / d)
+	var ry = dx * (h / d)
+	
+	# The circle have two intersections
+	for i in [-1, 1]:
+		var x = p2.x + rx * i
+		var y = p2.y + ry * i
+		points.append(Vector2(x, y))
+	
+	return points
+
+
 # Sums the distance between each points of the line to get its total lenght
 # If to_id is -1 compute the line's total length
 # If to_id is a valid id, compute the line's length from line[0] to line[to_id]
