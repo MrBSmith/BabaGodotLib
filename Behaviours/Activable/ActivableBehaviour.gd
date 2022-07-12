@@ -3,6 +3,7 @@ class_name ActivableBehaviour
 
 export var active : bool = false setget set_active, is_active 
 export(float, 0.0, 999.0, 0.1) var active_change_cooldown : float = 0.0
+export var stay_active : bool = false
 
 signal active_changed(active)
 
@@ -13,6 +14,9 @@ func get_class() -> String: return "ActivableBehaviour"
 
 func set_active(value: bool) -> void:
 	if value != active && !$Cooldown.is_running():
+		if stay_active && value == false:
+			return
+		
 		active = value
 		
 		if !is_equal_approx(active_change_cooldown, 0.0):

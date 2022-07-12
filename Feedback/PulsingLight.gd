@@ -13,6 +13,8 @@ onready var initial_scale = get_scale()
 onready var current_color : Color = get_light_color() setget set_current_color, get_current_color
 onready var initial_mask_text_scale : float = $LightMask.get_texture_scale()
 
+signal pulsing_changed
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "PulsingLight" or .is_class(value)
@@ -31,18 +33,23 @@ func set_current_color(value: Color):
 
 func get_current_color() -> Color: return current_color
 
-func set_pulsing(value: bool): pulsing = value
+func set_pulsing(value: bool): 
+	if value != pulsing:
+		pulsing = value
+		emit_signal("pulsing_changed")
 func is_pulsing() -> bool: return pulsing
 
 
 #### BUILT-IN ####
 
+
+func _init() -> void:
+	var __ = connect("pulsing_changed", self, "_on_pulsing_changed")
+
+
 func _ready() -> void:
 	var __ = tween_node.connect("tween_all_completed", self, "_on_tween_all_completed")
 	__ = timer_node.connect("timeout", self, "_on_timer_timeout")
-	
-	if pulsing:
-		start_pulsing()
 
 
 #### VIRTUALS ####
@@ -60,17 +67,12 @@ func start_pulsing():
 	
 	__ = tween_node.start()
 	
-	var tween_delay_timer = Timer.new()
-	add_child(tween_delay_timer)
-	
-	tween_delay_timer.start(pulse_duration / 2)
-	
-	yield(tween_delay_timer, "timeout")
-	
-	tween_delay_timer.queue_free()
-	
-	__ = tween_node.interpolate_method(self, "set_current_color", light_color, Color.transparent,
-						pulse_duration / 2, Tween.TRANS_CUBIC, Tween.EASE_IN)
+	_fade()
+
+
+func _fade(from : Color = light_color, to := Color.transparent, delay: float = pulse_duration / 2) -> void:
+	var __ = tween_node.interpolate_method(self, "set_current_color", from, to,
+						pulse_duration / 2, Tween.TRANS_CUBIC, Tween.EASE_IN, delay)
 	
 	__ = tween_node.start()
 
@@ -85,6 +87,14 @@ func start_pulsing():
 func _on_tween_all_completed():
 	timer_node.start(pulse_delay)
 
+
 func _on_timer_timeout():
 	if pulsing:
 		start_pulsing()
+
+
+func _on_pulsing_changed() -> void:
+	if pulsing:
+		start_pulsing()
+	else:
+		_fade(get_current_color(), Color.transparent, 0.0)
