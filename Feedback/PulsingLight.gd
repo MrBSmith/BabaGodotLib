@@ -94,6 +94,9 @@ func _on_timer_timeout():
 
 
 func _on_pulsing_changed() -> void:
+	if !is_inside_tree():
+		yield(self, "ready")
+	
 	if pulsing:
 		start_pulsing()
 	else:
