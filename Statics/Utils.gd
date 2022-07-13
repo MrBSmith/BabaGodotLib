@@ -172,6 +172,9 @@ static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
 	return array
 
 
+static func compute_astar_point_id(cell: Vector2, key: int = 666) -> int:
+	return int(abs(cell.x + key * cell.y))
+
 
 #### STRINGS ####
 
