@@ -49,16 +49,10 @@ static func array_get_rdm_element(array: Array):
 
 # Find the name of the given direction and returns it as a String
 static func find_dir_name(dir: Vector2) -> String:
-	var dir_values_array = DIRECTIONS_8.values()
-	var dir_index = dir_values_array.find(dir)
-	
-	if dir_index == -1:
-		return ""
-	
-	var dir_keys_array = DIRECTIONS_8.keys()
-	var dir_key = dir_keys_array[dir_index]
-	
-	return dir_key
+	for i in range(DIRECTIONS_8.size()):
+		if dir.is_equal_approx(DIRECTIONS_8.values()[i]):
+			return DIRECTIONS_8.keys()[i]
+	return ""
 
 
 static func find_behaviour(node: Node, behaviour_name: String) -> Behaviour:
