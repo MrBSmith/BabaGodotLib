@@ -169,6 +169,14 @@ static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
 static func compute_astar_point_id(cell: Vector2, key: int = 666) -> int:
 	return int(abs(cell.x + key * cell.y))
 
+# Returns theorical adjacents cells of the given cell (does not check if the cell exists or not)
+static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
+	var adjs = PoolVector2Array()
+	for dir in DIRECTIONS_4.values():
+		adjs.append(cell + dir)
+	
+	return adjs
+
 
 #### STRINGS ####
 
