@@ -59,6 +59,7 @@ func get_hp() -> int: return hp
 
 
 func set_cooldown(value: float) -> void:
+	value = clamp(value, 0.0, INF)
 	$Cooldown.wait_time = value
 
 
