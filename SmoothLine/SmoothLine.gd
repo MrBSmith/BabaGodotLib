@@ -4,7 +4,7 @@ extends Line2D
 
 export var line_curve : Curve2D setget set_line_curve
 
-export(float) var spline_length = 100
+export(float) var spline_length := 100.0
 export(bool) var _smooth setget _set_smooth
 
 signal smooth_changed(value)
