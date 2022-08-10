@@ -16,27 +16,40 @@ class_name GameLoader
 # Load the content of the .cfg save file located in the save_dir_path folder. 
 # The method will fetch the right save based on its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
-static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node) -> void:
+static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null) -> void:
 	var config_file = load_save_config_file(save_dir_path, slot_id)
 	var input_mapper = InputMapper.new()
 
 	for section in config_file.get_sections():
 		match(section):
 			"audio":
-				#set audio settings
 				for key in config_file.get_section_keys(section):
 					var value = config_file.get_value(section, key)
 					var bus_id = AudioServer.get_bus_index(key.capitalize())
 					AudioServer.set_bus_volume_db(bus_id, value)
+					
 			"controls":
-				#set controls settings
 				for action_name in config_file.get_section_keys(section):
 					var value = config_file.get_value(section, action_name)
 					input_mapper.remap_action_key(action_name, value)
+			
 			"progression":
+				if progression == null:
+					print("No progression node passed; progression could not be loaded")
+					continue
+				
 				for key in config_file.get_section_keys(section):
 					var value = config_file.get_value(section, key)
 					progression.set(key, value)
+			
+			"players_data":
+				if players_data == null:
+					print("No players_data node passed; players_data could not be loaded")
+					continue
+				
+				# All the players data are stored in one big dictionnary, so it should always be only one key there
+				for key in config_file.get_section_keys(section):
+					players_data.players_data_dict = config_file.get_value(section, key)
 
 
 # Create a ConfigFile object out of the settings.cfg found in the save folder corresponding to the given slot_id.
