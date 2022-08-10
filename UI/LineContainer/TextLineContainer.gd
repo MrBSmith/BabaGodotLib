@@ -1,13 +1,14 @@
+tool
 extends LineContainer
 class_name TextLineContainer
 
 onready var text_label = get_node_or_null("TextLabel")
-onready var amount_label = $AmountLabel
-onready var texture_rect = $TextureRect
+onready var amount_label = get_node_or_null("AmountLabel")
+onready var texture_rect = get_node_or_null("TextureRect")
 
-var text : String = "EMPTY" setget set_text, get_text
-var amount : int = INF setget set_amount, get_amount
-var icon_texture : Texture = null setget set_icon_texture, get_icon_texture
+export var text : String = "EMPTY" setget set_text, get_text
+export var amount : int = INF setget set_amount, get_amount
+export var icon_texture : Texture = null setget set_icon_texture, get_icon_texture
 
 #### ACCESSORS ####
 
@@ -28,12 +29,6 @@ func set_amount(value: int):
 	
 	amount = value
 	
-	if amount == int(INF):
-		amount_label.queue_free()
-		amount_label = null
-		_update_alignment()
-		return
-	
 	if value != int(INF):
 		amount_label.set_text(String(amount))
 	else: 
@@ -46,8 +41,10 @@ func set_icon_texture(value: Texture):
 		yield(self, "ready")
 	
 	if value == null:
-		texture_rect.queue_free()
-		texture_rect = null
+		if texture_rect:
+			texture_rect.queue_free()
+			texture_rect = null
+		
 		_update_alignment()
 		return 
 	
