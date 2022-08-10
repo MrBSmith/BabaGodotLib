@@ -27,7 +27,7 @@ export var hp : int = max_hp setget set_hp, get_hp
 
 export var free_when_destroyed := true
 
-export var cooldown : float = 0.0 setget set_cooldown
+export var cooldown : float = INF setget set_cooldown
 
 var is_destroyed := false
 
@@ -59,7 +59,7 @@ func get_hp() -> int: return hp
 
 
 func set_cooldown(value: float) -> void:
-	value = clamp(value, 0.0, INF)
+	value = clamp(value, 0.0001, INF)
 	$Cooldown.wait_time = value
 
 
@@ -88,7 +88,8 @@ func damage() -> void:
 	else:
 		set_hp(Math.clampi(hp - 1, 0, max_hp))
 	
-	$Cooldown.start()
+	if $Cooldown.wait_time != INF:
+		$Cooldown.start()
 
 
 func destroy() -> void:
