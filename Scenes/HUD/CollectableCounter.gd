@@ -1,5 +1,5 @@
 extends HBoxContainer
-class_name Collectable_HUD_Label
+class_name CollectableCounter
 
 export var maximum_amount : int = 0
 export var collectable_type : String = ""
@@ -10,8 +10,8 @@ onready var base_texture_scale = $Texture.get_scale()
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "Collectable_HUD_Label" or .is_class(value)
-func get_class() -> String: return "Collectable_HUD_Label"
+func is_class(value: String): return value == "CollectableCounter" or .is_class(value)
+func get_class() -> String: return "CollectableCounter"
 
 
 #### BUILT-IN ####
@@ -20,12 +20,18 @@ func _ready() -> void:
 	var __ = EVENTS.connect("collect", self, "_on_collect_obj_event")
 	__ = EVENTS.connect("collectable_amount_updated", self, "_on_collectable_amount_updated")
 
+
 #### VIRTUALS ####
 
 
 
 #### LOGIC ####
 
+func set_amount(amount: int) -> void:
+	label.set_text(String(amount))
+	
+	if maximum_amount != 0:
+		label.set_text(label.get_text() + "/" + String(owner.gold_objective))
 
 
 #### INPUTS ####
@@ -39,7 +45,6 @@ func _on_collect_obj_event(behaviour: CollectableBehaviour, col_type: String):
 		return
 	
 	behaviour.set_target($Texture)
-
 
 
 func _on_obj_collect_animation_finished():
@@ -67,6 +72,4 @@ func _on_collectable_amount_updated(col_type: String, amount: int):
 	if col_type != collectable_type:
 		return
 	
-	label.set_text(String(amount))
-	if maximum_amount != 0:
-		label.set_text(label.get_text() + "/" + String(owner.gold_objective))
+	set_amount(amount)
