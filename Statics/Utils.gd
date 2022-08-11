@@ -178,6 +178,22 @@ static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
 	return adjs
 
 
+# Convert a number of milliseconds into a String formated this way:
+# mm:ss:msms
+static func secs_to_formated_time(seconds: float) -> String:
+	var milliseconds = (seconds - int(seconds)) * 100
+	var minutes : int = Math.clampi(seconds / 60, 0, 60)
+	
+	if seconds > 0.0:
+		seconds = int(seconds) % 60
+	
+	var str_min = str(minutes).pad_zeros(2)
+	var str_sec = str(seconds).pad_zeros(2)
+	var str_mil_sec = str(int(milliseconds)).pad_zeros(2)
+	
+	return "%s:%s:%s" % [str_min, str_sec, str_mil_sec]
+
+
 #### STRINGS ####
 
 static func to_snake(string: String) -> String:
