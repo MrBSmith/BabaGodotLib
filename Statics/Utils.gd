@@ -182,7 +182,7 @@ static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
 # mm:ss:msms
 static func secs_to_formated_time(seconds: float) -> String:
 	var milliseconds = (seconds - int(seconds)) * 100
-	var minutes : int = Math.clampi(seconds / 60, 0, 60)
+	var minutes := int(clamp(seconds / 60.0, 0.0, 60.0))
 	
 	if seconds > 0.0:
 		seconds = int(seconds) % 60
