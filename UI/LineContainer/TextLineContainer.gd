@@ -3,7 +3,7 @@ extends LineContainer
 class_name TextLineContainer
 
 onready var text_label = get_node_or_null("TextLabel")
-onready var amount_label = get_node_or_null("AmountLabel")
+onready var counter_label = get_node_or_null("CounterLabel")
 onready var texture_rect = get_node_or_null("TextureRect")
 
 export var text : String setget set_text, get_text
@@ -78,8 +78,11 @@ func _on_text_label_resized():
 		text_label.set_custom_minimum_size(Vector2(get_size().x, 0))
 
 func _on_amount_changed(_value: int) -> void:
-	if amount_label && amount != INF:
-		amount_label.set_text(str(amount))
+	if counter_label:
+		if Engine.editor_hint:
+			counter_label.set_amount(amount)
+		else:
+			counter_label.tween_amount(amount)
 
 func _on_text_changed(_value: String) -> void:
 	if text_label:

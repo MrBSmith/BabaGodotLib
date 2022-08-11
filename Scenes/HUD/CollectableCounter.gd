@@ -4,7 +4,7 @@ class_name CollectableCounter
 export var maximum_amount : int = 0
 export var collectable_type : String = ""
 
-onready var label = $Label
+onready var counter_label = $CounterLabel
 onready var base_texture_scale = $Texture.get_scale()
 
 
@@ -27,11 +27,12 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func set_amount(amount: int) -> void:
-	label.set_text(String(amount))
-	
-	if maximum_amount != 0:
-		label.set_text(label.get_text() + "/" + String(owner.gold_objective))
+func set_amount(amount: int, instant: bool = false) -> void:
+	if instant:
+		counter_label.set_amount(amount)
+	else:
+		counter_label.tween_amount(amount, 0.5)
+
 
 
 #### INPUTS ####
