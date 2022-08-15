@@ -21,23 +21,18 @@ class_name GameSaver
 #		...etc
 
 
-# Update the settings dictionnary then
-# save settings into a config file at the given slot path, create the directory if it doesn't exist
-static func save_game(path : String, data: Dictionary):
-	if !DirNavHelper.is_dir_existing(path):
-		DirNavHelper.create_dir(path)
-	
-	var __ = save_properties_in_cfg(path + "/settings.cfg", data)
-
-
 # Save the slot from the given slot_id
 static func save_game_in_slot(save_dir_path: String, slot_id : int, data: Dictionary, 
 				save_name : String = "save") -> void:
 	
-	var slot_path = GameLoader.find_corresponding_save_file(save_dir_path, slot_id)
-	var slot_name = save_name + String(slot_id) if slot_path == "" else slot_path.split("/")[-2]
+	var slot_name = save_name + String(slot_id)
 	
-	save_game(save_dir_path + "/" + slot_name, data)
+	if !DirNavHelper.is_dir_existing(save_dir_path):
+		DirNavHelper.create_dir(save_dir_path)
+	
+	var save_file_path = save_dir_path + "/" + slot_name + ".cfg"
+	
+	var __ = save_properties_in_cfg(save_file_path, data)
 
 
 # Feed a configuration file by giving a dictionary
