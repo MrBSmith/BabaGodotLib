@@ -17,7 +17,10 @@ class_name GameLoader
 # The method will fetch the right save based on its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null) -> void:
-	var config_file = load_save_config_file(save_dir_path, slot_id)
+	var config_file_path = find_corresponding_save_file(save_dir_path, slot_id)
+	var config_file = ConfigFile.new()
+	config_file.load(config_file_path)
+	
 	var input_mapper = InputMapper.new()
 
 	for section in config_file.get_sections():
@@ -35,7 +38,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 			
 			"progression":
 				if progression == null:
-					print("No progression node passed; progression could not be loaded")
+					print_debug("No progression node passed; progression could not be loaded")
 					continue
 				
 				for key in config_file.get_section_keys(section):
@@ -44,7 +47,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 			
 			"players_data":
 				if players_data == null:
-					print("No players_data node passed; players_data could not be loaded")
+					print_debug("No players_data node passed; players_data could not be loaded")
 					continue
 				
 				# All the players data are stored in one big dictionnary, so it should always be only one key there
@@ -77,24 +80,28 @@ static func load_config_file(cfg_file_path: String) -> ConfigFile:
 # This method will return the path of the save file that has been found according to the specified save_id
 static func find_corresponding_save_file(dir_path: String, save_id : int) -> String:
 	var config_file = ConfigFile.new()
-	for dir in DirNavHelper.fetch_dir_content(dir_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY):
-		var cfg_path = dir_path + "/" + dir + "/settings.cfg"
-		var error = config_file.load(cfg_path)
+	for file in DirNavHelper.fetch_dir_content(dir_path, DirNavHelper.DIR_FETCH_MODE.FILE_ONLY):
+		var error = config_file.load(dir_path + "/" + file)
 
 		if error == OK:
 			var file_save_id : int = config_file.get_value("system", "slot_id")
 			if save_id == file_save_id:
-				return cfg_path
+				return dir_path + "/" + file
 		else:
-			push_error("Failed to load settings cfg file with path %s. error code : %d" % [cfg_path, error])
+			push_error("Failed to load the save file with path %s. error code : %d" % [file, error])
 	return ""
 
 
 # Returns the path of the save with the given save_id
 # the dir argument must be the path to the folder containing all the saves
-static func find_save_slot(dir_path: String, save_id : int) -> String:
-	var cfg_file_path = find_corresponding_save_file(dir_path, save_id)
-	return cfg_file_path.replacen("/settings.cfg", "")
+static func get_save_name(save_path: String) -> String:
+	var path_array = save_path.split("/")
+	if path_array.empty():
+		push_error("The given path %s isn't a valid save path" % save_path)
+		return ""
+	
+	var file_name = path_array[-1].replace(".cfg", "")
+	return file_name
 
 
 # Loops trough every save folder, and finds the first one to be empty/inexistant
@@ -140,6 +147,17 @@ static func find_first_save_file_id(dir_path: String, max_slots: int) -> int:
 # Returns the number of save dir
 static func get_saves_count(saves_path: String) -> int:
 	return DirNavHelper.fetch_dir_content(saves_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY).size()
+
+
+# Returns an array of .cfg file_path found in the given directory
+static func get_saves(saves_dir_path: String) -> Array:
+	var saves_array = []
+	
+	for file in DirNavHelper.fetch_dir_content(saves_dir_path, DirNavHelper.DIR_FETCH_MODE.FILE_ONLY):
+		if ".cfg" in file:
+			saves_array.append(file)
+	
+	return saves_array
 
 
 # Get a save's specific property value according to a given property_name
