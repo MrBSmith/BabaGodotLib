@@ -2,22 +2,6 @@ extends Node
 class_name LevelLoader
 
 
-# Get the .json file, and convert it to a usable dictionary of property
-static func _deserialize_level_properties(file_path : String) -> Dictionary:
-	var level_properties  : String = ""
-	var parsed_data : Dictionary = {}
-	var load_file = File.new()
-	
-	if !load_file.file_exists(file_path):
-		return parsed_data
-	
-	load_file.open(file_path, load_file.READ)
-	level_properties = load_file.get_as_text()
-	parsed_data = parse_json(level_properties)
-	load_file.close()
-	
-	return parsed_data
-
 
 # Get the type of a value string (vector2 bool float or int) by checking its content
 static func _get_string_value_type(value : String) -> String: 
