@@ -1,6 +1,8 @@
 extends FollowCollectable
 class_name FollowHUDCollectable
 
+export var camera_pos_relative : bool = true
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "FollowHUDCollectable" or .is_class(value)

@@ -44,10 +44,13 @@ func update_state(delta: float):
 	
 	var target = owner.get_target()
 	var target_global_pos = target.get_global_position()
-	var camera = get_current_camera2D()
-	var camera_top_left_corner = camera.get_camera_screen_center() - window_size / 2
-	var target_pos = camera_top_left_corner + target_global_pos
+	var target_pos = target_global_pos
 	
+	if owner.camera_pos_relative:
+		var camera = get_current_camera2D()
+		var camera_top_left_corner = camera.get_camera_screen_center() - window_size / 2
+		target_pos += camera_top_left_corner
+
 	if target.get("rect_pivot_offset"):
 		target_pos += target.rect_pivot_offset
 	

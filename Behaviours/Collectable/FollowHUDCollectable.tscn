@@ -8,6 +8,7 @@
 script = ExtResource( 1 )
 default_state = ""
 acceleration = 10.0
+camera_pos_relative = true
 
 [node name="Collect" parent="StateMachine" index="2"]
 script = ExtResource( 3 )
