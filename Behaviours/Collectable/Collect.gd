@@ -3,7 +3,7 @@ class_name Collectable_CollectState
 
 onready var root_scene = owner.owner
 
-export var speed : float = 600.0
+export var speed : float = 900.0
 export var acceleration : float = 3.0
 
 var initial_dir = Vector2.ZERO
