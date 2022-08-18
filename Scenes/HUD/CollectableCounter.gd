@@ -7,6 +7,8 @@ export var collectable_type : String = ""
 onready var counter_label = $CounterLabel
 onready var base_texture_scale = $Texture.get_scale()
 
+signal collectable_animation_finished
+
 
 #### ACCESSORS ####
 
@@ -49,6 +51,8 @@ func _on_collect_obj_event(behaviour: CollectableBehaviour, col_type: String):
 
 
 func _on_obj_collect_animation_finished():
+	emit_signal("collectable_animation_finished", name)
+	
 	var tween = $Tween
 	var texture = $Texture
 	

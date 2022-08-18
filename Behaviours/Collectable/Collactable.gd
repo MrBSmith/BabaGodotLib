@@ -44,7 +44,7 @@ func compute_amount_collected() -> int:
 
 
 func _collect_success() -> void:
-	EVENTS.emit_signal("collectable_amount_collected", get_collectable_name(), compute_amount_collected())
+	EVENTS.emit_signal("increment_collectable_amount", get_collectable_name(), compute_amount_collected())
 	owner.queue_free()
 
 

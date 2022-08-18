@@ -6,16 +6,12 @@
 
 [node name="FollowHUDCollectable" instance=ExtResource( 2 )]
 script = ExtResource( 1 )
-
-[node name="StateMachine" parent="." index="3"]
-standalone_trigger = {
-}
-
-[node name="Idle" parent="StateMachine" index="0"]
-standalone_trigger = {
-}
+default_state = ""
+acceleration = 10.0
 
 [node name="Collect" parent="StateMachine" index="2"]
 script = ExtResource( 3 )
-standalone_trigger = {
-}
+speed = 600.0
+acceleration = 3.0
+initial_speed = 1000.0
+initial_speed_damping = 200.0
