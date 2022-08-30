@@ -4,7 +4,6 @@ class_name DirNavHelper
 const debug : bool = true
 
 enum DIR_FETCH_MODE {
-	ALL,
 	DIR_ONLY,
 	FILE_ONLY
 }
@@ -149,22 +148,30 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 # Fetch the content of the given dir
 # fetch_mode determine if you want to fetch only folders, only files or everything
-static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.ALL) -> Array:
+static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.FILE_ONLY, ignores := PoolStringArray()) -> Array:
 	var dir = Directory.new()
 	var error = dir.open(dir_path)
 	var files = []
-
+	
 	if error == OK:
 		dir.list_dir_begin(true, true)
 		var file = dir.get_next()
 
 		while file != "":
-			if fetch_mode == DIR_FETCH_MODE.DIR_ONLY && !dir.current_is_dir() or \
-				fetch_mode == DIR_FETCH_MODE.FILE_ONLY && dir.current_is_dir():
-				file = dir.get_next()
-				continue
-
-			files.append(file)
+			var file_path = dir_path + "/" + file
+			
+			if not file in ignores:
+				match(fetch_mode):
+					DIR_FETCH_MODE.FILE_ONLY:
+						if dir.current_is_dir():
+							files += fetch_dir_content(file_path, fetch_mode)
+						else:
+							files.append(file_path)
+					
+					DIR_FETCH_MODE.DIR_ONLY:
+						if dir.current_is_dir():
+							files.append(file_path)
+			
 			file = dir.get_next()
 
 		dir.list_dir_end()
@@ -173,3 +180,4 @@ static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE
 
 	else:
 		return []
+
