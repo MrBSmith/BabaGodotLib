@@ -52,8 +52,7 @@ func tween_amount(new_amount: int, duration: float = 0.3,
 
 
 func _on_amount_changed(_value: int) -> void:
-	if amount != INF:
-		set_text(str(amount))
-	else:
-		set_text("")
+	set_visible(amount != INF)
+	set_text(str(amount))
+
 
