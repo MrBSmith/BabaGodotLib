@@ -81,12 +81,12 @@ static func load_config_file(cfg_file_path: String) -> ConfigFile:
 static func find_corresponding_save_file(dir_path: String, save_id : int) -> String:
 	var config_file = ConfigFile.new()
 	for file in DirNavHelper.fetch_dir_content(dir_path, DirNavHelper.DIR_FETCH_MODE.FILE_ONLY):
-		var error = config_file.load(dir_path + "/" + file)
+		var error = config_file.load(file)
 
 		if error == OK:
 			var file_save_id : int = config_file.get_value("system", "slot_id")
 			if save_id == file_save_id:
-				return dir_path + "/" + file
+				return file
 		else:
 			push_error("Failed to load the save file with path %s. error code : %d" % [file, error])
 	return ""
