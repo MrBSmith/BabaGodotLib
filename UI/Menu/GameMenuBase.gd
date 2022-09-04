@@ -229,9 +229,9 @@ func set_buttons_default_state():
 
 func _go_to_last_menu() -> void:
 	if self == get_tree().get_current_scene():
-		EVENTS.emit_signal("navigate_menu_back_query", null, self)
+		EVENTS.emit_signal("navigate_menu_back_query")
 	else:
-		EVENTS.emit_signal("navigate_menu_back_query", get_parent(), self)
+		EVENTS.emit_signal("navigate_menu_back_query")
 
 
 func _resume_game():

@@ -10,9 +10,6 @@ onready var tween = $Tween
 export var start_color := Color.transparent
 export var fade_color := Color.black
 
-signal transition_finished
-signal transition_middle
-
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "FadeTransition" or .is_class(value)
@@ -25,6 +22,8 @@ func set_visible(value: bool):
 #### BUILT-IN ####
 
 func _ready() -> void:
+	EVENTS.connect("fade_transition", self, "_on_EVENTS_fade_transition")
+	
 	$ColorRect.set_anchors_preset(Control.PRESET_WIDE)
 	$ColorRect.set_frame_color(start_color)
 
@@ -46,7 +45,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		yield(tween, "tween_all_completed")
 		
 		if fade_mode == FADE_MODE.FADE_IN_OUT:
-			emit_signal("transition_middle")
+			EVENTS.emit_signal("transition_middle")
 	
 	if fade_mode != FADE_MODE.FADE_OUT:
 		tween.interpolate_property($ColorRect, "color", fade_color, Color(0.0, 0.0, 0.0, 0.0),
@@ -55,7 +54,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		tween.start()
 		yield(tween, "tween_all_completed")
 	
-	emit_signal("transition_finished")
+	EVENTS.emit_signal("transition_finished")
 
 
 func set_to_black() -> void:
@@ -71,3 +70,9 @@ func set_to_transparent() -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_EVENTS_fade_transition(duration: float, fade_mode: int) -> void:
+	fade(duration, fade_mode)
+
+
+

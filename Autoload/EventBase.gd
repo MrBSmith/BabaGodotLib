@@ -84,7 +84,7 @@ signal goto_menu_root()
 signal menu_entered(menu_name)
 
 signal navigate_menu_query(menu_name, dest_menu_parent, current_menu)
-signal navigate_menu_back_query(dest_menu_parent, current_menu)
+signal navigate_menu_back_query()
 
 
 #### LEVEL NAVIGATION ####

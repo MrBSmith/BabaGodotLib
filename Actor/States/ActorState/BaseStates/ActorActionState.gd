@@ -34,6 +34,9 @@ func _ready() -> void:
 #### LOGIC ####
 
 func interact():
+	if !action_hitbox_node.monitoring:
+		return
+	
 	# Get every area in the hitbox area
 	var interact_areas = action_hitbox_node.get_overlapping_areas()
 	

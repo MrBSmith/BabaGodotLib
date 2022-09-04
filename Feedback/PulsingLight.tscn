@@ -11,6 +11,7 @@ texture = ExtResource( 1 )
 range_z_max = 0
 range_layer_min = -100
 range_layer_max = 100
+range_item_cull_mask = 3
 __meta__ = {
 "_edit_lock_": true
 }
@@ -21,6 +22,7 @@ texture_scale = 0.5
 mode = 1
 range_layer_min = -100
 range_layer_max = 100
+range_item_cull_mask = 3
 __meta__ = {
 "_edit_lock_": true
 }
