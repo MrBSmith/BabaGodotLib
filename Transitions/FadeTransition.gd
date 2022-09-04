@@ -44,7 +44,9 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		
 		tween.start()
 		yield(tween, "tween_all_completed")
-		emit_signal("transition_middle")
+		
+		if fade_mode == FADE_MODE.FADE_IN_OUT:
+			emit_signal("transition_middle")
 	
 	if fade_mode != FADE_MODE.FADE_OUT:
 		tween.interpolate_property($ColorRect, "color", fade_color, Color(0.0, 0.0, 0.0, 0.0),
