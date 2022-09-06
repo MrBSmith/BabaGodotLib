@@ -2,15 +2,7 @@ extends Node
 class_name GameLoader
 
 # A static class, usefull for loading game data
-
-# The save folder must be structured like the following:
-# saves/
-# 	save1/
-# 		settings.cfg
-# 		...
-# 	save2/
-# 		settings.cfg
-#		...etc
+# The saves are stored as .cfg files in the directory you give it
 
 
 # Load the content of the .cfg save file located in the save_dir_path folder. 
@@ -55,7 +47,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 					players_data.players_data_dict = config_file.get_value(section, key)
 
 
-# Create a ConfigFile object out of the settings.cfg found in the save folder corresponding to the given slot_id.
+# Create a ConfigFile object out of the save.cfg found in the save folder corresponding to the given slot_id.
 # the dir argument must be the path to the folder containing all the saves
 static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	var save_path : String = find_corresponding_save_file(dir, slot_id)
@@ -66,7 +58,7 @@ static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	return load_config_file(save_path)
 
 
-# Create a ConfigFile object out of the settings.cfg found at given path and returns it
+# Create a ConfigFile object out of the save.cfg found at given path and returns it
 static func load_config_file(cfg_file_path: String) -> ConfigFile:
 	var config_file = ConfigFile.new()
 	var error = config_file.load(cfg_file_path)
