@@ -89,7 +89,6 @@ signal navigate_menu_back_query()
 
 #### LEVEL NAVIGATION ####
 
-signal go_to_next_level()
 signal go_to_last_level()
 signal go_to_level(level_id)
 signal go_to_level_by_path(path)

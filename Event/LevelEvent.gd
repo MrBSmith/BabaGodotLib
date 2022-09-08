@@ -29,12 +29,18 @@ func method_call():
 	if target_as_group:
 		target_array = get_tree().get_nodes_in_group(target_name)
 	else:
-		var current_scene_root = get_tree().get_current_scene()
-		if current_scene_root.name == target_name:
-			target_array.append(current_scene_root)
+		var level = GAME.current_level
+		if level == null:
+			push_error("The current level is null, the event couldn't trigger")
+			return
+		
+		if level.name == target_name:
+			target_array.append(level)
 		else:
-			target_array.append(current_scene_root.find_node(target_name))
-	
+			var target = level.find_node(target_name)
+			if target != null:
+				target_array.append(target)
+		
 	# Call the method in every target, and pass every argument in the array
 	for target in target_array:
 		if target.has_method(method_name) or GDScript:
