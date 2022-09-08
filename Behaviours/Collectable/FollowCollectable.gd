@@ -32,6 +32,7 @@ func _ready() -> void:
 func collect() -> void:
 	.collect()
 	set_state("Collect")
+	EVENTS.emit_signal("collect", owner, collectable_name)
 
 
 func follow_target(new_target: Node):
