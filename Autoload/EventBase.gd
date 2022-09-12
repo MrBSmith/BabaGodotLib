@@ -18,7 +18,6 @@ class_name EventsBase
 
 ####
 
-
 # warnings-disable
 
 signal new_game()
@@ -94,3 +93,7 @@ signal go_to_last_level()
 signal go_to_level(level_id)
 signal go_to_level_by_path(path)
 signal go_to_world_map()
+
+#### CUTSCENES ####
+
+signal cutscene_finished()
