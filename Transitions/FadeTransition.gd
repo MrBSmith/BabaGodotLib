@@ -77,4 +77,5 @@ func _on_EVENTS_fade_transition(duration: float, fade_mode: int) -> void:
 
 func _on_EVENTS_interupt_transition() -> void:
 	tween.stop_all()
+	tween.remove_all()
 	set_to_transparent()
