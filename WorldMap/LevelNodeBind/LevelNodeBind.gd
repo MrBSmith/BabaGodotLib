@@ -12,6 +12,12 @@ export var destination_node_path : String = ""
 export var hidden : bool = false setget set_hidden, is_hidden
 export var angled_bind : bool = true
 
+export var active : bool = true setget set_active, is_active
+
+export var active_color : Color
+export var inactive_color : Color
+
+
 var origin : Node2D setget set_origin, get_origin
 var destination : Node2D setget set_destination, get_destination
 
@@ -25,6 +31,7 @@ var is_ready : bool = false
 var print_logs : bool = false
 
 signal level_node_added()
+signal active_changed(active)
 
 #### ACCESSORS ####
 
@@ -113,8 +120,19 @@ func set_state(value): $StateMachine.set_state(value)
 func get_state() -> Object: return $StateMachine.get_state()
 func get_state_name() -> String: return $StateMachine.get_state_name()
 
+func set_active(value: bool) -> void:
+	if value != active:
+		active = value
+		emit_signal("active_changed")
+
+func is_active() -> bool:
+	return active
 
 #### BUILT-IN ####
+
+func _init() -> void:
+	var __ = connect("active_changed", self, "_on_active_changed")
+
 
 func _ready() -> void:
 	var __ = connect("level_node_added", self, "_on_level_node_added")
@@ -255,3 +273,11 @@ func _on_level_node_position_changed() -> void:
 		print("Level node dropped")
 	
 	_update()
+
+
+func _on_active_changed() -> void:
+	if !is_inside_tree():
+		yield(self, "ready")
+	
+	line.set_active(active)
+

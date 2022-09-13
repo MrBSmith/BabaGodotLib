@@ -8,6 +8,11 @@ enum EDITOR_SELECTED{
 	BIND_DESTINATION
 }
 
+export var accessible : bool = true setget set_accessible, is_accessible
+
+export var accessible_color : Color
+export var unaccessible_color : Color
+
 var editor_select_state : int = EDITOR_SELECTED.UNSELECTED setget set_editor_select_state, get_editor_select_state
 
 # warning-ignore:unused_signal
@@ -16,6 +21,8 @@ signal add_bind_query(origin, dest)
 signal remove_all_binds_query(origin)
 # warning-ignore:unused_signal
 signal position_changed()
+
+signal accessible_changed()
 
 #### ACCESSORS ####
 
@@ -32,7 +39,18 @@ func set_editor_select_state(value: int):
 			EDITOR_SELECTED.BIND_DESTINATION: $ColorRect.set_frame_color(Color.red)
 func get_editor_select_state() -> int: return editor_select_state
 
+func set_accessible(value : bool):
+	if accessible != value:
+		accessible = value
+		emit_signal("accessible_changed")
+func is_accessible() -> bool: return accessible
+
+
 #### BUILT-IN ####
+
+func _init() -> void:
+	var __ = connect("accessible_changed", self, "_on_accessible_changed")
+
 
 func _ready() -> void:
 	if !Engine.editor_hint:
@@ -60,3 +78,9 @@ func get_binds_count() -> int:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_accessible_changed() -> void:
+	var color = accessible_color if accessible else unaccessible_color
+	set_self_modulate(color)
+
+

@@ -9,13 +9,14 @@ export var level_scene_path : String = "" setget , get_level_scene_path
 export var level_name : String = "" setget set_level_name, get_level_name
 
 export var hidden : bool = false setget set_hidden, is_hidden
-export var accessible : bool = true setget set_accessible, is_accessible
 export var visited : bool = false setget set_visited, is_visited
+
+export var label_accessible_color : Color
+export var label_unaccessible_color : Color
 
 var is_ready := false
 
 signal hidden_changed(level_node, hidden_value)
-signal accessible_changed()
 signal level_visited(level_node)
 
 
@@ -31,12 +32,6 @@ func set_visited(value: bool):
 		emit_signal("level_visited", self)
 	else: set_modulate(Color.white)
 func is_visited() -> bool: return visited
-
-func set_accessible(value : bool):
-	if accessible != value:
-		accessible = value
-		emit_signal("accessible_changed")
-func is_accessible() -> bool: return accessible
 
 func set_hidden(value: bool): 
 	if !is_ready:
@@ -77,7 +72,6 @@ func _ready() -> void:
 	
 	var __ = connect("hidden_changed", owner, "_on_level_node_hidden_changed")
 	__ = connect("level_visited", owner, "_on_level_visited")
-	__ = connect("accessible_changed", self, "_on_accessible_changed")
 	
 	if !Engine.editor_hint:
 		if material != null:
@@ -103,6 +97,7 @@ func _ready() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_accessible_changed() -> void:
-	if !accessible:
-		set_modulate(Color.firebrick)
-	else: set_modulate(Color.white)
+	._on_accessible_changed()
+	
+	var label_color = label_accessible_color if accessible else label_unaccessible_color
+	$Label.set_self_modulate(label_color)
