@@ -222,3 +222,13 @@ static func key_find_matching_actions(key_scancode: int, action_names : Array = 
 				matching_actions.append(action)
 	
 	return matching_actions
+
+
+static func action_get_keys(action: String) -> PoolStringArray:
+	var input_event_array = InputMap.get_action_list(action)
+	var keys_array = PoolStringArray()
+	
+	for event in input_event_array:
+		keys_array.append(event.as_text())
+	
+	return keys_array
