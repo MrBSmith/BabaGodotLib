@@ -2,7 +2,7 @@ tool
 extends Node2D
 class_name WorldMapMovingElement
 
-export var speed : float = 100.0
+export var speed : float = 200.0
 
 onready var tween_node = $Tween
 

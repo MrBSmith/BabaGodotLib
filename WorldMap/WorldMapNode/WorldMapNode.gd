@@ -48,16 +48,17 @@ func is_accessible() -> bool: return accessible
 
 #### BUILT-IN ####
 
-func _init() -> void:
-	var __ = connect("accessible_changed", self, "_on_accessible_changed")
-
 
 func _ready() -> void:
+	var __ = connect("accessible_changed", self, "_on_accessible_changed")
+	
 	if !Engine.editor_hint:
 		$ColorRect.queue_free()
 	else:
-		var __ = connect("add_bind_query", owner, "_on_add_bind_query")
+		__ = connect("add_bind_query", owner, "_on_add_bind_query")
 		__ = connect("remove_all_binds_query", owner, "_on_remove_all_binds_query")
+	
+	_on_accessible_changed()
 
 #### VIRTUALS ####
 

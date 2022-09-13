@@ -15,6 +15,7 @@ export var cursor_start_level_path : String = ""
 onready var bind_scene = load(bind_scene_path)
 
 var cursor_moving : bool = false
+var buffered_cursor_move := Vector2.ZERO
 
 export var print_logs := true
 var is_ready : bool = false 
@@ -34,6 +35,8 @@ func get_class() -> String: return "WorldMap"
 func _ready():
 	is_ready = true
 	init_cursor_position(null)
+	
+	var __ = cursor.connect("back_to_idle", self, "_on_cursor_back_to_idle")
 
 
 func _enter_tree() -> void:
@@ -87,11 +90,16 @@ func are_level_nodes_bounded_id(node1_id: int, node2_id: int) -> bool:
 
 # Move the cursor based on the user input
 func move_cursor(dir: Vector2):
+	if cursor.get_state_name() == "Move":
+		buffered_cursor_move = dir
+		return
+	
 	var adequate_node = find_adequate_node(dir)
 	if adequate_node == null:
 		return
 	
-	cursor.move_to_node(adequate_node)
+	if adequate_node.is_accessible():
+		cursor.move_to_node(adequate_node)
 
 
 # Find the node targeted by the user, based on the direction of his input and returns it
@@ -179,7 +187,7 @@ func is_animation_running() -> bool:
 #### INPUTS ####
 
 func _input(_event: InputEvent) -> void:
-	if Engine.editor_hint or cursor_moving:
+	if Engine.editor_hint:
 		return
 	
 	if Input.is_action_just_pressed("ui_right"):
@@ -194,7 +202,7 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_left"):
 		move_cursor(Vector2.LEFT)
 	
-	if Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed("ui_accept") && !cursor_moving:
 		var cursor_node = cursor.get_current_node()
 		
 		if cursor_node is LevelNode:
@@ -247,3 +255,9 @@ func _on_level_visited(level_node : LevelNode):
 func _on_node_removed(node: Node) -> void:
 	if node is WorldMapNode:
 		emit_signal("world_map_node_removed", node)
+
+
+func _on_cursor_back_to_idle() -> void:
+	if buffered_cursor_move != Vector2.ZERO:
+		move_cursor(buffered_cursor_move)
+		buffered_cursor_move = Vector2.ZERO

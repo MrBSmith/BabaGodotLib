@@ -130,12 +130,11 @@ func is_active() -> bool:
 
 #### BUILT-IN ####
 
-func _init() -> void:
-	var __ = connect("active_changed", self, "_on_active_changed")
 
 
 func _ready() -> void:
-	var __ = connect("level_node_added", self, "_on_level_node_added")
+	var __ = connect("active_changed", self, "_on_active_changed")
+	__ = connect("level_node_added", self, "_on_level_node_added")
 	
 	if line == null:
 		line = Line2D.new()
@@ -144,6 +143,7 @@ func _ready() -> void:
 	set_curve(Curve2D.new())
 	
 	is_ready = true
+	_on_active_changed()
 	
 	if owner != null && origin_node_path != "" && destination_node_path != "":
 		set_origin(owner.get_node(origin_node_path))
