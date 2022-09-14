@@ -1,6 +1,11 @@
 extends AnimatedSprite
 class_name SyncAnimatedSprite
 
+export var sync_frame_rate : bool = true
+
+export var master_path : NodePath
+onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
+
 signal animation_changed(anim)
 
 #### ACCESSORS ####
@@ -12,12 +17,14 @@ func get_class() -> String: return "SyncAnimatedSprite"
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var parent = get_parent()
-	if parent is AnimatedSprite:
-		parent.connect("frame_changed", self, "_on_parent_frame_changed")
+	if master_path.is_empty() && get_parent().is_class("SyncAnimatedSprite"):
+		master_anim_sprite = get_parent()	
+	
+	if master_anim_sprite != null:
+		var __ = master_anim_sprite.connect("frame_changed", self, "_on_parent_frame_changed")
 		
-		if parent.is_class("SyncAnimatedSprite"):
-			parent.connect("animation_changed", self, "_on_parent_animation_changed")
+		if master_anim_sprite.is_class("SyncAnimatedSprite"):
+			__ = master_anim_sprite.connect("animation_changed", self, "_on_parent_animation_changed")
 
 
 #### VIRTUALS ####
@@ -41,8 +48,10 @@ func play(anim: String = "", backwards: bool = false) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_parent_frame_changed() -> void:
-	set_frame(get_parent().get_frame())
+	if sync_frame_rate && frames != null:
+		set_frame(get_parent().get_frame())
 
 
 func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -> void:
-	set_animation(anim)
+	if frames != null && frames.has_animation(anim):
+		set_animation(anim)
