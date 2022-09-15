@@ -200,6 +200,12 @@ static func to_snake(string: String) -> String:
 	return string.to_lower().replacen(" ", "_")
 
 
+static func to_pascal(string: String) -> String:
+	string = string.capitalize()
+	string = string.replacen(" ", "")
+	return string
+
+
 #### INPUTS ####
 
 static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
