@@ -38,7 +38,7 @@ func map_input_profile(profile: InputProfile) -> void:
 	for action_name in profile.dict.keys():
 		remap_action_key(action_name, profile.dict[action_name])
 	
-	EVENTS.emit_signal("save_custom_input_profile", profile.dict)
+	EVENTS.emit_signal("input_profile_changed", profile.dict)
 
 
 func change_custom_profile_key(action_name: String, key_array : Array = []) -> void:
