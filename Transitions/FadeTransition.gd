@@ -22,7 +22,7 @@ func set_visible(value: bool):
 #### BUILT-IN ####
 
 func _ready() -> void:
-	EVENTS.connect("fade_transition", self, "_on_EVENTS_fade_transition")
+	var __ = EVENTS.connect("fade_transition", self, "_on_EVENTS_fade_transition")
 	
 	$ColorRect.set_anchors_preset(Control.PRESET_WIDE)
 	$ColorRect.set_frame_color(start_color)

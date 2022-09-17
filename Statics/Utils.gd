@@ -141,13 +141,41 @@ static func fetch(node: Node, wanted_class: String) -> Array:
 	return array
 
 
-static func fetch_recursive(node: Node, wanted_class: String, array: Array) -> void:
+static func fetch_recursive(node: Node, wanted_class: String, array: Array = []) -> Array:
 	for child in node.get_children():
 		if child.is_class(wanted_class) && not child in array:
 			array.append(child)
 		
 		if child.get_child_count() > 0:
-			fetch_recursive(child, wanted_class, array)
+			var __ = fetch_recursive(child, wanted_class, array)
+	
+	return array
+
+# Takes a node, and a class path structured this way:
+# class_a/class_b/class_c...
+
+# Find direct or indirect children of the given node that respect given the path of classes
+# Then returns it in an array
+static func fetch_from_class_path(node: Node, class_path: String, class_as_group: bool = false, array : Array = []) -> Array:
+	var class_array = class_path.split("/")
+	
+	if class_array.empty():
+		push_error("The fetch_from_class_path method should never have an empty class_path, abort")
+		return []
+	
+	var first_class = class_array[0]
+	class_array.remove(0)
+	var new_class_path = class_array.join("/")
+	
+	if node.is_class(first_class) or (class_as_group && node.is_in_group(first_class)):
+		
+		if class_array.empty():
+			array.append(node)
+		else:
+			for child in node.get_children():
+				var __ = fetch_from_class_path(child, new_class_path, class_as_group, array)
+	
+	return array
 
 
 static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
