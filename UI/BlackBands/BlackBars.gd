@@ -34,22 +34,24 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func appear(disapear: bool = false, duration: float = 1.5) -> void:
+func appear(disappear: bool = false, duration: float = 1.5) -> void:
+	set_visible(true)
+	
 	var tween
 	
 	for bar in bars_array:
 		tween = create_tween()
 		var is_top_bar = bar == $TopBar
 		var to = top_bar_hidden_pos.y if is_top_bar else bottom_bar_hidden_pos.y
-		var offset = bar.rect_size.y * Math.bool_to_sign(is_top_bar) if !disapear else 0.0
+		var offset = bar.rect_size.y * Math.bool_to_sign(is_top_bar) if !disappear else 0.0
 		
 		tween.tween_property(bar, "rect_position:y", to + offset, duration).set_trans(Tween.TRANS_SINE)
 	
 	yield(tween, "finished")
-	set_visible(!disapear)
+	set_visible(!disappear)
 
 
-func disapear(duration: float = 1.5) -> void:
+func disappear(duration: float = 1.5) -> void:
 	appear(true, duration)
 
 
