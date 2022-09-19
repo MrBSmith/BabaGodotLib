@@ -96,4 +96,5 @@ signal go_to_world_map()
 
 #### CUTSCENES ####
 
+signal cutscene_started()
 signal cutscene_finished()
