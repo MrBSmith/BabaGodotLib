@@ -151,6 +151,17 @@ static func fetch_recursive(node: Node, wanted_class: String, array: Array = [])
 	
 	return array
 
+# Find an autoload with the given name, return null if none where find
+static func find_autoload(target_name: String, tree: SceneTree) -> Node:
+	for node in tree.get_root().get_children():
+		if node.name == target_name:
+			return node
+		else:
+			for child in node.get_children():
+				if child.name == target_name:
+					return child
+	return null
+
 # Takes a node, and a class path structured this way:
 # class_a/class_b/class_c...
 

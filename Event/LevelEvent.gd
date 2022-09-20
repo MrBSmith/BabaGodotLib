@@ -34,12 +34,19 @@ func method_call():
 			push_error("The current level is null, the event couldn't trigger")
 			return
 		
+		
+		
 		if level.name == target_name:
 			target_array.append(level)
 		else:
-			var target = level.find_node(target_name)
+			var target = get_tree().get_current_scene().find_node(target_name)
+			if target == null:
+				target = Utils.find_autoload(target_name, get_tree())
+			
 			if target != null:
 				target_array.append(target)
+			else:
+				push_error("No target with the name %s were found" % target_name)
 		
 	# Call the method in every target, and pass every argument in the array
 	for target in target_array:
