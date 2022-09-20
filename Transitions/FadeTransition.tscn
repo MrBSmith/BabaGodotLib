@@ -3,6 +3,7 @@
 [ext_resource path="res://BabaGodotLib/Transitions/FadeTransition.gd" type="Script" id=1]
 
 [node name="FadeTransition" type="CanvasLayer"]
+pause_mode = 2
 layer = 128
 script = ExtResource( 1 )
 
