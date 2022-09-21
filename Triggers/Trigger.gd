@@ -2,6 +2,7 @@ extends Node2D
 class_name Trigger
 
 export var enabled : bool = true setget set_enabled, is_enabled
+export var trigger_on_level_started : bool = false
 
 # warnings-disable
 signal triggered()
@@ -16,7 +17,11 @@ func is_enabled() -> bool: return enabled
 
 #### BUILT-IN ####
 
-
+func _ready() -> void:
+	if trigger_on_level_started:
+		yield(EVENTS, "level_ready")
+		
+		GAME.current_level.connect("level_started", self, "_on_level_started")
 
 #### VIRTUALS ####
 
@@ -25,7 +30,7 @@ func is_enabled() -> bool: return enabled
 #### LOGIC ####
 
 func trigger() -> void:
-	if enabled:
+	if enabled && !is_queued_for_deletion():
 		emit_signal("triggered")
 
 #### INPUTS ####
@@ -33,3 +38,6 @@ func trigger() -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_level_started() -> void:
+	trigger()

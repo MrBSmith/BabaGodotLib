@@ -9,7 +9,8 @@ export var queue_free_after_trigger : bool = true
 
 
 func event():
-	method_call()
+	if !is_queued_for_deletion():
+		method_call()
 
 
 # Call the given method in a single target or a group target
@@ -39,7 +40,7 @@ func method_call():
 		if level.name == target_name:
 			target_array.append(level)
 		else:
-			var target = get_tree().get_current_scene().find_node(target_name)
+			var target = GAME.current_level.find_node(target_name)
 			if target == null:
 				target = Utils.find_autoload(target_name, get_tree())
 			
