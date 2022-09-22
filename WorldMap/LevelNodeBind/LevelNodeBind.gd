@@ -12,7 +12,7 @@ export var destination_node_path : String = ""
 export var hidden : bool = false setget set_hidden, is_hidden
 export var angled_bind : bool = true
 
-export var active : bool = true setget set_active, is_active
+export var active : bool = false setget set_active, is_active
 
 export var active_color : Color
 export var inactive_color : Color

@@ -2,6 +2,8 @@ tool
 extends CanvasLayer
 class_name WorldMap
 
+const GARAGE_SCENE_PATH = "res://Scenes/Garage/Garage.tscn"
+
 onready var level_node_container = $Levels
 onready var binds_container = $Binds
 onready var characters_container = $Characters
@@ -171,7 +173,11 @@ func get_bind(origin: WorldMapNode, dest: WorldMapNode) -> LevelNodeBind:
 # Trigger the scene change to enter the level
 func enter_current_level():
 	var current_cursor_level = cursor.get_current_node()
-	EVENTS.emit_signal("go_to_level_by_path", current_cursor_level.get_level_scene_path())
+	var path = current_cursor_level.get_level_scene_path()
+	if path == GARAGE_SCENE_PATH:
+		GAME._go_to_garage()
+	else:
+		EVENTS.emit_signal("go_to_level_by_path", path)
 
 
 func is_level_valid(level : LevelNode) -> bool:

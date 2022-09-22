@@ -57,6 +57,8 @@ func get_level_scene_path() -> String: return level_scene_path
 
 func set_level_name(value: String): 
 	level_name = value
+	if !is_inside_tree():
+		yield(self, "ready")
 	$Label.set_text(level_name)
 func get_level_name() -> String: return level_name
 

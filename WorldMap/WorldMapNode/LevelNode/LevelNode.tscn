@@ -9,19 +9,27 @@
 [ext_resource path="res://Global/AbstractStates/Appear.gd" type="Script" id=7]
 [ext_resource path="res://BabaGodotLib/WorldMap/WorldMapNode/WorldMapNode.tscn" type="PackedScene" id=8]
 
-
 [node name="LevelNode" instance=ExtResource( 8 )]
+self_modulate = Color( 0, 0, 0, 1 )
 script = ExtResource( 3 )
+accessible_color = Color( 0.270588, 0.611765, 0.156863, 1 )
+unaccessible_color = Color( 0.337255, 0.345098, 0.462745, 1 )
+level_scene_path = ""
+level_name = ""
+hidden = false
+visited = false
+label_accessible_color = Color( 0.14902, 0.219608, 0.278431, 1 )
+label_unaccessible_color = Color( 0.321569, 0, 0.176471, 1 )
 
 [node name="Label" type="Label" parent="." index="1"]
+self_modulate = Color( 0, 0, 0, 1 )
 margin_left = -11.0
 margin_top = -8.0
 margin_right = 11.0
 margin_bottom = 6.0
 custom_fonts/font = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+align = 1
+valign = 1
 
 [node name="StatesMachine" type="Node2D" parent="." index="2"]
 script = ExtResource( 2 )
