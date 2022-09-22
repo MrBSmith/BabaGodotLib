@@ -52,6 +52,7 @@ func _ready() -> void:
 	var __ = connect("options_array_changed", self, "_on_options_array_changed")
 	
 	EVENTS.emit_signal("menu_entered", name)
+	GAME.swap_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	_setup()
 
 
@@ -232,6 +233,7 @@ func _go_to_last_menu() -> void:
 
 
 func _resume_game():
+	GAME.swap_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
 	queue_free()
