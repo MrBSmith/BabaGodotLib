@@ -41,10 +41,10 @@ func map_input_profile(profile: InputProfile) -> void:
 	EVENTS.emit_signal("input_profile_changed", profile.dict)
 
 
-func change_custom_profile_key(action_name: String, key_array : Array = []) -> void:
+func change_custom_profile_key(action_name: String, input_array: Array = []) -> void:
 	var custom_profile = profiles_array[PROFILES_PRESET.CUSTOM]
 	if custom_profile.dict.has(action_name):
-		profiles_array[PROFILES_PRESET.CUSTOM].dict[action_name] = key_array
+		profiles_array[PROFILES_PRESET.CUSTOM].dict[action_name] = input_array
 
 
 func map_current_profile() -> void:
@@ -72,15 +72,12 @@ func fetch_current_actions(actions_to_fetch := PoolStringArray()) -> Dictionary:
 	
 	for action in actions_to_fetch:
 		var input_event_array = InputMap.get_action_list(action)
-		var keys_array = []
+		var input_array = []
 		
 		for input_event in input_event_array:
-			if input_event is InputEventJoypadButton:
-				continue
-			
-			keys_array.append(input_event.scancode)
+			input_array.append(input_event)
 		
-		actions_dict[action] = keys_array
+		actions_dict[action] = input_array
 	
 	return actions_dict
 
@@ -133,13 +130,11 @@ func map_player_default_profile(players_settings_file_path: String, sections: Ar
 
 
 # This function will remove the current keys in the given action from the settings and add a new key instead
-func remap_action_key(action_name : String, keys_array : Array):
+func remap_action_key(action_name : String, input_array : Array):
 	erase_action_keys(action_name)
 
-	for key in keys_array:
-		var new_event = InputEventKey.new()
-		new_event.set_scancode(key)
-		InputMap.action_add_event(action_name, new_event)
+	for input in input_array:
+		InputMap.action_add_event(action_name, input)
 
 
 # This function will remove the selected action from the settings (InputMap)
