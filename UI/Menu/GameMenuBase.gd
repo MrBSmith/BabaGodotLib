@@ -10,7 +10,7 @@ enum CANCEL_ACTION {
 export var menu_option_scene : PackedScene
 export var screen_title_option_base : PackedScene
 
-export var opt_container_path : String = "VBoxContainer"
+export var opt_container_path : NodePath = "VBoxContainer"
 
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
@@ -52,7 +52,6 @@ func _ready() -> void:
 	var __ = connect("options_array_changed", self, "_on_options_array_changed")
 	
 	EVENTS.emit_signal("menu_entered", name)
-	GAME.swap_mouse_mode(Input.MOUSE_MODE_CONFINED)
 	_setup()
 
 
@@ -85,7 +84,10 @@ func focus_first_option() -> void:
 	
 	for button in opt_container.get_children():
 		if !button.is_disabled():
-			button.set_focused(true)
+			if button.has_method("set_focused"):
+				button.set_focused(true)
+			else:
+				button.grab_focus()
 			break
 
 
@@ -233,7 +235,6 @@ func _go_to_last_menu() -> void:
 
 
 func _resume_game():
-	GAME.swap_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
 	queue_free()
