@@ -7,8 +7,14 @@ export var method_name : String = ""
 export var arguments_array : Array = []
 export var queue_free_after_trigger : bool = true
 
+# If this is true, the event will trigger only the first time play a level
+export var once_per_level : bool = true
+
 
 func event():
+	if GAME.progression.is_level_visited(GAME.current_level):
+		return
+	
 	if !is_queued_for_deletion():
 		method_call()
 
@@ -34,8 +40,6 @@ func method_call():
 		if level == null:
 			push_error("The current level is null, the event couldn't trigger")
 			return
-		
-		
 		
 		if level.name == target_name:
 			target_array.append(level)

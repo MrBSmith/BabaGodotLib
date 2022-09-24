@@ -3,13 +3,15 @@ class_name Serializer
 
 
 # Find recursivly every wanted nodes, and extract their wanted properties
-static func fetch_branch_state(property_dict: Dictionary, root_node: Node, dict_to_fill : Dictionary = {}, node: Node = null) -> Dictionary:
+static func fetch_branch_state(property_dict: Dictionary, root_node: Node, ignored_classes := PoolStringArray(),
+								 dict_to_fill : Dictionary = {}, node: Node = null) -> Dictionary:
+	
 	var class_path_array = property_dict.keys()
 	if node == null: 
 		node = root_node
 	
 	for class_path in class_path_array:
-		var found_nodes_array = Utils.fetch_from_class_path(node, class_path)
+		var found_nodes_array = Utils.fetch_from_class_path(node, class_path, ignored_classes)
 		
 		for found_node in found_nodes_array:
 			var object_properties = get_object_properties(property_dict, found_node)
@@ -17,7 +19,11 @@ static func fetch_branch_state(property_dict: Dictionary, root_node: Node, dict_
 			dict_to_fill[root_node.get_path_to(found_node)] = object_properties
 	
 	for child in node.get_children():
-		var __ = fetch_branch_state(property_dict, root_node, dict_to_fill, child)
+		for _class in ignored_classes:
+			if child.is_class(_class):
+				return dict_to_fill
+		
+		var __ = fetch_branch_state(property_dict, root_node, ignored_classes, dict_to_fill, child)
 	
 	return dict_to_fill
 

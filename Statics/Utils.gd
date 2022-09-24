@@ -167,7 +167,7 @@ static func find_autoload(target_name: String, tree: SceneTree) -> Node:
 
 # Find direct or indirect children of the given node that respect given the path of classes
 # Then returns it in an array
-static func fetch_from_class_path(node: Node, class_path: String, class_as_group: bool = false, array : Array = []) -> Array:
+static func fetch_from_class_path(node: Node, class_path: String, ignored_classes := PoolStringArray(), class_as_group: bool = false, array : Array = []) -> Array:
 	var class_array = class_path.split("/")
 	
 	if class_array.empty():
@@ -178,13 +178,17 @@ static func fetch_from_class_path(node: Node, class_path: String, class_as_group
 	class_array.remove(0)
 	var new_class_path = class_array.join("/")
 	
+	for _class in ignored_classes:
+		if node.is_class(_class):
+			return []
+	
 	if node.is_class(first_class) or (class_as_group && node.is_in_group(first_class)):
 		
 		if class_array.empty():
 			array.append(node)
 		else:
 			for child in node.get_children():
-				var __ = fetch_from_class_path(child, new_class_path, class_as_group, array)
+				var __ = fetch_from_class_path(child, new_class_path, ignored_classes, class_as_group, array)
 	
 	return array
 
