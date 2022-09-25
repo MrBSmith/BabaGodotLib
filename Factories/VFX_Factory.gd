@@ -33,9 +33,7 @@ func play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> vo
 	for key in state_dict.keys():
 		fx_node.set(key, state_dict[key])
 	
-	add_child(fx_node)
-	fx_node.play_animation()
-
+	owner.add_child(fx_node)
 
 
 #### INPUTS ####
