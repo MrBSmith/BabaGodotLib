@@ -193,7 +193,7 @@ func is_animation_running() -> bool:
 #### INPUTS ####
 
 func _input(_event: InputEvent) -> void:
-	if Engine.editor_hint:
+	if Engine.editor_hint or GAME.cutscene_playing:
 		return
 	
 	if Input.is_action_just_pressed("ui_right"):
