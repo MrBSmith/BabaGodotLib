@@ -1,6 +1,11 @@
 extends Object
 class_name Utils
 
+enum {
+	CLOCKWISE,
+	COUNTER_CLOCKWISE
+}
+
 const DIRECTIONS_4 : Dictionary = {
 	"Up": Vector2.UP,
 	"Right": Vector2.RIGHT,
