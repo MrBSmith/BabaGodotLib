@@ -26,13 +26,13 @@ func collect() -> void:
 	set_target(null)
 	EVENTS.emit_signal("collect", owner, get_collectable_name())
 	
+	if collect_sound:
+		EVENTS.emit_signal("play_sound_effect", collect_sound)
+	
 	trigger_collect_animation()
 
 
 func trigger_collect_animation() -> void:
-	if collect_sound:
-		EVENTS.emit_signal("play_spacial_sound_effect", collect_sound, owner.get_global_position())
-	
 	if animation_player.has_animation("Collect"):
 		animation_player.play("Collect")
 	else:
