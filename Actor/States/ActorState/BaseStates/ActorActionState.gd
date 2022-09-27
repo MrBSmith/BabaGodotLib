@@ -2,6 +2,8 @@ tool
 extends State
 class_name ActorActionState
 
+onready var impact_sound = get_node_or_null("ImpactSound")
+
 export var interact_frame : int = 2
 
 var action_hitbox_node : Area2D
@@ -39,7 +41,6 @@ func interact():
 	
 	# Get every area in the hitbox area
 	var interact_areas = action_hitbox_node.get_overlapping_areas()
-	
 	damage()
 	
 	# Check if one on the areas in the hitbox area is an interative one, and interact with it if it is
@@ -52,11 +53,15 @@ func interact():
 	
 	if is_wrong_interaction() && animated_sprite.get_sprite_frames().has_animation("WrongAction"):
 		animated_sprite.play("WrongAction")
+	
+	if (has_damaged or is_wrong_interaction()) && impact_sound:
+		EVENTS.emit_signal("play_sound_effect", impact_sound)
 
 
 # Damage a block if it is in the hitbox area, and if his type correspond to the current robot breakable type
 func damage():
 	var bodies_in_hitbox = action_hitbox_node.get_overlapping_bodies()
+	
 	for body in bodies_in_hitbox:
 		if body == owner or body.owner == owner or body is TileMap:
 			continue
