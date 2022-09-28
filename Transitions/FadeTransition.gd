@@ -10,6 +10,8 @@ onready var tween = $Tween
 export var start_color := Color.transparent
 export var fade_color := Color.black
 
+var running : bool = false setget , is_running
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "FadeTransition" or .is_class(value)
@@ -17,6 +19,8 @@ func get_class() -> String: return "FadeTransition"
 
 func set_visible(value: bool):
 	$ColorRect.set_visible(value)
+
+func is_running() -> bool: return running
 
 
 #### BUILT-IN ####
@@ -35,6 +39,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay : float = 0.0) -> void:
+	running = true
 	var duration = fade_time / 2 if fade_mode == FADE_MODE.FADE_IN_OUT else fade_time
 	
 	if fade_mode != FADE_MODE.FADE_IN:
@@ -54,6 +59,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		tween.start()
 		yield(tween, "tween_all_completed")
 	
+	running = false
 	EVENTS.emit_signal("transition_finished")
 
 
