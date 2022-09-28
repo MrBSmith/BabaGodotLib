@@ -92,9 +92,7 @@ func fetch_default_profiles_data(default_profile_file_path: String) -> void:
 func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array = []) -> Array:
 	var input_profile_config_file = ConfigFile.new()
 	
-	var prefix = DirNavHelper._get_path_prefix(file_path)
-	var file_path_prefix = prefix if prefix != "" else "res://"
-	var complete_file_path = file_path_prefix + file_path
+	var complete_file_path = file_path
 	var err = input_profile_config_file.load(complete_file_path)
 	
 	if sections_to_read.empty():
@@ -125,6 +123,7 @@ func map_player_default_profile(players_settings_file_path: String, sections: Ar
 	
 	if players_input_profile == null:
 		push_error("The player's input profile couldn't be fetched in the file located: %s" % players_settings_file_path)
+		return
 	
 	map_input_profile(players_input_profile)
 

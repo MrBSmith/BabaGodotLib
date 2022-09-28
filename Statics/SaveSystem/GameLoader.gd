@@ -39,7 +39,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 			
 			"players_data":
 				if players_data == null:
-					print_debug("No players_data node passed; players_data could not be loaded")
+					push_error("No players_data node passed; players_data could not be loaded")
 					continue
 				
 				# All the players data are stored in one big dictionnary, so it should always be only one key there
