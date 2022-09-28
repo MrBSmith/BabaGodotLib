@@ -53,10 +53,14 @@ static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persi
 
 	for object_path in state_dict.keys():
 		var object = branch_root.get_node_or_null(object_path)
-
+		
 		if object == null:
-			push_warning("The object with path : " + object_path + " couldn't be found")
-			continue
+			var path_as_string = String(object_path).replace("@", "")
+			object = branch_root.get_node_or_null(path_as_string)
+			
+			if object == null:
+				push_warning("The object with path : " + object_path + " couldn't be found")
+				continue
 		
 		if is_node_state_ignored(object, ignored_classes):
 			continue
