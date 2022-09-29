@@ -42,9 +42,13 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 					push_error("No players_data node passed; players_data could not be loaded")
 					continue
 				
+				var player_data_dict = {}
+				
 				# All the players data are stored in one big dictionnary, so it should always be only one key there
 				for key in config_file.get_section_keys(section):
-					players_data.players_data_dict = config_file.get_value(section, key)
+					player_data_dict[key] = config_file.get_value(section, key)
+				
+				players_data.players_data_dict = player_data_dict
 
 
 # Create a ConfigFile object out of the save.cfg found in the save folder corresponding to the given slot_id.
