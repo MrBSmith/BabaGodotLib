@@ -91,9 +91,7 @@ func fetch_default_profiles_data(default_profile_file_path: String) -> void:
 # Each section have to correspond to a profile, if sections_to_read is empty, each sections of the file will be considered a profile
 func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array = []) -> Array:
 	var input_profile_config_file = ConfigFile.new()
-	
-	var complete_file_path = file_path
-	var err = input_profile_config_file.load(complete_file_path)
+	var err = input_profile_config_file.load(file_path)
 	
 	if sections_to_read.empty():
 		sections_to_read = input_profile_config_file.get_sections()
