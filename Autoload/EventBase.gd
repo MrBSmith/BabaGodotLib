@@ -85,6 +85,7 @@ signal menu_entered(menu_name)
 
 signal navigate_menu_query(menu_name, dest_menu_parent, current_menu)
 signal navigate_menu_back_query()
+signal change_scene_to_menu(menu_name, trans_duration)
 
 
 #### LEVEL NAVIGATION ####
