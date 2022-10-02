@@ -10,6 +10,10 @@ export var queue_free_after_trigger : bool = true
 # If this is true, the event will trigger only the first time play a level
 export var once_per_level : bool = true
 
+func is_class(value: String) -> bool: return value == "LevelEvent" or .is_class(value)
+func get_class() -> String: return "LevelEvent"
+
+
 
 func event():
 	if GAME.progression.is_level_visited(GAME.current_level):

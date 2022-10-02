@@ -106,6 +106,9 @@ func set_hover_texture_flags(value: int) -> void:
 	$HBoxContainer/HoverTexture2.set_visible(hover_texture_flags & TEXTURE_FLAGS.RIGHT)
 
 
+func is_class(value: String): return value == "MenuOptionsBase" or .is_class(value)
+func get_class() -> String: return "MenuOptionsBase"
+
 #### BUILT-IN ####
 
 func _ready() -> void:

@@ -177,7 +177,7 @@ func enter_current_level():
 	if path == GARAGE_SCENE_PATH:
 		GAME._go_to_garage()
 	else:
-		EVENTS.emit_signal("go_to_level_by_path", path)
+		EVENTS.emit_signal("go_to_level_by_path", path, true)
 
 
 func is_level_valid(level : LevelNode) -> bool:
