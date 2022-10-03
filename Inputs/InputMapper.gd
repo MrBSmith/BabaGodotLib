@@ -117,7 +117,15 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 # Fetch the player's default_profile file content, then map the profile fetched
 func map_player_default_profile(players_settings_file_path: String, sections: Array = []) -> void:
 	var profile_array = _fetch_input_profile_from_file(players_settings_file_path, sections)
-	var players_input_profile = null if profile_array.empty() else profile_array[0]
+	var players_input_profile = null 
+	
+	# Default input
+	if profile_array.size() == 3:
+		 players_input_profile = profile_array[PROFILES_PRESET.QWERTY]
+	
+	# Players input
+	elif profile_array.size() == 1:
+		 players_input_profile = profile_array[0]
 	
 	if players_input_profile == null:
 		push_error("The player's input profile couldn't be fetched in the file located: %s" % players_settings_file_path)
@@ -132,6 +140,8 @@ func remap_action_key(action_name : String, input_array : Array):
 
 	for input in input_array:
 		InputMap.action_add_event(action_name, input)
+	
+	EVENTS.emit_signal("input_mapped", action_name, input_array)
 
 
 # This function will remove the selected action from the settings (InputMap)
