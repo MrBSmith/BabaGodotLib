@@ -31,3 +31,4 @@ script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+amount = -9223372036854775808

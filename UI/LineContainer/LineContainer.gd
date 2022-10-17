@@ -9,6 +9,8 @@ export var transition_duration : float = 0.18
 export var hidden : bool = true setget set_hidden, is_hidden
 export var hidden_margin_left : float = 30.0
 
+onready var default_color = get_modulate()
+
 var is_ready : bool = false
 
 
@@ -19,7 +21,8 @@ func get_class() -> String: return "LineContainer"
 
 func set_hidden(value: bool):
 	hidden = value
-	update_visibilty()
+	if is_ready:
+		update_visibilty()
 
 
 func is_hidden() -> bool: return hidden
@@ -41,15 +44,15 @@ func _ready() -> void:
 func update_visibilty():
 	if hidden:
 		set_margin(MARGIN_LEFT, hidden_margin_left)
-		set_modulate(Color.transparent)
+		modulate.a = 0.0
 	else:
 		set_margin(MARGIN_LEFT, default_margin_left)
-		set_modulate(Color.white)
+		modulate.a = 1.0
 
 
 func appear():
-	tween.interpolate_property(self, "modulate",
-		Color.transparent, Color.white, transition_duration,
+	tween.interpolate_property(self, "modulate:a",
+		0.0, 1.0, transition_duration,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	tween.interpolate_property(self, "margin_left",
@@ -63,8 +66,8 @@ func appear():
 
 
 func disappear():
-	tween.interpolate_property(self, "modulate",
-		Color.white, Color.transparent, transition_duration,
+	tween.interpolate_property(self, "modulate:a",
+		1.0, 0.0, transition_duration,
 		Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	
 	tween.interpolate_property(self, "margin_left",
