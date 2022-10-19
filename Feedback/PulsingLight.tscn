@@ -7,7 +7,7 @@
 script = ExtResource( 2 )
 
 [node name="Light2D" type="Light2D" parent="."]
-light_mask = 524288
+light_mask = 0
 texture = ExtResource( 1 )
 range_z_max = 0
 range_layer_min = -100
@@ -21,9 +21,8 @@ __meta__ = {
 texture = ExtResource( 1 )
 texture_scale = 0.5
 mode = 1
-range_layer_min = -100
 range_layer_max = 100
-range_item_cull_mask = 524288
+range_item_cull_mask = 0
 __meta__ = {
 "_edit_lock_": true
 }
