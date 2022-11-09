@@ -13,7 +13,8 @@ func get_class() -> String: return "VFX_Factory"
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var _err = EVENTS.connect("play_VFX", self, "_on_play_VFX")
+	var _err = EVENTS.connect("play_VFX", self, "play_VFX")
+	_err = EVENTS.connect("play_VFX_scene", self, "play_VFX_scene")
 
 #### VIRTUALS ####
 
@@ -26,14 +27,23 @@ func play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> vo
 		print("The fx named " + fx_name + " doesn't exist in the dictionnary")
 		return
 	
-	var fx = vfx_dict[fx_name]
-	var fx_node = fx.instance()
+	var scene = vfx_dict[fx_name]
+	play_VFX_scene(scene, pos, state_dict)
+
+
+func play_VFX_scene(scene: PackedScene, pos: Vector2, state_dict : Dictionary = {}) -> void:
+	var fx_node = scene.instance()
 	fx_node.set_global_position(pos)
 	
 	for key in state_dict.keys():
-		fx_node.set(key, state_dict[key])
+		var setter_name = "set_" + key
+		if fx_node.has_method(setter_name):
+			fx_node.call(setter_name, state_dict[key])
+		else:
+			fx_node.set(key, state_dict[key])
 	
 	owner.add_child(fx_node)
+
 
 
 #### INPUTS ####
@@ -41,6 +51,3 @@ func play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> vo
 
 
 #### SIGNAL RESPONSES ####
-
-func _on_play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> void:
-	play_VFX(fx_name, pos, state_dict)
