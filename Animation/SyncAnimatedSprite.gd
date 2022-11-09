@@ -6,6 +6,8 @@ export var sync_frame_rate : bool = true
 export var master_path : NodePath
 onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
 
+onready var sprite_offset = offset
+ 
 signal animation_changed(anim)
 
 #### ACCESSORS ####
@@ -39,6 +41,14 @@ func play(anim: String = "", backwards: bool = false) -> void:
 		emit_signal("animation_changed", anim, backwards)
 	
 	.play(anim, backwards)
+
+
+func set_flip_h(value: bool) -> void:
+	.set_flip_h(value)
+	
+	# Flip the sprite's x position
+	position.x = abs(position.x) * Math.bool_to_sign(!value)
+	offset.x = sprite_offset.x * Math.bool_to_sign(!value)
 
 
 #### INPUTS ####
