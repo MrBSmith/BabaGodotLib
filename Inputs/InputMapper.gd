@@ -34,11 +34,14 @@ func get_current_profile() -> InputProfile: return profiles_array[current_profil
 
 #### LOGIC ####
 
-func map_input_profile(profile: InputProfile) -> void:
+func map_input_profile(profile: InputProfile, player_id: int = -1) -> void:
 	for action_name in profile.dict.keys():
+		if player_id >= 0 && !("player" + str(player_id + 1)).is_subsequence_of(action_name):
+			continue
+		
 		remap_action_key(action_name, profile.dict[action_name])
 	
-	EVENTS.emit_signal("input_profile_changed", profile.dict)
+	EVENTS.emit_signal("input_profile_changed", profile.dict, player_id)
 
 
 func change_custom_profile_key(action_name: String, input_array: Array = []) -> void:
@@ -49,6 +52,16 @@ func change_custom_profile_key(action_name: String, input_array: Array = []) -> 
 
 func map_current_profile() -> void:
 	map_input_profile(get_current_profile())
+
+
+func get_profile_by_name(profile_name: String) -> InputProfile:
+	var profile_id = PROFILES_PRESET.keys().find(profile_name.to_upper())
+	
+	if profile_id == -1:
+		push_error("Given profile name %s not found" % profile_name)
+		return null
+	
+	return profiles_array[profile_id] as InputProfile
 
 
 # Takes a Dictionary of actions, and check if it matches one of the profiles contained in the profiles_array
@@ -141,6 +154,7 @@ func remap_action_key(action_name : String, input_array : Array):
 	for input in input_array:
 		InputMap.action_add_event(action_name, input)
 	
+	print("action mapped %s with: %s" % [action_name, input_array[0].as_text()])
 	EVENTS.emit_signal("input_mapped", action_name, input_array)
 
 
