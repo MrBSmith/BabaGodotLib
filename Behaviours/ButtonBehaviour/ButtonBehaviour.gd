@@ -10,16 +10,23 @@ enum STATE {
 	DISABLED
 }
 
-export var togglable : bool = false
+enum TOGGLE_MODE {
+	NONE,
+	SIMPLE_TOGGLE,
+	RADIO
+}
+
+export(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
 export(STATE) var state : int = STATE.NORMAL setget set_state
 export var print_logs : bool = false
 
-var toggled : bool = false
+export var toggled : bool = false
 
 var mouse_inside : bool = false
 
 signal state_changed
 signal pressed
+signal toggled(value)
 
 #### ACCESSORS ####
 
@@ -43,6 +50,11 @@ func _ready() -> void:
 	__ = get_parent().connect("focus_entered", self, "_on_focus_entered")
 	__ = get_parent().connect("focus_exited", self, "_on_focus_exited")
 	__ = get_parent().connect("gui_input", self, "_on_gui_input")
+	__ = get_parent().connect("visibility_changed", self, "_on_visibility_changed")
+	
+	if toggled:
+		emit_signal("toggled")
+		_update_state()
 
 
 #### VIRTUALS ####
@@ -73,14 +85,14 @@ func toggle() -> void:
 	if disabled:
 		return
 	
-	if !togglable:
+	if toggle_mode == TOGGLE_MODE.NONE:
 		push_error("trying to toggle a non-togglable button, aborting")
 		return
 	
 	toggled = !toggled
 	
-	if state != STATE.PRESSED:
-		_update_state()
+	_update_state()
+	emit_signal("toggled", toggled)
 
 
 #### INPUTS ####
@@ -98,10 +110,14 @@ func _on_gui_input(event: InputEvent) -> void:
 		if event.is_action_pressed("ui_accept") or \
 			(event is InputEventMouseButton && event.button_index == BUTTON_LEFT):
 			
-			set_state(STATE.PRESSED)
+			if toggle_mode == TOGGLE_MODE.NONE:
+				set_state(STATE.PRESSED)
 			
-			if togglable:
+			elif toggle_mode == TOGGLE_MODE.SIMPLE_TOGGLE or (toggle_mode == TOGGLE_MODE.RADIO && !toggled):
 				toggle()
+			
+			else:
+				return
 			
 			emit_signal("pressed")
 	
@@ -137,3 +153,7 @@ func _on_focus_entered() -> void:
 func _on_focus_exited() -> void:
 	if state == STATE.FOCUSED:
 		_update_state()
+
+
+func _on_visibility_changed() -> void:
+	_update_state()
