@@ -70,7 +70,7 @@ func _update_state() -> void:
 	
 	if toggled:
 		set_state(STATE.TOGGLED)
-	
+
 	elif get_parent().get_focus_owner() == get_parent():
 		set_state(STATE.FOCUSED)
 	
@@ -131,17 +131,17 @@ func _on_gui_input(event: InputEvent) -> void:
 
 func _on_mouse_entered() -> void:
 	if print_logs: print("mouse_entered")
+	mouse_inside = true
 	
 	if not state in [STATE.DISABLED, STATE.TOGGLED, STATE.PRESSED]:
 		set_state(STATE.HOVER)
-		mouse_inside = true
 
 
 func _on_mouse_exited() -> void:
 	if print_logs: print("mouse_exited")
+	mouse_inside = false
 
 	if state == STATE.HOVER:
-		mouse_inside = false
 		_update_state()
 
 
