@@ -20,7 +20,7 @@ export(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
 export(STATE) var state : int = STATE.NORMAL setget set_state
 export var print_logs : bool = false
 
-export var toggled : bool = false
+export var toggled : bool = false setget set_toggled
 
 var mouse_inside : bool = false
 
@@ -40,6 +40,10 @@ func set_state(value: int) -> void:
 	if value != state:
 		state = value
 		emit_signal("state_changed")
+
+func set_toggled(value: bool) -> void:
+	toggled = value
+	_update_state()
 
 
 #### BUILT-IN ####

@@ -36,7 +36,7 @@ func get_current_profile() -> InputProfile: return profiles_array[current_profil
 
 func map_input_profile(profile: InputProfile, player_id: int = -1) -> void:
 	for action_name in profile.dict.keys():
-		if player_id >= 0 && !("player" + str(player_id + 1)).is_subsequence_of(action_name):
+		if player_id >= 0 && !is_action_of_player(action_name, player_id):
 			continue
 		
 		remap_action_key(action_name, profile.dict[action_name])
@@ -62,6 +62,43 @@ func get_profile_by_name(profile_name: String) -> InputProfile:
 		return null
 	
 	return profiles_array[profile_id] as InputProfile
+
+
+func get_player_profile(player_id : int) -> String:
+	for i in range(profiles_array.size()):
+		var profile = profiles_array[i]
+		
+		for j in range(profile.dict.keys().size()):
+			var action = profile.dict.keys()[j]
+			if !is_action_of_player(action, player_id):
+				continue
+			
+			var profile_inputs = profile.dict[action]
+			var mapped_inputs = InputMap.get_action_list(action)
+			
+			if !compare_inputs_list(profile_inputs, mapped_inputs):
+				break
+			
+			return PROFILES_PRESET.keys()[i].capitalize()
+	
+	return "Custom"
+
+
+
+func compare_inputs_list(list_a: Array, list_b: Array) -> bool:
+	if list_a.size() != list_b.size():
+		return false
+	
+	for i in range(list_a.size()):
+		if list_a[i].as_text() != list_b[i].as_text():
+			return false
+	
+	return true
+
+
+
+func is_action_of_player(action_name: String, player_id: int) -> bool:
+	return ("player" + str(player_id + 1)).is_subsequence_of(action_name)
 
 
 # Takes a Dictionary of actions, and check if it matches one of the profiles contained in the profiles_array
