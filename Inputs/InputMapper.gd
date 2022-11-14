@@ -6,7 +6,7 @@ func get_class() -> String: return "InputMapper"
 
 signal profile_changed(profile)
 
-enum PROFILES_PRESET{AZERTY, QWERTY, CUSTOM}
+enum PROFILES_PRESET{AZERTY, QWERTY, CONTROLER, CUSTOM}
 export(PROFILES_PRESET) var default_profile_id
 
 var profiles_array: Array = []

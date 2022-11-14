@@ -24,6 +24,8 @@ export var toggled : bool = false setget set_toggled
 
 var mouse_inside : bool = false
 
+var is_ready : bool = false
+
 signal state_changed
 signal pressed
 signal toggled(value)
@@ -34,16 +36,27 @@ func is_class(value: String): return value == "ButtonBehaviour" or .is_class(val
 func get_class() -> String: return "ButtonBehaviour"
 
 func set_state(value: int) -> void:
-	if disabled:
-		return
-	
 	if value != state:
 		state = value
 		emit_signal("state_changed")
+		
+		if print_logs:
+			print("%s changed state to: %s" % [get_parent().name, STATE.keys()[state]])
+
 
 func set_toggled(value: bool) -> void:
 	toggled = value
 	_update_state()
+
+
+func set_disabled(value: bool) -> void:
+	if value != disabled:
+		disabled = value
+		
+		if !is_ready:
+			yield(self, "ready")
+			
+		set_state(STATE.DISABLED)
 
 
 #### BUILT-IN ####
@@ -55,6 +68,8 @@ func _ready() -> void:
 	__ = get_parent().connect("focus_exited", self, "_on_focus_exited")
 	__ = get_parent().connect("gui_input", self, "_on_gui_input")
 	__ = get_parent().connect("visibility_changed", self, "_on_visibility_changed")
+	
+	is_ready = true
 	
 	if toggled:
 		emit_signal("toggled")
@@ -144,7 +159,7 @@ func _on_mouse_entered() -> void:
 func _on_mouse_exited() -> void:
 	if print_logs: print("mouse_exited")
 	mouse_inside = false
-
+	
 	if state == STATE.HOVER:
 		_update_state()
 
