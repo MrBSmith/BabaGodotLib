@@ -6,12 +6,13 @@ func get_class() -> String: return "InputMapper"
 
 signal profile_changed(profile)
 
-enum PROFILES_PRESET{KEYBOARD, CONTROLER, CUSTOM}
+enum PROFILES_PRESET{KEYBOARD, CONTROLLER, CUSTOM}
 export(PROFILES_PRESET) var default_profile_id
 
 var profiles_array: Array = []
 var current_profile_id : int = default_profile_id setget set_current_profile_id, get_current_profile_id
 
+export var print_logs: bool = false
 
 #### ACCESSORS ####
 
@@ -114,28 +115,39 @@ func find_corresponding_profile(action_dict: Dictionary) -> int:
 
 # Fetch every actions contained in actions_to_fetch
 # If the action_to_fetch array is empty: fetch every actions
-func fetch_current_actions(actions_to_fetch := PoolStringArray()) -> Dictionary:
-	var actions_dict = Dictionary()
+func fetch_file_inputs(file_path: String) -> Dictionary:
+	var cfg_file = ConfigFile.new()
+	var err = cfg_file.load(file_path)
 	
-	if actions_to_fetch.empty():
-		actions_to_fetch = InputMap.get_actions()
+	if err != OK:
+		push_error("Error while opening the .cfg settings file at path %s" % file_path)
+		return {}
 	
-	for action in actions_to_fetch:
-		var input_event_array = InputMap.get_action_list(action)
-		var input_array = []
-		
-		for input_event in input_event_array:
-			input_array.append(input_event)
-		
-		actions_dict[action] = input_array
-	
-	return actions_dict
+	return cfg_file.get_value("controls", "inputs")
 
 
 # Fetch all data contained in the default_profile_file located at given path and hydrate profiles_array with it 
 func fetch_default_profiles_data(default_profile_file_path: String) -> void:
 	profiles_array = _fetch_input_profile_from_file(default_profile_file_path)
 
+
+# inputs = {
+#	player1: {
+#		"Controller": {
+#			"action": [input_event...],
+#			"move_left": [input_event...]
+#		}
+#	}
+#	player2: {
+#		"Controller": {
+#			"action": [input_event...],
+#			"move_left": [input_event...]
+#		}
+#	}
+#	commons: {
+#		"cancel": [input_event...]
+#	}
+# }
 
 # Fetch input relative data form the file at the given path located in the given sections and returns an array of profiles found
 # Each section have to correspond to a profile, if sections_to_read is empty, each sections of the file will be considered a profile
@@ -165,23 +177,10 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 
 
 # Fetch the player's default_profile file content, then map the profile fetched
-func map_player_default_profile(players_settings_file_path: String, sections: Array = []) -> void:
-	var profile_array = _fetch_input_profile_from_file(players_settings_file_path, sections)
-	var players_input_profile = null 
+func map_player_settings_inputs(file_path: String) -> void:
+	var inputs_dict = fetch_file_inputs(file_path)
 	
-	# Default input
-	if profile_array.size() == 3:
-		 players_input_profile = profile_array[PROFILES_PRESET.QWERTY]
-	
-	# Players input
-	elif profile_array.size() == 1:
-		 players_input_profile = profile_array[0]
-	
-	if players_input_profile == null:
-		push_error("The player's input profile couldn't be fetched in the file located: %s" % players_settings_file_path)
-		return
-	
-	map_input_profile(players_input_profile)
+	PLAYERS_INPUT.update_inputs(inputs_dict)
 
 
 # This function will remove the current keys in the given action from the settings and add a new key instead
@@ -191,7 +190,8 @@ func remap_action_key(action_name : String, input_array : Array):
 	for input in input_array:
 		InputMap.action_add_event(action_name, input)
 	
-	print("action mapped %s with: %s" % [action_name, input_array[0].as_text()])
+	if print_logs: 
+		print("action mapped %s with: %s" % [action_name, input_array[0].as_text()])
 	EVENTS.emit_signal("input_mapped", action_name, input_array)
 
 
