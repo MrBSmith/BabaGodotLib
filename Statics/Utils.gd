@@ -286,3 +286,13 @@ static func action_get_keys(action: String) -> PoolStringArray:
 		keys_array.append(event.as_text())
 	
 	return keys_array
+
+
+static func get_input_event_as_text(event: InputEvent) -> String:
+	if event == null:
+		return ""
+	
+	if event is InputEventKey && event.scancode == 0:
+		return OS.get_scancode_string(OS.keyboard_get_scancode_from_physical(event.physical_scancode))
+	else:
+		return event.as_text()
