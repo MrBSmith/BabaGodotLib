@@ -10,7 +10,7 @@ enum FADE_MODE {
 }
 
 export(FADE_MODE) var fade_mode : int = FADE_MODE.CONTENT
-var visible : bool = false
+export var visible : bool = true
 
 signal content_fade_finished
 signal container_fade_finished
@@ -52,6 +52,7 @@ func play() -> void:
 			_fade_content()
 			yield(self, "content_fade_finished")
 	
+	visible = !visible
 	emit_signal("animation_finished")
 
 
@@ -71,11 +72,11 @@ func _fade_content() -> void:
 	var dur = anim_duration / 2.0 if fade_mode in [FADE_MODE.CONTAINER_THEN_CONTENT, FADE_MODE.CONTENT_THEN_CONTAINER] else anim_duration 
 	var tween = create_tween()
 	
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.set_trans(trans_type)
+	tween.set_ease(ease_type)
 	
 	for child in target.get_children():
-		if child.get("modulate") != null:
+		if child is Control:
 			var to_mod = Color.white if !visible else Color.transparent
 			
 			var __ = tween.tween_property(child, "modulate", to_mod, dur)
@@ -89,8 +90,8 @@ func _fade_container() -> void:
 	var dur = anim_duration / 2.0 if fade_mode in [FADE_MODE.CONTAINER_THEN_CONTENT, FADE_MODE.CONTENT_THEN_CONTAINER] else anim_duration 
 	var tween = create_tween()
 	
-	tween.set_trans(Tween.TRANS_CUBIC)
-	tween.set_ease(Tween.EASE_IN_OUT)
+	tween.set_trans(trans_type)
+	tween.set_ease(ease_type)
 	
 	var __ = tween.tween_property(target, "modulate", to_mod, dur)
 	
@@ -105,3 +106,10 @@ func _fade_container() -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_target_changed() -> void:
+	var mod = Color.transparent if !visible else Color.white
+	
+	for child in target.get_children():
+		if child is Control:
+			child.set_modulate(mod)

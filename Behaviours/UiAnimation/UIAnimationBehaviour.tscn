@@ -1,15 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://BabaGodotLib/Behaviours/UiAnimation/UIAnimationBehaviour.gd" type="Script" id=1]
-[ext_resource path="res://BabaGodotLib/Behaviours/UiAnimation/OpeningAnimationModule.gd" type="Script" id=2]
-[ext_resource path="res://BabaGodotLib/Behaviours/UiAnimation/UiAnimationModule/FadeAnimationModule.gd" type="Script" id=3]
 
 [node name="UIAnimationBehaviour" type="Node2D"]
 script = ExtResource( 1 )
 behaviour_type = "UiAnimation"
-
-[node name="OpeningAnimationModule" type="Node" parent="."]
-script = ExtResource( 2 )
-
-[node name="FadeAnimationModule" type="Node" parent="."]
-script = ExtResource( 3 )

@@ -61,6 +61,9 @@ func trigger_animation(backwards: bool = false) -> void:
 		modules_array.invert()
 	
 	for module in modules_array:
+		if not module is UIAnimationModule && not module is ParallelModulePlayer:
+			continue 
+		
 		if module.disabled:
 			continue
 		
@@ -74,9 +77,8 @@ func trigger_animation(backwards: bool = false) -> void:
 
 #### INPUTS ####
 
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_accept") && !event.is_echo():
+func _input(_event: InputEvent) -> void:
+	if Input.is_action_just_pressed("ui_accept"):
 		trigger_animation()
 
 

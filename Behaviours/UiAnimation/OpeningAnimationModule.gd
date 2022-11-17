@@ -41,6 +41,9 @@ func set_default_size(value: Vector2) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
+	if disabled:
+		return
+	
 	if start_mode == START_MODE.START_CLOSED:
 		if target == null:
 			yield(self, "target_changed")
@@ -87,11 +90,9 @@ func close_instant() -> void:
 
 # Resize animation
 func _open_animation() -> void:
-	var ease_type = Tween.EASE_IN if !closed else Tween.EASE_OUT
-	
 	var tween = create_tween()
 	tween.set_ease(ease_type)
-	tween.set_trans(Tween.TRANS_CUBIC)
+	tween.set_trans(trans_type)
 	
 	for margin in range(4):
 		var bit_margin = MARGINS.values()[margin]
@@ -99,8 +100,8 @@ func _open_animation() -> void:
 			continue
 		
 		var default_size_axis = default_size.x if margin in [MARGIN_LEFT, MARGIN_RIGHT] else default_size.y
-		var from = default_size_axis if !closed else 0.0
-		var to = 0.0 if !closed else default_size_axis
+		var from = default_size_axis if closed else 0.0
+		var to = 0.0 if closed else default_size_axis
 		
 		# If the opposite margin is also animated
 		if animated_margins & MARGINS.values()[margin - 2]:

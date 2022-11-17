@@ -1,6 +1,30 @@
 extends Node
 class_name UIAnimationModule
 
+enum TRANS_TYPE {
+	TRANS_LINEAR = 0,
+	TRANS_SINE = 1,
+	TRANS_QUINT = 2,
+	TRANS_QUART = 3,
+	TRANS_QUAD = 4,
+	TRANS_EXPO = 5,
+	TRANS_ELASTIC = 6,
+	TRANS_CUBIC = 7,
+	TRANS_CIRC = 8,
+	TRANS_BOUNCE = 9,
+	TRANS_BACK = 10
+}
+
+enum EASE_TYPE {
+	EASE_IN = 0,
+	EASE_OUT = 1,
+	EASE_IN_OUT = 2,
+	EASE_OUT_IN = 3
+}
+
+
+export(TRANS_TYPE) var trans_type : int = TRANS_TYPE.TRANS_CUBIC
+export(EASE_TYPE) var ease_type : int = EASE_TYPE.EASE_IN_OUT
 export var disabled : bool = false
 
 export(float, 0.01, 999.0) var anim_duration : float = 1.0
