@@ -93,10 +93,10 @@ func _on_focus_changed(button: Button, focused: bool):
 	if !hidden:
 		emit_signal("focus_changed", button, focused)
 	
-	if amount_label == null:
-		return
-	
-	if focused:
-		amount_label.set_modulate(button.get_color("font_color_hover"))
-	else:
-		amount_label.set_modulate(button.get_color("font_color"))
+#	if amount_label == null:
+#		return
+#
+#	if focused:
+#		amount_label.set_modulate(button.get_color("font_color_hover"))
+#	else:
+#		amount_label.set_modulate(button.get_color("font_color"))

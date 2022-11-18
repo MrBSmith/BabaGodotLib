@@ -27,6 +27,8 @@ onready var default_margins_array : Array = []
 
 var default_size := Vector2.INF setget set_default_size
 
+export var print_logs : bool = false
+
 signal resize_finished
 
 #### ACCESSORS ####
@@ -51,14 +53,6 @@ func _ready() -> void:
 		close_instant()
 
 
-func _fetch_default_margin() -> Array:
-	var array = []
-	
-	for margin in range(4):
-		array.append(target.get_margin(margin))
-	
-	return array
-
 
 #### VIRTUALS ####
 
@@ -76,6 +70,19 @@ func play() -> void:
 
 
 #### LOGIC ####
+
+func update_default_params() -> void:
+	set_default_size(target.rect_size)
+	default_margins_array = _fetch_default_margin()
+
+
+func _fetch_default_margin() -> Array:
+	var array = []
+	
+	for margin in range(4):
+		array.append(target.get_margin(margin))
+	
+	return array
 
 
 func close_instant() -> void:
@@ -134,5 +141,4 @@ func _on_animation_finished() -> void:
 	
 
 func _on_target_changed() -> void:
-	set_default_size(target.rect_size)
-	default_margins_array = _fetch_default_margin()
+	update_default_params()

@@ -10,6 +10,7 @@ var buffered_method : BufferedMethod
 var animation_playing : bool = false
 var is_ready := false
 
+signal animation_started
 signal animation_finished
 
 class BufferedMethod:
@@ -53,6 +54,8 @@ func trigger_animation(backwards: bool = false) -> void:
 	if animation_playing:
 		buffered_method = BufferedMethod.new(funcref(self, "trigger_animation"), [backwards])
 		return
+	
+	emit_signal("animation_started")
 	
 	animation_playing = true
 	var modules_array = get_children()
