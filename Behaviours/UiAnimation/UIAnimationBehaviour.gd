@@ -80,9 +80,6 @@ func trigger_animation(backwards: bool = false) -> void:
 
 #### INPUTS ####
 
-func _input(_event: InputEvent) -> void:
-	if Input.is_action_just_pressed("ui_accept"):
-		trigger_animation()
 
 
 #### SIGNAL RESPONSES ####

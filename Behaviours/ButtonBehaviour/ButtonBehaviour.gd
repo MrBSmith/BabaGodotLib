@@ -45,8 +45,10 @@ func set_state(value: int) -> void:
 
 
 func set_toggled(value: bool) -> void:
-	toggled = value
-	_update_state()
+	if value != toggled:
+		toggled = value
+		_update_state()
+		emit_signal("toggled", toggled)
 
 
 func set_disabled(value: bool) -> void:

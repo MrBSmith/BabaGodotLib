@@ -87,10 +87,10 @@ func _ready() -> void:
 	__ = connect("resized", self, "_on_resized")
 	__ = connect("child_entered_tree", self, "_on_child_entered_tree")
 	
-	
 	for child in get_children():
 		if child is Control:
 			connect_child_signals(child)
+
 
 #### VIRTUALS ####
 
@@ -142,15 +142,6 @@ func _resort() -> void:
 	if visible_children.empty():
 		return
 	
-	# Apply its minimum size to the container
-	if sorting_type == SORTING_TYPE.HORIZONTAL && adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_X:
-		if !is_equal_approx(non_expand_chidren_sum, rect_min_size.x):
-			rect_min_size.x = non_expand_chidren_sum
-
-	elif sorting_type == SORTING_TYPE.VERTICAL && adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_Y:
-		if !is_equal_approx(non_expand_chidren_sum, rect_min_size.y):
-			rect_min_size.y = non_expand_chidren_sum
-	
 	var nb_expand_children = visible_children.size() - non_expand_children.size()
 	
 	# Find the size of expand children
@@ -184,8 +175,8 @@ func _resort() -> void:
 				if child.size_flags_horizontal & SIZE_EXPAND:
 					size.x = child_axis_size
 				else:
-					size.x = rect_size.x
-			
+					size.x = 0.0
+				
 			if adapt_flags & ADAPT_FLAGS.CHILDREN_SIZE_Y:
 				size.y = rect_size.y
 			
@@ -202,7 +193,7 @@ func _resort() -> void:
 				if child.size_flags_vertical & SIZE_EXPAND:
 					size.y = child_axis_size
 				else:
-					size.y = rect_size.y
+					size.y = 0.0
 			
 			if adapt_flags & ADAPT_FLAGS.CHILDREN_POS_X:
 				pos.x = 0.0
@@ -219,7 +210,6 @@ func _resort() -> void:
 
 func _update_size() -> void:
 	var visible_children = []
-	var nb_intervals = visible_children.size() - 1
 	
 	for child in get_children():
 		if _is_node_ignored(child):
@@ -227,6 +217,8 @@ func _update_size() -> void:
 		
 		elif child is Control && child.visible:
 			visible_children.append(child)
+	
+	var nb_intervals = visible_children.size() - 1
 	
 	var children_axis_sum := 0.0
 	var biggest_child_axis := 0.0
@@ -244,7 +236,7 @@ func _update_size() -> void:
 	
 	if sorting_type == SORTING_TYPE.HORIZONTAL:
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_X:
-			var size_x = children_axis_sum - nb_intervals * separation
+			var size_x = children_axis_sum + nb_intervals * separation
 			if !is_equal_approx(size_x, rect_size.x):
 				rect_size.x = size_x
 		
@@ -260,7 +252,7 @@ func _update_size() -> void:
 				rect_size.x = size_x
 		
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_Y:
-			var size_y = children_axis_sum - nb_intervals * separation
+			var size_y = children_axis_sum + nb_intervals * separation
 			if !is_equal_approx(size_y, rect_size.y):
 				rect_size.y = size_y
 	
@@ -280,11 +272,13 @@ func connect_child_signals(child: Control) -> void:
 		push_error("The given node %s is not a child abort" % child.name)
 	
 	if !child.is_connected("resized", self, "_on_child_resized"):
-		child.connect("resized", self, "_on_child_resized", [child])
+		var __ = child.connect("resized", self, "_on_child_resized", [child])
 	
 	if !child.is_connected("visibility_changed", self, "_on_child_visibility_changed"):
-		child.connect("visibility_changed", self, "_on_child_visibility_changed", [child])
-
+		var __ = child.connect("visibility_changed", self, "_on_child_visibility_changed", [child])
+	
+	if !child.is_connected("size_flags_changed", self, "_on_child_size_flags_changed"):
+		var __ = child.connect("size_flags_changed", self, "_on_child_size_flags_changed")
 
 
 #### INPUTS ####
@@ -321,8 +315,16 @@ func _on_child_resized(child: Node) -> void:
 
 func _on_child_entered_tree(child: Node) -> void:
 	if child is Control:
+		if print_logs:
+			print("%s has a new child %s" % [name, child.name])
+		
 		connect_child_signals(child)
+		emit_signal("sort_children")
 
 
-func _on_child_visibility_changed(child: Node) -> void:
+func _on_child_visibility_changed(_child: Node) -> void:
+	emit_signal("sort_children")
+
+
+func _on_child_size_flags_changed() -> void:
 	emit_signal("sort_children")

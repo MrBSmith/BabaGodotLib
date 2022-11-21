@@ -74,6 +74,11 @@ func play() -> void:
 func update_default_params() -> void:
 	set_default_size(target.rect_size)
 	default_margins_array = _fetch_default_margin()
+	
+	if print_logs:
+		print("default param for %s updated" % target.name)
+		print("default_size: %s" % str(target.rect_size))
+		print("default_margins_array: %s" % str(default_margins_array))
 
 
 func _fetch_default_margin() -> Array:
@@ -119,11 +124,18 @@ func _open_animation() -> void:
 		var origin_value = default_margins_array[margin] + from * Math.bool_to_sign(margin < 2)
 		var dest_value = default_margins_array[margin] + to * Math.bool_to_sign(margin < 2)
 		
+		if print_logs:
+			print("animate %s form: %s to: %s" % [margin_name, str(origin_value), str(dest_value)])
+		
 		target.set_margin(margin, origin_value)
 		tween.parallel().tween_property(target, margin_name, dest_value, anim_duration)
 	
 	yield(tween, "finished")
 	closed = !closed
+	
+	if print_logs:
+		print("%s animation finished: closed is now %s" % [target.name, str(closed)])
+	
 	emit_signal("resize_finished")
 
 
