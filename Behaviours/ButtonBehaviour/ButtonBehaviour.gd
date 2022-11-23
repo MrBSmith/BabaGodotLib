@@ -36,6 +36,9 @@ func is_class(value: String): return value == "ButtonBehaviour" or .is_class(val
 func get_class() -> String: return "ButtonBehaviour"
 
 func set_state(value: int) -> void:
+	if disabled:
+		return
+	
 	if value != state:
 		state = value
 		emit_signal("state_changed")
@@ -54,11 +57,7 @@ func set_toggled(value: bool) -> void:
 func set_disabled(value: bool) -> void:
 	if value != disabled:
 		disabled = value
-		
-		if !is_ready:
-			yield(self, "ready")
-			
-		set_state(STATE.DISABLED)
+		_update_state()
 
 
 #### BUILT-IN ####
