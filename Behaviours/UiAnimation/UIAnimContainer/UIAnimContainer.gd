@@ -119,7 +119,6 @@ func _resort() -> void:
 	
 	var child_axis_size = 0.0
 	var visible_children = []
-	var nb_intervals = visible_children.size() - 1
 	var non_expand_children = []
 	var non_expand_chidren_sum = 0.0
 	
@@ -142,17 +141,16 @@ func _resort() -> void:
 	if visible_children.empty():
 		return
 	
+	var nb_intervals = visible_children.size() - 1
 	var nb_expand_children = visible_children.size() - non_expand_children.size()
 	
 	# Find the size of expand children
 	if nb_expand_children != 0:
-		if sorting_type == SORTING_TYPE.HORIZONTAL:
-			child_axis_size = (rect_size.x - non_expand_chidren_sum) / nb_expand_children
-		else:
-			child_axis_size = (rect_size.y - non_expand_chidren_sum) / nb_expand_children
+		var rect_axis = rect_size.x if sorting_type == SORTING_TYPE.HORIZONTAL else rect_size.y
+		var total_separation = separation * nb_intervals
 		
-		if visible_children.size() > 1:
-			child_axis_size += nb_intervals * separation / 2.0
+		child_axis_size = ((rect_axis - total_separation - non_expand_chidren_sum) / nb_expand_children) 
+	
 	
 	for i in range(visible_children.size()):
 		var child = visible_children[i]
@@ -218,7 +216,7 @@ func _update_size() -> void:
 		elif child is Control && child.visible:
 			visible_children.append(child)
 	
-	var nb_intervals = visible_children.size() - 1
+	var nb_intervals = Math.clampi(visible_children.size() - 1, 0, 9999)
 	
 	var children_axis_sum := 0.0
 	var biggest_child_axis := 0.0

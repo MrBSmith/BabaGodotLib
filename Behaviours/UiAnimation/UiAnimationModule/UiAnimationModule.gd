@@ -23,8 +23,11 @@ enum EASE_TYPE {
 }
 
 
-export(TRANS_TYPE) var trans_type : int = TRANS_TYPE.TRANS_CUBIC
-export(EASE_TYPE) var ease_type : int = EASE_TYPE.EASE_IN_OUT
+export(TRANS_TYPE) var trans_type_in : int = TRANS_TYPE.TRANS_CUBIC
+export(TRANS_TYPE) var trans_type_out : int = TRANS_TYPE.TRANS_CUBIC
+export(EASE_TYPE) var ease_type_in : int = EASE_TYPE.EASE_IN_OUT
+export(EASE_TYPE) var ease_type_out : int = EASE_TYPE.EASE_IN_OUT
+
 export var disabled : bool = false
 
 export(float, 0.01, 999.0) var anim_duration : float = 1.0

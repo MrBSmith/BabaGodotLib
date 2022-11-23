@@ -103,6 +103,9 @@ func close_instant() -> void:
 # Resize animation
 func _open_animation() -> void:
 	var tween = create_tween()
+	var ease_type = ease_type_in if closed else ease_type_out
+	var trans_type = trans_type_in if closed else trans_type_out
+	
 	tween.set_ease(ease_type)
 	tween.set_trans(trans_type)
 	
