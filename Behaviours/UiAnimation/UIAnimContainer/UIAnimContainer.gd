@@ -86,6 +86,7 @@ func _ready() -> void:
 	__ = connect("sorting_type_changed", self, "_on_sorting_type_changed")
 	__ = connect("resized", self, "_on_resized")
 	__ = connect("child_entered_tree", self, "_on_child_entered_tree")
+	__ = connect("adapt_flags_changed", self, "_on_adapt_flags_changed")
 	
 	for child in get_children():
 		if child is Control:
@@ -326,3 +327,7 @@ func _on_child_visibility_changed(_child: Node) -> void:
 
 func _on_child_size_flags_changed() -> void:
 	emit_signal("sort_children")
+
+
+func _on_adapt_flags_changed() -> void:
+	_update_container()
