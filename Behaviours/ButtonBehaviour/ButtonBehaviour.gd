@@ -7,6 +7,7 @@ enum STATE {
 	FOCUSED,
 	PRESSED,
 	TOGGLED,
+	TOGGLED_FOCUSED,
 	DISABLED
 }
 
@@ -45,19 +46,31 @@ func set_state(value: int) -> void:
 		
 		if print_logs:
 			print("%s changed state to: %s" % [get_parent().name, STATE.keys()[state]])
-
+			print_stack()
 
 func set_toggled(value: bool) -> void:
 	if value != toggled:
 		toggled = value
 		_update_state()
 		emit_signal("toggled", toggled)
-
+func is_toggled() -> bool: return toggled
 
 func set_disabled(value: bool) -> void:
 	if value != disabled:
 		disabled = value
 		_update_state()
+
+func set_focused(value: int) -> void:
+	if value:
+		if state == STATE.TOGGLED:
+			set_state(STATE.TOGGLED_FOCUSED)
+		else:
+			set_state(STATE.FOCUSED)
+	else:
+		set_state(STATE.NORMAL)
+
+func is_focused() -> bool:
+	return state in [STATE.FOCUSED, STATE.TOGGLED_FOCUSED]
 
 
 #### BUILT-IN ####
@@ -85,14 +98,11 @@ func _ready() -> void:
 
 
 func _update_state() -> void:
-	if disabled:
+	if disabled or is_focused():
 		return
 	
 	if toggled:
 		set_state(STATE.TOGGLED)
-
-	elif get_parent().get_focus_owner() == get_parent():
-		set_state(STATE.FOCUSED)
 	
 	elif mouse_inside:
 		set_state(STATE.HOVER)
@@ -111,7 +121,11 @@ func toggle() -> void:
 	
 	toggled = !toggled
 	
-	_update_state()
+	if toggled && is_focused():
+		set_state(STATE.TOGGLED_FOCUSED)
+	else:
+		_update_state()
+	
 	emit_signal("toggled", toggled)
 
 
@@ -153,7 +167,7 @@ func _on_mouse_entered() -> void:
 	if print_logs: print("mouse_entered")
 	mouse_inside = true
 	
-	if not state in [STATE.DISABLED, STATE.TOGGLED, STATE.PRESSED]:
+	if not state in [STATE.DISABLED, STATE.TOGGLED, STATE.PRESSED] && ! is_focused():
 		set_state(STATE.HOVER)
 
 
@@ -166,13 +180,20 @@ func _on_mouse_exited() -> void:
 
 
 func _on_focus_entered() -> void:
-	if not state in [STATE.DISABLED, STATE.TOGGLED, STATE.PRESSED]:
-		set_state(STATE.FOCUSED)
+	if not state in [STATE.DISABLED, STATE.PRESSED] && !is_focused():
+		match(state):
+			STATE.TOGGLED: set_state(STATE.TOGGLED_FOCUSED)
+			_: set_state(STATE.FOCUSED)
 
 
 func _on_focus_exited() -> void:
-	if state == STATE.FOCUSED:
-		_update_state()
+	match(state):
+		STATE.FOCUSED:
+			set_state(STATE.NORMAL)
+		STATE.TOGGLED_FOCUSED:
+			set_state(STATE.TOGGLED)
+		_:
+			_update_state()
 
 
 func _on_visibility_changed() -> void:
