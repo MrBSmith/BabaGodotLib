@@ -1,7 +1,7 @@
 extends Resource
 class_name InputSequenceElement
 
-export var actions_array : Array = []
+@export var actions_array : Array = []
 
 # A dictionary representing the state the InputEvent must be in
 # Each key can be either a property or a method name (A getter typically)
@@ -9,11 +9,11 @@ export var actions_array : Array = []
 # or the value returned by the method
 
 # The method must retruns a value & takes no arguments or it will throw an error message
-export var state_dict : Dictionary = {}
+@export var state_dict : Dictionary = {}
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "InputSequenceElement" or .is_class(value)
+func is_class(value: String): return value == "InputSequenceElement" or super.is_class(value)
 func get_class() -> String: return "InputSequenceElement"
 
 

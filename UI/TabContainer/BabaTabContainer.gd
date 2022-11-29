@@ -1,13 +1,13 @@
 extends TabContainer
 class_name BabaTabContainer
 
-var frozen : bool = false setget set_frozen, is_frozen
+var frozen : bool = false : get = is_frozen, set = set_frozen
 
 signal frozen_changed(value)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "BabaTabContainer" or .is_class(value)
+func is_class(value: String): return value == "BabaTabContainer" or super.is_class(value)
 func get_class() -> String: return "BabaTabContainer"
 
 func set_frozen(value: bool) -> void:
@@ -20,7 +20,7 @@ func is_frozen() -> bool: return frozen
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("frozen_changed", self, "_on_frozen_changed")
+	var __ = connect("frozen_changed",Callable(self,"_on_frozen_changed"))
 
 
 #### VIRTUALS ####
@@ -30,7 +30,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func _is_focus_free() -> bool:
-	var control_focused = owner.get_focus_owner()
+	var control_focused = owner.get_viewport().gui_get_focus_owner()
 	return control_focused == null or control_focused == self or control_focused in get_children() or \
 				(control_focused is MenuOptionsBase and !control_focused.is_focused())
 

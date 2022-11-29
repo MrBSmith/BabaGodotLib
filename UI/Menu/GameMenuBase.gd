@@ -7,23 +7,23 @@ enum CANCEL_ACTION {
 	NONE
 }
 
-export var menu_option_scene : PackedScene
-export var screen_title_option_base : PackedScene
+@export var menu_option_scene : PackedScene
+@export var screen_title_option_base : PackedScene
 
-export var opt_container_path : NodePath = "VBoxContainer"
+@export var opt_container_path : NodePath = "VBoxContainer"
 
-onready var opt_container = get_node_or_null(opt_container_path)
-onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
+@onready var opt_container = get_node_or_null(opt_container_path)
+@onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 
-onready var options_array = _fetch_menu_option_array() setget set_options_array
+@onready var options_array = _fetch_menu_option_array() : set = set_options_array
 
-export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
-export var focus_first_option_on_ready : bool = true
+@export var cancel_action: CANCEL_ACTION = CANCEL_ACTION.GO_TO_LAST_MENU 
+@export var focus_first_option_on_ready : bool = true
 
 var default_button_state : Array = []
 var is_ready : bool = false
 
-var submenu : bool = false setget set_submenu, is_submenu
+var submenu : bool = false : get = is_submenu, set = set_submenu
 
 #warning-ignore:unused_signal
 signal menu_left
@@ -49,7 +49,7 @@ func set_options_array(value: Array) -> void:
 # Change the color of the option accordingly to their state
 func _ready() -> void:
 	is_ready = true
-	var __ = connect("options_array_changed", self, "_on_options_array_changed")
+	var __ = connect("options_array_changed",Callable(self,"_on_options_array_changed"))
 	
 	EVENTS.emit_signal("menu_entered", name)
 	_setup()
@@ -96,8 +96,8 @@ func focus_first_option() -> void:
 
 # Connect the options in the menu 
 # the wrapping argument determine if the cursor needs to wraps around 
-# Going up on the first option put the focus on the last
-# And going down on the last put the focus on the first
+# Going up checked the first option put the focus checked the last
+# And going down checked the last put the focus checked the first
 func _setup_menu_options_wrapping(wrapping: bool = true) -> void:
 	var nb_options = options_array.size()
 	var first_option_unabled : MenuOptionsBase = null
@@ -139,23 +139,23 @@ func _setup_menu_options_wrapping(wrapping: bool = true) -> void:
 		
 		if button == first_option_unabled:
 			if wrapping:
-				button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
+				button.set_focus_neighbor(SIDE_TOP, previous_button.get_path())
 		else:
-			button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
+			button.set_focus_neighbor(SIDE_TOP, previous_button.get_path())
 			button.set_focus_previous(previous_button.get_path())
 		
 		if button == last_option_unabled:
 			if wrapping:
-				button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
+				button.set_focus_neighbor(SIDE_BOTTOM, next_button.get_path())
 		else:
-			button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
+			button.set_focus_neighbor(SIDE_BOTTOM, next_button.get_path())
 			button.set_focus_next(next_button.get_path())
 
 
 func _connect_options_signals() -> void:
 	for option in get_tree().get_nodes_in_group("MenuOption"):
-		if !option.is_connected("focus_changed", self, "_on_menu_option_focus_changed"):
-			var _err = option.connect("focus_changed", self, "_on_menu_option_focus_changed")
+		if !option.is_connected("focus_changed",Callable(self,"_on_menu_option_focus_changed")):
+			var _err = option.connect("focus_changed",Callable(self,"_on_menu_option_focus_changed"))
 	
 	if opt_container == null:
 		return
@@ -165,10 +165,10 @@ func _connect_options_signals() -> void:
 		if not button is MenuOptionsBase:
 			continue
 		
-		if !button.is_connected("option_chose", self, "_on_menu_option_chose"):
-			var _err = button.connect("option_chose", self, "_on_menu_option_chose")
-			_err = button.connect("disabled_changed", self, "_on_menu_option_disabled_changed")
-			_err = button.connect("visibility_changed", self, "_on_menu_option_visible_changed")
+		if !button.is_connected("option_chose",Callable(self,"_on_menu_option_chose")):
+			var _err = button.connect("option_chose",Callable(self,"_on_menu_option_chose"))
+			_err = button.connect("disabled_changed",Callable(self,"_on_menu_option_disabled_changed"))
+			_err = button.connect("visibility_changed",Callable(self,"_on_menu_option_visible_changed"))
 
 
 func _fetch_menu_option_array() -> Array:
@@ -194,7 +194,7 @@ func _instantiate_new_menu_button(option_scene : PackedScene = null,\
 								new_button_text : String = "",\
 								new_button_disabled : bool = false) -> void:
 	if new_button_text != "":
-		var new_button = option_scene.instance()
+		var new_button = option_scene.instantiate()
 		
 		# set name of the button by replacing spaces with void character (" " => "")
 		# so that there is no space in the tree, but correctly displayed with spaces in game
@@ -205,12 +205,12 @@ func _instantiate_new_menu_button(option_scene : PackedScene = null,\
 		new_button.text = new_button_text
 		new_button.disabled = new_button_disabled
 		
-		# the node which will be on top of our new button
+		# the node which will be checked top of our new button
 		var option_upper_node : MarginContainer = opt_container.get_node_or_null(option_upper_node_name)\
 												if option_upper_node_name != "" else null
 		
 		if is_instance_valid(option_upper_node):
-			opt_container.add_child_below_node(option_upper_node, new_button, true)
+			option_upper_node.add_sibling(new_button, true)
 		else:
 			opt_container.add_child(new_button, true)
 	else:
@@ -266,7 +266,7 @@ func _on_menu_option_focus_changed(_button : Control, focus: bool) -> void:
 		choice_sound_node.play()
 
 # Virtual method to respond to the signal emited by an option beeing chosen
-# Here you can add the code that tells the game what to do based on what option was chose
+# Here you can add the code that tells the game what to do based checked what option was chose
 func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
 	pass
 

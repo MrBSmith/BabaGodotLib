@@ -3,22 +3,22 @@ class_name InputSequence
 
 var action_buffer : Array = []
 
-export var action_sequence : Array = []
-export var target_node_path : NodePath
-export var method : String = ""
-export var arguments : Array = []
-export var input_time_threshold : float = 1.0
+@export var action_sequence : Array = []
+@export var target_node_path : NodePath
+@export var method : String = ""
+@export var arguments : Array = []
+@export var input_time_threshold : float = 1.0
 
-export var print_logs := false
+@export var print_logs := false
 
-export var matching_inputs_array : Array = []
+@export var matching_inputs_array : Array = []
 
-onready var cooldown = Cooldown.new()
-onready var target_node = owner if target_node_path.is_empty() or target_node_path == null else get_node(target_node_path)
+@onready var cooldown = Cooldown.new()
+@onready var target_node = owner if target_node_path.is_empty() or target_node_path == null else get_node(target_node_path)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "InputSequence" or .is_class(value)
+func is_class(value: String): return value == "InputSequence" or super.is_class(value)
 func get_class() -> String: return "InputSequence"
 
 
@@ -27,7 +27,7 @@ func get_class() -> String: return "InputSequence"
 func _ready() -> void:
 	add_child(cooldown)
 	cooldown.set_wait_time(input_time_threshold)
-	cooldown.connect("timeout", self, "_on_cooldown_timeout")
+	cooldown.connect("timeout",Callable(self,"_on_cooldown_timeout"))
 
 
 #### VIRTUALS ####
@@ -40,7 +40,7 @@ func action(event: InputEvent) -> void:
 	if !cooldown.is_inside_tree() or !target_node:
 		return
 	
-	if action_sequence.empty():
+	if action_sequence.is_empty():
 		push_warning("The action_sequence array is empty; the sequence can never be fullfiled")
 		return
 	
@@ -52,7 +52,7 @@ func action(event: InputEvent) -> void:
 		
 		if new_input_id != 0:
 			var matching_ids = _get_matching_ids_array(new_input_id)
-			if print_logs && matching_ids.empty():
+			if print_logs && matching_ids.is_empty():
 				print("No matching ids")
 
 			if !is_input_matching(event, matching_ids):
@@ -60,7 +60,7 @@ func action(event: InputEvent) -> void:
 				abort()
 				return
 		
-		if action_buffer.empty():
+		if action_buffer.is_empty():
 			cooldown.start()
 			if print_logs:
 				print("action sequence started")
@@ -79,7 +79,7 @@ func action(event: InputEvent) -> void:
 		abort()
 
 
-func is_input_matching(event: InputEvent, match_ids_array: PoolIntArray) -> bool:
+func is_input_matching(event: InputEvent, match_ids_array: PackedInt32Array) -> bool:
 	for id in match_ids_array:
 		if id < action_buffer.size():
 			var matching_event = action_buffer[id]
@@ -92,11 +92,11 @@ func is_input_matching(event: InputEvent, match_ids_array: PoolIntArray) -> bool
 	return true
 
 
-func _get_matching_ids_array(id: int) -> PoolIntArray:
+func _get_matching_ids_array(id: int) -> PackedInt32Array:
 	for input_ids_array in matching_inputs_array:
 		if id in input_ids_array:
 			return input_ids_array
-	return PoolIntArray()
+	return PackedInt32Array()
 
 
 func abort() -> void:

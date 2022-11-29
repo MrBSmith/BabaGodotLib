@@ -1,18 +1,18 @@
-extends AnimatedSprite
+extends AnimatedSprite2D
 class_name SyncAnimatedSprite
 
-export var sync_frame_rate : bool = true
+@export var sync_frame_rate : bool = true
 
-export var master_path : NodePath
-onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
+@export var master_path : NodePath
+@onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
 
-onready var sprite_offset = offset
+@onready var sprite_offset = offset
  
 signal animation_changed(anim)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "SyncAnimatedSprite" or .is_class(value)
+func is_class(value: String): return value == "SyncAnimatedSprite" or super.is_class(value)
 func get_class() -> String: return "SyncAnimatedSprite"
 
 
@@ -23,10 +23,10 @@ func _ready() -> void:
 		master_anim_sprite = get_parent()	
 	
 	if master_anim_sprite != null:
-		var __ = master_anim_sprite.connect("frame_changed", self, "_on_parent_frame_changed")
+		var __ = master_anim_sprite.connect("frame_changed",Callable(self,"_on_parent_frame_changed"))
 		
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
-			__ = master_anim_sprite.connect("animation_changed", self, "_on_parent_animation_changed")
+			__ = master_anim_sprite.connect("animation_changed",Callable(self,"_on_parent_animation_changed"))
 
 
 #### VIRTUALS ####
@@ -36,15 +36,15 @@ func _ready() -> void:
 #### LOGIC ####
 
 # FUNCTION OVERRIDE #
-func play(anim: String = "", backwards: bool = false) -> void:
+func play(anim := StringName(), backwards: bool = false) -> void:
 	if (anim == "" and get_animation() != "default") or anim != get_animation():
 		emit_signal("animation_changed", anim, backwards)
 	
-	.play(anim, backwards)
+	super.play(anim, backwards)
 
 
 func set_flip_h(value: bool) -> void:
-	.set_flip_h(value)
+	super.set_flip_h(value)
 	
 	# Flip the sprite's x position
 	position.x = abs(position.x) * Math.bool_to_sign(!value)

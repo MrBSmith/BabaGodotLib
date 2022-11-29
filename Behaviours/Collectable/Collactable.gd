@@ -4,7 +4,7 @@ class_name Collectable
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "Collectable" or .is_class(value)
+func is_class(value: String): return value == "Collectable" or super.is_class(value)
 func get_class() -> String: return "Collectable"
 
 
@@ -24,10 +24,10 @@ func collect() -> void:
 		return
 	
 	set_target(null)
-	EVENTS.emit_signal("collect", owner, get_collectable_name())
+	EVENTS.collect.emit(owner, get_collectable_name())
 	
 	if collect_sound:
-		EVENTS.emit_signal("play_sound_effect", collect_sound)
+		EVENTS.play_sound_effect.emit(collect_sound)
 	
 	trigger_collect_animation()
 
@@ -40,7 +40,7 @@ func trigger_collect_animation() -> void:
 
 
 func compute_amount_collected() -> int:
-	return int(average_amount * (1 + rand_range(-amount_variance, amount_variance)))
+	return int(average_amount * (1 + randf_range(-amount_variance, amount_variance)))
 
 
 func _collect_success() -> void:

@@ -1,14 +1,14 @@
-tool
+@tool
 extends AudioStreamPlayer2D
 class_name BabaAudioStreamPlayer2D
 
-export(float, 0.0, 999.0) var pitch_range := 0.0
+@export var pitch_range := 0.0 # (float, 0.0, 999.0)
 
-onready var start_pitch := pitch_scale
+@onready var start_pitch := pitch_scale
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "BabaAudioStreamPlayer2D" or .is_class(value)
+func is_class(value: String): return value == "BabaAudioStreamPlayer2D" or super.is_class(value)
 func get_class() -> String: return "BabaAudioStreamPlayer2D"
 
 
@@ -24,8 +24,8 @@ func _ready() -> void:
 #### LOGIC ####
 
 func play(from_position: float = 0.0) -> void:
-	pitch_scale = start_pitch + rand_range(0.0, pitch_range) * Math.rand_sign()
-	.play(from_position)
+	pitch_scale = start_pitch + randf_range(0.0, pitch_range) * Math.rand_sign()
+	super.play(from_position)
 
 
 

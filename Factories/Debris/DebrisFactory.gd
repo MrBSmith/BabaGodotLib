@@ -2,30 +2,30 @@ extends Factory
 class_name DebrisFactory
 
 
-export var max_debris_per_frame : int = 20
+@export var max_debris_per_frame : int = 20
 
-onready var debris = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
+@onready var debris = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var _err = EVENTS.connect("scatter_object", self, "_on_scatter_object")
+	EVENTS.scatter_object.connect(_on_scatter_object)
 
 
 
 #### SIGNAL_RESPONSES ####
 
 func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0, no_clip := false):
-	var sprite = body.get_node("Sprite") if not body is Sprite else body 
+	var sprite = body.get_node("Sprite2D") if not body is Sprite2D else body 
 	var texture = sprite.get_texture()
-	var is_region = sprite.is_region()
-	var texture_origin = sprite.get_region_rect().position if is_region else Vector2.ZERO
+	var is_region_enabled = sprite.is_region_enabled()
+	var texture_origin = sprite.get_region_rect().position if is_region_enabled else Vector2.ZERO
 	var z = body.get_z_index()
 	var z_as_relative = body.is_z_relative()
 	
-	var sprite_width : float = texture.get_width() if !is_region else sprite.get_region_rect().size.x
-	var sprite_height : float = texture.get_height() if !is_region else sprite.get_region_rect().size.y
+	var sprite_width : float = texture.get_width() if !is_region_enabled else sprite.get_region_rect().size.x
+	var sprite_height : float = texture.get_height() if !is_region_enabled else sprite.get_region_rect().size.y
 	
 	var body_global_pos : Vector2 = body.get_global_position()
 	var body_origin : Vector2 = body_global_pos
@@ -43,7 +43,7 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 			if debris_counter >= max_debris_per_frame:
 				debris_counter = 0
 			
-			var debris_node = debris.instance()
+			var debris_node = debris.instantiate()
 			
 			if !no_clip:
 				var collision_shape = RectangleShape2D.new()
@@ -58,7 +58,7 @@ func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100
 												Vector2.ONE * square_size)
 			
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
-			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
+			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * randf_range(0.7, 1.3)))
 			
 			debris_node.set_z_index(z)
 			debris_node.set_z_as_relative(z_as_relative)

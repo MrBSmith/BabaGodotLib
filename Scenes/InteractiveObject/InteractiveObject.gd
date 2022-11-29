@@ -1,17 +1,17 @@
 extends Node2D
 class_name InteractiveObject
 
-export var turn_based = false
-export var default_state : String = ""
-export var interactable : bool = true setget set_interactable, is_interactable
+@export var turn_based = false
+@export var default_state : String = ""
+@export var interactable : bool = true : get = is_interactable, set = set_interactable
 
-onready var interact_area = get_node_or_null("InteractArea")
+@onready var interact_area = get_node_or_null("InteractArea")
 
 var is_ready : bool = false
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "InteractiveObject" or .is_class(value)
+func is_class(value: String): return value == "InteractiveObject" or super.is_class(value)
 func get_class() -> String: return "InteractiveObject"
 
 func set_interactable(value: bool): 
@@ -26,7 +26,7 @@ func is_interactable() -> bool: return interactable
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("interact", self, "_on_interact")
+	EVENTS.interact.connect(_on_interact)
 	
 	is_ready = true
 

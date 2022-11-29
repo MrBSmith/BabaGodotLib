@@ -26,7 +26,7 @@ const DIRECTIONS_8 : Dictionary = {
 
 
 # Finds the given wanted_key in the given dict and returns its id
-# You can operate a case sensitive search or not based on case_sensitive value
+# You can operate a case sensitive search or not based checked case_sensitive value
 static func dict_find_key(dict: Dictionary, wanted_key: String, case_sensitive: bool = true) -> int:
 	for i in range(dict.keys().size()):
 		var key = dict.keys()[i]
@@ -46,7 +46,7 @@ static func dict_find_key_by_value(dict: Dictionary, value) -> String:
 
 
 static func array_get_rdm_element(array: Array):
-	if array.empty():
+	if array.is_empty():
 		return null
 	
 	return array[randi() % array.size()]
@@ -82,7 +82,7 @@ static func trim_image(image: Image) -> Image:
 	var biggest_x = -1
 	var biggest_y = -1
 	
-	image.lock()
+	false # image.lock() # TODOConverter40, Image no longer requires locking, `false` helps to not break one line if/else, so it can freely be removed
 	
 	for i in range(2):
 		var w_array = range(image.get_width()) if i == 0 else range(image.get_width() - 1, 1, -1)
@@ -172,16 +172,16 @@ static func find_autoload(target_name: String, tree: SceneTree) -> Node:
 
 # Find direct or indirect children of the given node that respect given the path of classes
 # Then returns it in an array
-static func fetch_from_class_path(node: Node, class_path: String, ignored_classes := PoolStringArray(), class_as_group: bool = false, array : Array = []) -> Array:
+static func fetch_from_class_path(node: Node, class_path: String, ignored_classes := PackedStringArray(), class_as_group: bool = false, array : Array = []) -> Array:
 	var class_array = class_path.split("/")
 	
-	if class_array.empty():
+	if class_array.is_empty():
 		push_error("The fetch_from_class_path method should never have an empty class_path, abort")
 		return []
 	
 	var first_class = class_array[0]
-	class_array.remove(0)
-	var new_class_path = class_array.join("/")
+	class_array.remove_at(0)
+	var new_class_path = "/".join(class_array)
 	
 	for _class in ignored_classes:
 		if node.is_class(_class):
@@ -189,7 +189,7 @@ static func fetch_from_class_path(node: Node, class_path: String, ignored_classe
 	
 	if node.is_class(first_class) or (class_as_group && node.is_in_group(first_class)):
 		
-		if class_array.empty():
+		if class_array.is_empty():
 			array.append(node)
 		else:
 			for child in node.get_children():
@@ -218,8 +218,8 @@ static func compute_astar_point_id(cell: Vector2, key: int = 666) -> int:
 	return int(abs(cell.x + key * cell.y))
 
 # Returns theorical adjacents cells of the given cell (does not check if the cell exists or not)
-static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
-	var adjs = PoolVector2Array()
+static func get_adjacents_cells(cell: Vector2) -> PackedVector2Array:
+	var adjs = PackedVector2Array()
 	for dir in DIRECTIONS_4.values():
 		adjs.append(cell + dir)
 	
@@ -256,8 +256,8 @@ static func to_pascal(string: String) -> String:
 
 #### INPUTS ####
 
-static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
-	var matching_actions = PoolStringArray()
+static func input_find_matching_actions(event: InputEvent) -> PackedStringArray:
+	var matching_actions = PackedStringArray()
 	
 	for action in InputMap.get_actions():
 		if InputMap.action_has_event(action, event):
@@ -266,21 +266,21 @@ static func input_find_matching_actions(event: InputEvent) -> PoolStringArray:
 	return matching_actions
 
 
-static func key_find_matching_actions(input_event: InputEvent, action_names : Array = []) -> PoolStringArray:
-	var matching_actions = PoolStringArray()
-	var actions_array = action_names if !action_names.empty() else InputMap.get_actions()
+static func key_find_matching_actions(input_event: InputEvent, action_names : Array = []) -> PackedStringArray:
+	var matching_actions = PackedStringArray()
+	var actions_array = action_names if !action_names.is_empty() else InputMap.get_actions()
 	
 	for action in actions_array:
-		for event in InputMap.get_action_list(action):
-			if event.shortcut_match(input_event):
+		for event in InputMap.action_get_events(action):
+			if event.is_match(input_event):
 				matching_actions.append(action)
 	
 	return matching_actions
 
 
-static func action_get_keys(action: String) -> PoolStringArray:
-	var input_event_array = InputMap.get_action_list(action)
-	var keys_array = PoolStringArray()
+static func action_get_keys(action: String) -> PackedStringArray:
+	var input_event_array = InputMap.action_get_events(action)
+	var keys_array = PackedStringArray()
 	
 	for event in input_event_array:
 		keys_array.append(event.as_text())
@@ -293,7 +293,7 @@ static func get_input_event_as_text(event: InputEvent) -> String:
 		return ""
 	
 	if event is InputEventKey && event.scancode == 0:
-		return OS.get_scancode_string(OS.keyboard_get_scancode_from_physical(event.physical_scancode))
+		return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(event.physical_keycode))
 	else:
 		return event.as_text()
 
@@ -304,14 +304,14 @@ static func are_event_same_input(event_a: InputEvent, event_b: InputEvent) -> bo
 	
 	if event_a is InputEventKey:
 		return (event_a.scancode == event_b.scancode && event_a.scancode != 0) \
-		or (event_a.physical_scancode == event_b.physical_scancode && event_a.physical_scancode != 0)
+		or (event_a.physical_keycode == event_b.physical_keycode && event_a.physical_keycode != 0)
 	
 	elif event_a is InputEventJoypadButton:
 		return event_a.button_index == event_b.button_index && event_a.device == event_b.device
 	
 	elif event_a is InputEventJoypadMotion:
 		return event_a.axis == event_b.axis && sign(event_a.axis_value) == sign(event_b.axis_value) \
-			 && event_a.device == event_b.device
+			&& event_a.device == event_b.device
 	
 	return false
 

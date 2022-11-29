@@ -1,15 +1,15 @@
-tool
+@tool
 extends Label
 class_name TimeLabel
 
 # Expressed in seconds
-var time : float  = 0.0 setget set_time
+var time : float  = 0.0 : set = set_time
 
 signal amount_tweening_finished
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "TimeLabel" or .is_class(value)
+func is_class(value: String): return value == "TimeLabel" or super.is_class(value)
 func get_class() -> String: return "TimeLabel"
 
 func set_time(value: float) -> void:
@@ -40,11 +40,11 @@ func tween_amount(new_amount: int, duration := 0.3) -> void:
 func tween_time(new_time: float, duration := 0.3) -> void:
 	var tween = create_tween()
 	
-	var tweener = tween.tween_method(self, "set_time", time, new_time, duration)
+	var tweener = tween.tween_method(Callable(self,"set_time"),time,new_time,duration)
 	tweener.set_trans(Tween.TRANS_SINE)
 	tweener.set_ease(Tween.EASE_IN_OUT)
 	
-	yield(tween, "finished")
+	await tween.finished
 	emit_signal("amount_tweening_finished")
 
 

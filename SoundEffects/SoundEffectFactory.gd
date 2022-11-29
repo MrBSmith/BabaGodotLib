@@ -6,14 +6,14 @@ class_name SoundEffectFactory
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "SoundEffectFactory" or .is_class(value)
+func is_class(value: String): return value == "SoundEffectFactory" or super.is_class(value)
 func get_class() -> String: return "SoundEffectFactory"
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("play_sound_effect", self, "_on_EVENTS_play_sound_effect")
+	var __ = EVENTS.connect("play_sound_effect",Callable(self,"_on_EVENTS_play_sound_effect"))
 
 
 #### VIRTUALS ####
@@ -35,16 +35,16 @@ func play(stream_player : Node, pitch_range: float = 0.0) -> void:
 	target.call_deferred("add_child", new_stream_player)
 	
 	if !new_stream_player.is_inside_tree():
-		yield(new_stream_player, "ready")
+		await new_stream_player.ready
 	
 	if stream_player is AudioStreamPlayer2D:
 		var pos = stream_player.get_global_position()
 		new_stream_player.set_global_position(pos)
 	
-	new_stream_player.pitch_scale += rand_range(0.0, pitch_range) * Math.rand_sign()
+	new_stream_player.pitch_scale += randf_range(0.0, pitch_range) * Math.rand_sign()
 	new_stream_player.call_deferred("play")
 	
-	yield(new_stream_player, "finished")
+	await new_stream_player.finished
 	new_stream_player.queue_free()
 
 

@@ -1,4 +1,4 @@
-tool
+@tool
 extends State
 class_name ActorHurtState
 
@@ -13,16 +13,16 @@ func enter_state():
 	flash_finished = false
 	
 	var tween = owner.tween
-	var __ = tween.connect("flash_finished", self, "_on_flash_finished")
-	__ = connect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
+	var __ = tween.connect("flash_finished",Callable(self,"_on_flash_finished"))
+	__ = connect("hurt_feedback_finished",Callable(self,"_on_hurt_feedback_finished"))
 	
-	owner.tween.flash(Color.red)
-	.enter_state()
+	owner.tween.flash(Color.RED)
+	super.enter_state()
 
 
 func exit_state():
-	owner.tween.disconnect("flash_finished", self, "_on_flash_finished")
-	disconnect("hurt_feedback_finished", self, "_on_hurt_feedback_finished")
+	owner.tween.disconnect("flash_finished",Callable(self,"_on_flash_finished"))
+	disconnect("hurt_feedback_finished",Callable(self,"_on_hurt_feedback_finished"))
 
 
 #### SIGNAL RESPONSES ####

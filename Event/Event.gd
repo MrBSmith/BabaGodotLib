@@ -6,9 +6,9 @@ class_name Event
 ### Whenever the tiggered signal is received from one of its Trigger children
 ### and if event_disabled is false -> the virtual method event() is called
 
-export var event_disabled : bool = false
+@export var event_disabled : bool = false
 
-func is_class(value: String): return value == "Event" or .is_class(value)
+func is_class(value: String): return value == "Event" or super.is_class(value)
 func get_class() -> String: return "Event"
 
 # Get every TriggerArea child of this node and store them in the triggers_area_array
@@ -16,7 +16,7 @@ func get_class() -> String: return "Event"
 func _ready():
 	for child in get_children():
 		if child is Trigger:
-			child.connect("triggered", self, "_on_trigger_triggered")
+			child.connect("triggered",Callable(self,"_on_trigger_triggered"))
 
 
 

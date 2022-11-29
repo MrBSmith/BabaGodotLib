@@ -1,40 +1,29 @@
 extends Behaviour
 class_name UIAnimationBehaviour
 
-export var target_path : NodePath
-export var autostart : bool = false
+@export var target_path : NodePath
+@export var autostart : bool = false
 
-onready var target = owner if target_path.is_empty() else get_node(target_path)
+@onready var target = owner if target_path.is_empty() else get_node(target_path)
 
-var buffered_method : BufferedMethod
+var buffered_method : Callable
 var animation_playing : bool = false
 var is_ready := false
 
 signal animation_started
 signal animation_finished
 
-class BufferedMethod:
-	var func_ref : FuncRef
-	var args = []
-	
-	func _init(_func_ref: FuncRef, _args: Array) -> void:
-		func_ref = _func_ref
-		args = _args
-	
-	func call_method() -> void:
-		func_ref.call_funcv(args)
-
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "UIAnimationBehaviour" or .is_class(value)
+func is_class(value: String): return value == "UIAnimationBehaviour" or super.is_class(value)
 func get_class() -> String: return "UIAnimationBehaviour"
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("animation_finished", self, "_on_animation_finished")
+	animation_finished.connect(_on_animation_finished)
 	
 	for module in Utils.fetch_recursive(self, "UIAnimationModule"):
 		module.target = target
@@ -52,16 +41,16 @@ func _ready() -> void:
 
 func trigger_animation(backwards: bool = false) -> void:
 	if animation_playing:
-		buffered_method = BufferedMethod.new(funcref(self, "trigger_animation"), [backwards])
+		buffered_method = trigger_animation.bind(backwards)
 		return
 	
-	emit_signal("animation_started")
+	animation_started.emit()
 	
 	animation_playing = true
 	var modules_array = get_children()
 	
 	if backwards:
-		modules_array.invert()
+		modules_array.reverse()
 	
 	for module in modules_array:
 		if not module is UIAnimationModule && not module is ParallelModulePlayer:
@@ -72,10 +61,10 @@ func trigger_animation(backwards: bool = false) -> void:
 		
 		module.play()
 		
-		yield(module, "animation_finished")
+		await module.animation_finished
 	
 	animation_playing = false
-	emit_signal("animation_finished")
+	animation_finished.emit()
 
 
 #### INPUTS ####
@@ -86,6 +75,6 @@ func trigger_animation(backwards: bool = false) -> void:
 
 func _on_animation_finished() -> void:
 	if is_instance_valid(buffered_method):
-		buffered_method.call_method()
+		buffered_method.call()
 		buffered_method = null
 

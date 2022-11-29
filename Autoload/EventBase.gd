@@ -10,7 +10,7 @@ class_name EventsBase
 # their references to connect their signal directly
 
 # Instead: the emitter send a signal using: EVENTS.emit_signal("signal_name", some_arguments, ...)
-# The receiver must connect the signal: EVENTS.connect("signal_name", self, "_on_signal_name")
+# The receiver must connect the signal: EVENTS.connect("signal_name",Callable(self,"_on_signal_name"))
 
 # Take care not to overuse this!
 # Please use this class only if you need two entities 
@@ -41,7 +41,7 @@ signal network_game_ended()
 signal network_client_left()
 signal network_client_action(action)
 signal network_event(events) #events should be a Dictionary of every events happened. Example: "events":{"event1",:value1,"event2":value2,...}
-signal network_xl_destructible_object_destroyed(destructible_object) # Reference to the destructible object being destroyed
+signal network_xl_destructible_object_destroyed(destructible_object) # RefCounted to the destructible object being destroyed
 
 #### PATHFINDER ####
 

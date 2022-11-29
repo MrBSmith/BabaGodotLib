@@ -1,10 +1,10 @@
 extends Node
 class_name SceneFinder
 
-export var debug : bool = false
+@export var debug : bool = false
 
-export var dir_path : PoolStringArray
-export var exceptions_array : Array = []
+@export var dir_path : PackedStringArray
+@export var exceptions_array : Array = []
 var target_array : Array = []
 
 #### ACCESSORS ####
@@ -28,9 +28,9 @@ func find_all_scene_of_class(path : String = ""):
 			print("ERROR: the find_all_script_of_class method has no specified path")
 		return
 	
-	var dir = Directory.new()
-	if dir.open(path) == OK:
-		dir.list_dir_begin(true)
+	var dir = DirAccess.open(path)
+	if dir != null:
+		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 		var current_file_name : String = dir.get_next()
 		
 		while current_file_name != "":
@@ -58,7 +58,7 @@ func find_all_scene_of_class(path : String = ""):
 
 
 # Retruns the path of the current file pointed by the dir object
-func get_current_file_path(dir : Directory, current_file_name : String) -> String:
+func get_current_file_path(dir : DirAccess, current_file_name : String) -> String:
 	return dir.get_current_dir() + "/" + current_file_name
 
 

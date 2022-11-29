@@ -1,16 +1,16 @@
 extends MenuBase
 class_name ListMenu
 
-export var option_v_separation : int = INF 
-export var column_container_path : String = "HBoxContainer"
-export var description_window_scene : PackedScene
+@export var option_v_separation : int = INF 
+@export var column_container_path : String = "HBoxContainer"
+@export var description_window_scene : PackedScene
 
-onready var menu_root = $MenuRoot
-onready var column_container = get_node_or_null(column_container_path)
-onready var current_menu = null setget set_current_menu, get_current_menu
+@onready var menu_root = $MenuRoot
+@onready var column_container = get_node_or_null(column_container_path)
+@onready var current_menu = null : get = get_current_menu, set = set_current_menu
 
-export var max_lines : int = 3 setget set_max_lines, get_max_lines
-export var max_columns : int = 2 setget set_max_columns, get_max_columns
+@export var max_lines : int = 3 : get = get_max_lines, set = set_max_lines
+@export var max_columns : int = 2 : get = get_max_columns, set = set_max_columns
 
 var current_top_line : int = 0
 
@@ -21,7 +21,7 @@ signal menu_changed(menu_branch)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "ListMenu" or .is_class(value)
+func is_class(value: String): return value == "ListMenu" or super.is_class(value)
 func get_class() -> String: return "ListMenu"
 
 func set_max_lines(value: int): 
@@ -42,9 +42,9 @@ func get_max_columns() -> int: return max_columns
 
 func set_current_menu(menu: Node):
 	if !is_ready:
-		yield(self, "ready")
+		await self.ready
 	
-	if (menu_root.is_a_parent_of(menu) or menu == menu_root) && menu != current_menu:
+	if (menu_root.is_ancestor_of(menu) or menu == menu_root) && menu != current_menu:
 		current_menu = menu
 		clear_options()
 		_update_whole_display()
@@ -57,12 +57,12 @@ func get_current_menu() -> Node: return current_menu
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("option_table_size_changed", self, "_on_option_table_size_changed")
-	__ = connect("menu_changed", self, "_on_menu_changed")
-	__ = connect("resized", self, "_on_menu_resized")
+	var __ = connect("option_table_size_changed",Callable(self,"_on_option_table_size_changed"))
+	__ = connect("menu_changed",Callable(self,"_on_menu_changed"))
+	__ = connect("resized",Callable(self,"_on_menu_resized"))
 	
-	__ = EVENTS.connect("menu_cancel", self, "_on_menu_cancel")
-	__ = EVENTS.connect("goto_menu_root", self, "_on_goto_menu_root")
+	__ = EVENTS.connect("menu_cancel",Callable(self,"_on_menu_cancel"))
+	__ = EVENTS.connect("goto_menu_root",Callable(self,"_on_goto_menu_root"))
 
 
 #### VIRTUALS ####
@@ -74,7 +74,7 @@ func _ready() -> void:
 
 func _setup():
 	if !is_ready:
-		yield(self, "ready")
+		await self.ready
 	_update_whole_display()
 
 
@@ -86,35 +86,33 @@ func add_sub_menu(data_array: Array, menu: Node = menu_root):
 
 
 func _update_whole_display():
-	var result = _update_columns()
-	if result is GDScriptFunctionState:
-		yield(self, "update_column_finished")
-	
-	_update_options()
-	yield(self, "option_update_finished")
+	await _update_columns()
+	await _update_options()
 	
 	_update_columns_size()
 
 
-func _update_columns():
+func _update_columns() -> void:
 	var nb_column = column_container.get_child_count()
+	
 	if nb_column > max_columns:
 		var column_excess = nb_column - max_columns
 		for _i in range(column_excess):
 			var last_column = column_container.get_child(get_child_count() - 1)
 			last_column.queue_free()
-			yield(last_column, "tree_exited")
+			await last_column.tree_exited
+	
 	else:
 		for i in range(max_columns):
 			if i + 1 > nb_column:
 				var column = VBoxContainer.new()
 				column_container.add_child(column)
-				column.add_constant_override("separation", option_v_separation)
+				column.add_theme_constant_override("separation", option_v_separation)
 				column.set_owner(self)
 				column.set_name("VBoxContainer")
 				nb_column += 1
 	
-	emit_signal("update_column_finished")
+	update_column_finished.emit()
 
 
 func _update_options():
@@ -138,7 +136,7 @@ func _update_options():
 		if !must_option_be_displayed(i) or !in_correct_column:
 			if option_already_displayed != null:
 				option_already_displayed.queue_free()
-				yield(option_already_displayed, "tree_exited")
+				await option_already_displayed.tree_exited
 		
 		# Add needed options
 		if must_option_be_displayed(i):
@@ -146,8 +144,8 @@ func _update_options():
 				var option = instantiate_option(data_array[i])
 				
 				column.add_child(option)
-				option.connect("option_chose", self, "_on_option_chose")
-				option.connect("focus_changed", self, "_on_option_focus_changed")
+				option.option_chose.connect(_on_option_chose)
+				option.focus_changed.connect(_on_option_focus_changed)
 				option.owner = self
 				option.set_name(obj_name.capitalize())
 				last_added_option = option
@@ -158,9 +156,9 @@ func _update_options():
 	
 	if last_added_option != null:
 		if !last_added_option.is_ready:
-			yield(last_added_option, "ready")
+			await last_added_option.ready
 
-	emit_signal("option_update_finished")
+	option_update_finished.emit()
 
 
 func _update_columns_size():
@@ -169,7 +167,7 @@ func _update_columns_size():
 
 
 func instantiate_option(data_container: OptionDataContainer) -> Button:
-	var option = menu_option_scene.instance()
+	var option = menu_option_scene.instantiate()
 	option.set_text(data_container.name)
 	option.set_amount(data_container.amount)
 	option.set_icon_texture(data_container.icon_texture)
@@ -206,10 +204,10 @@ func set_option_all_caps(value: bool):
 	for option in get_every_options():
 		option.set_all_caps(value)
 	
-	yield(get_tree(), "idle_frame")
+	await get_tree().idle_frame
 	
 	for column in column_container.get_children():
-		column.set_margin(MARGIN_LEFT, 0.0) 
+		column.set_margin(SIDE_LEFT, 0.0) 
 
 
 func disable_every_options(value: bool):
@@ -219,7 +217,7 @@ func disable_every_options(value: bool):
 
 
 func find_sub_menu(menu_name: String) -> Node:
-	return menu_root.find_node(menu_name, true, false)
+	return menu_root.find_child(menu_name, true, false)
 
 
 func scroll_down():
@@ -229,11 +227,8 @@ func scroll_down():
 	
 	if next_top_line != current_top_line:
 		current_top_line = next_top_line
-		var result = _update_options()
+		await _update_options()
 		
-		if result is GDScriptFunctionState:
-			result = yield(self, "option_update_finished")
-			
 		scroll_focus(1)
 
 
@@ -244,10 +239,7 @@ func scroll_up():
 	
 	if next_top_line != current_top_line:
 		current_top_line = next_top_line
-		var result = _update_options()
-		
-		if result is GDScriptFunctionState:
-			result = yield(self, "option_update_finished")
+		await _update_options()
 		
 		scroll_focus(-1)
 
@@ -266,7 +258,7 @@ func scroll_focus(scroll_amount: int) -> void:
 
 
 func get_focused_option() -> Button:
-	return column_container.get_focus_owner()
+	return column_container.get_viewport().gui_get_focus_owner()
 
 
 func are_all_columns_empty() -> bool:
@@ -306,7 +298,7 @@ func navigate_upstream_menu():
 #### INPUTS ####
 
 func _input(_event: InputEvent) -> void:
-	var focused_option = get_focus_owner()
+	var focused_option = get_viewport().gui_get_focus_owner()
 	if focused_option == null:
 		return
 	

@@ -1,19 +1,19 @@
-tool
+@tool
 extends Control
 class_name BlackBars
 
-export var bars_width : float = 24.0 setget set_bars_width
+@export var bars_width : float = 24.0 : set = set_bars_width
 
-onready var top_bar_hidden_pos = $TopBar.get_position()
-onready var bottom_bar_hidden_pos = $BottomBar.get_position()
+@onready var top_bar_hidden_pos = $TopBar.get_position()
+@onready var bottom_bar_hidden_pos = $BottomBar.get_position()
 
-onready var bars_array = [$TopBar, $BottomBar]
+@onready var bars_array = [$TopBar, $BottomBar]
 
 signal bars_width_changed
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "BlackBars" or .is_class(value)
+func is_class(value: String): return value == "BlackBars" or super.is_class(value)
 func get_class() -> String: return "BlackBars"
 
 func set_bars_width(value: float) -> void:
@@ -25,9 +25,9 @@ func set_bars_width(value: float) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("cutscene_started", self, "_on_cutscene_started")
-	__ = EVENTS.connect("cutscene_finished", self, "_on_cutscene_finished")
-	__ = connect("bars_width_changed", self, "_on_bars_width_changed")
+	EVENTS.cutscene_started.connect(_on_cutscene_started)
+	EVENTS.cutscene_finished.connect(_on_cutscene_finished)
+	bars_width_changed.connect(_on_bars_width_changed)
 
 
 #### VIRTUALS ####
@@ -39,17 +39,17 @@ func _ready() -> void:
 func appear(disappear: bool = false, duration: float = 1.5) -> void:
 	set_visible(true)
 	
-	var tween
+	var tween = create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
 	
 	for bar in bars_array:
-		tween = create_tween()
 		var is_top_bar = bar == $TopBar
 		var to = top_bar_hidden_pos.y if is_top_bar else bottom_bar_hidden_pos.y
-		var offset = bar.rect_size.y * Math.bool_to_sign(is_top_bar) if !disappear else 0.0
+		var offset = bar.size.y * Math.bool_to_sign(is_top_bar) if !disappear else 0.0
 		
-		tween.tween_property(bar, "rect_position:y", to + offset, duration).set_trans(Tween.TRANS_SINE)
+		tween.tween_property(bar, "position:y", to + offset, duration)
 	
-	yield(tween, "finished")
+	await tween.finished
 	set_visible(!disappear)
 
 
@@ -67,10 +67,10 @@ func disappear(duration: float = 1.5) -> void:
 
 func _on_bars_width_changed(width: float) -> void:
 	for bar in bars_array:
-		bar.rect_size.y = width
+		bar.size.y = width
 		
 		if bar == $TopBar:
-			bar.rect_position.y = -width
+			bar.position.y = -width
 
 
 func _on_cutscene_started() -> void:

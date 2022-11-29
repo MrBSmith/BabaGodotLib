@@ -1,6 +1,6 @@
 shader_type canvas_item;
 
-uniform vec4 outline_color : hint_color; 
+uniform vec4 outline_color : source_color; 
 uniform vec2 uv_origin = vec2(0.0); 
 uniform vec2 uv_part_size = vec2(1);
 uniform vec2 region_size = vec2(32.0, 16.0);

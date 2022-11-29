@@ -3,8 +3,8 @@ class_name Serializer
 
 
 # Find recursivly every wanted nodes, and extract their wanted properties
-static func fetch_branch_state(property_dict: Dictionary, root_node: Node, ignored_classes := PoolStringArray(),
-								 dict_to_fill : Dictionary = {}, node: Node = null) -> Dictionary:
+static func fetch_branch_state(property_dict: Dictionary, root_node: Node, ignored_classes := PackedStringArray(),
+								dict_to_fill : Dictionary = {}, node: Node = null) -> Dictionary:
 	
 	var class_path_array = property_dict.keys()
 	if node == null: 
@@ -30,7 +30,7 @@ static func fetch_branch_state(property_dict: Dictionary, root_node: Node, ignor
 
 # Recursivly get every persistant objects direct/indirect children of the given node
 # Store the data in the array passed as argument
-static func get_every_persistant_object(node: Node, persistants_classes := PoolStringArray(), array_to_fill: Array = []) -> Array:
+static func get_every_persistant_object(node: Node, persistants_classes := PackedStringArray(), array_to_fill: Array = []) -> Array:
 	for child in node.get_children():
 		for _class in persistants_classes:
 			if child.is_class(_class) or child.is_in_group(_class):
@@ -47,7 +47,7 @@ static func get_every_persistant_object(node: Node, persistants_classes := PoolS
 # The state_dict must be structured this way:
 # Keys are the path to the node, relative to the branch_root, then the value is another dict where keys
 # are the name of the property and the value its value
-static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persistant_classes := PoolStringArray(), ignored_classes := PoolStringArray()) -> void:
+static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persistant_classes := PackedStringArray(), ignored_classes := PackedStringArray()) -> void:
 	var persitiant_objects : Array = []
 	var undestructed_obj : Array = []
 
@@ -77,7 +77,7 @@ static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persi
 				object.set(property, value)
 	
 	if !branch_root.is_inside_tree():
-		yield(branch_root, "ready")
+		await branch_root.ready
 	
 	persitiant_objects = get_every_persistant_object(branch_root, persistant_classes)
 	
@@ -86,7 +86,7 @@ static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persi
 			obj.queue_free()
 
 
-static func is_node_state_ignored(node: Node, state_classes_ignored := PoolStringArray()) -> bool:
+static func is_node_state_ignored(node: Node, state_classes_ignored := PackedStringArray()) -> bool:
 	for class_ignored in state_classes_ignored:
 		if node.is_class(class_ignored) or (node.owner && node.owner.is_class(class_ignored)):
 			return true

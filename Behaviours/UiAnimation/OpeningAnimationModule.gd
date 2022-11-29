@@ -18,27 +18,27 @@ enum ANIMATION_MODE {
 	BOTH
 }
 
-export(START_MODE) var start_mode = START_MODE.START_CLOSED
-export(ANIMATION_MODE) var anim_mode = ANIMATION_MODE.TOGGLE
-export(int, FLAGS, "Left", "Top", "Right", "Bottom") var animated_margins : int = MARGINS.RIGHT | MARGINS.LEFT
+@export var start_mode: START_MODE = START_MODE.START_CLOSED
+@export var anim_mode: ANIMATION_MODE = ANIMATION_MODE.TOGGLE
+@export_flags(MARGINS) var animated_margins : int = MARGINS.RIGHT | MARGINS.LEFT
 
-onready var closed : bool = false if start_mode == START_MODE.START_OPENED else true
-onready var default_margins_array : Array = []
+@onready var closed : bool = false if start_mode == START_MODE.START_OPENED else true
+@onready var default_margins_array : Array = []
 
-var default_size := Vector2.INF setget set_default_size
+var default_size := Vector2.ONE * INF:
+	set(value):
+		if not value in [default_size, Vector2.ONE * INF]:
+			default_size = value
 
-export var print_logs : bool = false
+@export var print_logs : bool = false
 
 signal resize_finished
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "OpeningAnimationModule" or .is_class(value)
+func is_class(value: String): return value == "OpeningAnimationModule" or super.is_class(value)
 func get_class() -> String: return "OpeningAnimationModule"
 
-func set_default_size(value: Vector2) -> void:
-	if not value in [default_size, Vector2.INF]:
-		default_size = value
 
 #### BUILT-IN ####
 
@@ -48,7 +48,7 @@ func _ready() -> void:
 	
 	if start_mode == START_MODE.START_CLOSED:
 		if target == null:
-			yield(self, "target_changed")
+			await self.target_changed
 		
 		close_instant()
 
@@ -60,11 +60,11 @@ func play() -> void:
 	target.set_visible(true)
 	
 	_open_animation()
-	yield(self, "resize_finished")
+	await self.resize_finished
 	
 	if anim_mode == ANIMATION_MODE.BOTH:
 		_open_animation()
-		yield(self, "resize_finished")
+		await self.resize_finished
 	
 	emit_signal("animation_finished")
 
@@ -72,12 +72,12 @@ func play() -> void:
 #### LOGIC ####
 
 func update_default_params() -> void:
-	set_default_size(target.rect_size)
+	default_size = target.size
 	default_margins_array = _fetch_default_margin()
 	
 	if print_logs:
 		print("default param for %s updated" % target.name)
-		print("default_size: %s" % str(target.rect_size))
+		print("default_size: %s" % str(target.size))
 		print("default_margins_array: %s" % str(default_margins_array))
 
 
@@ -114,7 +114,7 @@ func _open_animation() -> void:
 		if !(animated_margins & bit_margin):
 			continue
 		
-		var default_size_axis = default_size.x if margin in [MARGIN_LEFT, MARGIN_RIGHT] else default_size.y
+		var default_size_axis = default_size.x if margin in [SIDE_LEFT, SIDE_RIGHT] else default_size.y
 		var from = default_size_axis if closed else 0.0
 		var to = 0.0 if closed else default_size_axis
 		
@@ -133,7 +133,7 @@ func _open_animation() -> void:
 		target.set_margin(margin, origin_value)
 		tween.parallel().tween_property(target, margin_name, dest_value, anim_duration)
 	
-	yield(tween, "finished")
+	await tween.finished
 	closed = !closed
 	
 	if print_logs:

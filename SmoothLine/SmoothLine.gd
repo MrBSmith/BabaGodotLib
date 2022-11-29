@@ -1,38 +1,34 @@
-tool
+@tool
 class_name SmoothLine
 extends Line2D
 
-export var line_curve : Curve2D setget set_line_curve
+@export var line_curve : Curve2D :
+	set(value):
+		if line_curve != value:
+			line_curve = value
+			line_curve_changed.emit(value)
 
-export(float) var spline_length := 100.0
-export(bool) var _smooth setget _set_smooth
+@export var spline_length : float = 100.0
+@export var _smooth: bool:
+	set(value):
+		if value != _smooth:
+			_smooth = value
+			smooth_changed.emit(_smooth)
 
 signal smooth_changed(value)
 signal line_curve_changed(curve)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "" or .is_class(value)
+func is_class(value: String): return value == "" or super.is_class(value)
 func get_class() -> String: return ""
-
-
-func _set_smooth(value: bool) -> void:
-	if value != _smooth:
-		_smooth = value
-		emit_signal("smooth_changed", _smooth)
-
-
-func set_line_curve(value: Curve2D) -> void:
-	if line_curve != value:
-		line_curve = value
-		emit_signal("line_curve_changed", value)
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("smooth_changed", self, "_on_smooth_changed")
-	__ = connect("line_curve_changed", self, "_on_line_curve_changed")
+	var __ = connect("smooth_changed",Callable(self,"_on_smooth_changed"))
+	__ = connect("line_curve_changed",Callable(self,"_on_line_curve_changed"))
 
 
 #### VIRTUALS ####

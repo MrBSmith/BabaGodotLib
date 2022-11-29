@@ -3,7 +3,7 @@ render_mode unshaded;
 
 uniform bool apply = false;
 
-uniform sampler2D displace_texture : hint_albedo;
+uniform sampler2D displace_texture : source_color;
 uniform int displace_amount = 1;
 uniform float aberation_amount = 1.0;
 

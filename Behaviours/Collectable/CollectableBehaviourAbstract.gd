@@ -6,15 +6,15 @@ class_name CollectableBehaviour
 # This class can be extended and attached to any node to give 
 # it the behaviour of a collectable
 
-onready var collect_sound = get_node_or_null("CollectSound")
-onready var travelling_sound = get_node_or_null("CollectSound")
-onready var animation_player = get_node_or_null("AnimationPlayer")
-onready var collect_area = get_node_or_null("CollectArea")
+@onready var collect_sound = get_node_or_null("CollectSound")
+@onready var travelling_sound = get_node_or_null("CollectSound")
+@onready var animation_player = get_node_or_null("AnimationPlayer")
+@onready var collect_area = get_node_or_null("CollectArea")
 
-export var collectable_name : String = "" setget set_collectable_name, get_collectable_name
+@export var collectable_name : String = "" : get = get_collectable_name, set = set_collectable_name
 
-export var average_amount : int = 1
-export(float, 0.0, 1.0) var amount_variance : float = 0.0
+@export var average_amount : int = 1
+@export var amount_variance : float = 0.0 # (float, 0.0, 1.0)
 
 var target_weakref : WeakRef = null
 
@@ -25,7 +25,7 @@ signal collect_animation_finished
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "CollectableBehaviour" or .is_class(value)
+func is_class(value: String): return value == "CollectableBehaviour" or super.is_class(value)
 func get_class() -> String: return "CollectableBehaviour"
 
 func set_target(value: Node): target_weakref = weakref(value)
@@ -44,12 +44,12 @@ func get_collectable_name() -> String:
 #### BUILT-IN ####
 
 func _ready():
-	var __ = connect("collect_animation_finished", self, "_on_collect_animation_finished")
-	__ = collect_area.connect("body_entered", self, "_on_collect_area_body_entered")
-	__ = connect("interactable_changed", self, "_on_interactable_changed")
+	var __ = connect("collect_animation_finished",Callable(self,"_on_collect_animation_finished"))
+	__ = collect_area.connect("body_entered",Callable(self,"_on_collect_area_body_entered"))
+	__ = connect("interactable_changed",Callable(self,"_on_interactable_changed"))
 	
 	if animation_player:
-		animation_player.connect("animation_finished", self, "_on_AnimationPlayer_animation_finished")
+		animation_player.connect("animation_finished",Callable(self,"_on_AnimationPlayer_animation_finished"))
 
 
 #### VIRTUALS ####

@@ -23,17 +23,17 @@ enum EASE_TYPE {
 }
 
 
-export(TRANS_TYPE) var trans_type_in : int = TRANS_TYPE.TRANS_CUBIC
-export(TRANS_TYPE) var trans_type_out : int = TRANS_TYPE.TRANS_CUBIC
-export(EASE_TYPE) var ease_type_in : int = EASE_TYPE.EASE_IN_OUT
-export(EASE_TYPE) var ease_type_out : int = EASE_TYPE.EASE_IN_OUT
+@export_enum(TRANS_TYPE) var trans_type_in : int = TRANS_TYPE.TRANS_CUBIC
+@export_enum(TRANS_TYPE) var trans_type_out : int = TRANS_TYPE.TRANS_CUBIC
+@export_enum(EASE_TYPE) var ease_type_in : int = EASE_TYPE.EASE_IN_OUT
+@export_enum(EASE_TYPE) var ease_type_out : int = EASE_TYPE.EASE_IN_OUT
 
-export var disabled : bool = false
+@export var disabled : bool = false
 
-export(float, 0.01, 999.0) var anim_duration : float = 1.0
+@export var anim_duration : float = 1.0 # (float, 0.01, 999.0)
 
-var target : Control setget set_target
-var animation_playing : bool = false setget set_animation_playing, is_animation_playing
+var target : Control : set = set_target
+var animation_playing : bool = false : get = is_animation_playing, set = set_animation_playing
 
 #warning-ignore:unused_signal
 signal animation_finished
@@ -41,7 +41,7 @@ signal target_changed
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "UIAnimationModule" or .is_class(value)
+func is_class(value: String): return value == "UIAnimationModule" or super.is_class(value)
 func get_class() -> String: return "UIAnimationModule"
 
 func set_animation_playing(value: bool): animation_playing = value
@@ -55,7 +55,7 @@ func set_target(value: Control) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("target_changed", self, "_on_target_changed")
+	var __ = connect("target_changed",Callable(self,"_on_target_changed"))
 
 
 #### VIRTUALS ####

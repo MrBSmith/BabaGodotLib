@@ -1,12 +1,12 @@
-extends AnimatedSprite
+extends AnimatedSprite2D
 class_name VFX_AnimationBase
 
 var is_ready : bool = false
 
-onready var start_offset = offset
+@onready var start_offset = offset
 
 func _ready():
-	var _err = connect("animation_finished", self, "on_animation_finished")
+	animation_finished.connect(on_animation_finished)
 	play_animation()
 	
 	is_ready = true
@@ -19,7 +19,7 @@ func play_animation():
 
 # OVERRIDE
 func set_flip_h(value: bool) -> void:
-	.set_flip_h(value)
+	super.set_flip_h(value)
 	
 	if is_ready:
 		offset.x = start_offset.x * Math.bool_to_sign(!value)

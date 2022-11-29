@@ -1,18 +1,18 @@
 extends Object
 class_name InputMapper
 
-func is_class(value: String): return value == "InputMapper" or .is_class(value)
+func is_class(value: String): return value == "InputMapper" or super.is_class(value)
 func get_class() -> String: return "InputMapper"
 
 signal profile_changed(profile)
 
 enum PROFILES_PRESET{KEYBOARD, CONTROLLER, CUSTOM}
-export(PROFILES_PRESET) var default_profile_id
+@export var default_profile_id: PROFILES_PRESET
 
 var profiles_array: Array = []
-var current_profile_id : int = default_profile_id setget set_current_profile_id, get_current_profile_id
+var current_profile_id : int = default_profile_id : get = get_current_profile_id, set = set_current_profile_id
 
-export var print_logs: bool = false
+@export var print_logs: bool = false
 
 #### ACCESSORS ####
 
@@ -75,7 +75,7 @@ func get_player_profile(player_id : int) -> String:
 				continue
 			
 			var profile_inputs = profile.dict[action]
-			var mapped_inputs = InputMap.get_action_list(action)
+			var mapped_inputs = InputMap.action_get_events(action)
 			
 			if !compare_inputs_list(profile_inputs, mapped_inputs):
 				break
@@ -120,7 +120,7 @@ func fetch_file_inputs(file_path: String) -> Dictionary:
 	var err = cfg_file.load(file_path)
 	
 	if err != OK:
-		push_error("Error while opening the .cfg settings file at path %s" % file_path)
+		push_error("Error while opening the super.cfg settings file at path %s" % file_path)
 		return {}
 	
 	return cfg_file.get_value("controls", "inputs")
@@ -155,7 +155,7 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 	var input_profile_config_file = ConfigFile.new()
 	var err = input_profile_config_file.load(file_path)
 	
-	if sections_to_read.empty():
+	if sections_to_read.is_empty():
 		sections_to_read = input_profile_config_file.get_sections()
 	
 	if err == OK:
@@ -180,10 +180,11 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 func map_player_settings_inputs(file_path: String) -> void:
 	var inputs_dict = fetch_file_inputs(file_path)
 	
+	# TO DO: USE AN EVENT TO BREAK THE DIRECT DEPENDANCY
 	PLAYERS_INPUT.update_inputs(inputs_dict)
 
 
-# This function will remove the current keys in the given action from the settings and add a new key instead
+# This function will remove_at the current keys in the given action from the settings and add a new key instead
 func remap_action_key(action_name : String, input_array : Array):
 	erase_action_keys(action_name)
 
@@ -195,9 +196,9 @@ func remap_action_key(action_name : String, input_array : Array):
 	EVENTS.emit_signal("input_mapped", action_name, input_array)
 
 
-# This function will remove the selected action from the settings (InputMap)
+# This function will remove_at the selected action from the settings (InputMap)
 func erase_action_keys(action_name: String):
-	var input_events = InputMap.get_action_list(action_name)
+	var input_events = InputMap.action_get_events(action_name)
 	for event in input_events:
 		InputMap.action_erase_event(action_name, event)
 

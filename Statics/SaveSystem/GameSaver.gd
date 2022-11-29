@@ -2,13 +2,13 @@ extends Node
 class_name GameSaver
 
 # A static class that saves the game in it current state
-# Use save_game_in_slot() to create a folder in the given path container a .cfg file storing the data of the game
+# Use save_game_in_slot() to create a folder in the given path container a super.cfg file storing the data of the game
 # Alternatively you can use save_game() if you already know the path of the save folder
 
 # If you know the path of the .cfg file in the folder, you can write the data of the save in it using
 # save_properties_in_cfg
 
-# modify_save_property() is usefull when you want to change a property in the .cfg file without rewriting all its content
+# modify_save_property() is usefull when you want to change a property in the super.cfg file without rewriting all its content
 
 
 # The save folder must be structured like the following:
@@ -25,7 +25,7 @@ class_name GameSaver
 static func save_game_in_slot(save_dir_path: String, slot_id : int, data: Dictionary, 
 				save_name : String = "save") -> void:
 	
-	var slot_name = save_name + String(slot_id)
+	var slot_name = save_name + str(slot_id)
 	
 	if !DirNavHelper.is_dir_existing(save_dir_path):
 		DirNavHelper.create_dir(save_dir_path)
@@ -40,7 +40,7 @@ static func save_game_in_slot(save_dir_path: String, slot_id : int, data: Dictio
 static func save_properties_in_cfg(cfg_path: String, data: Dictionary, properties_to_write : Array = []) -> int: # -> GlobalScope Error
 	var config_file = ConfigFile.new()
 	
-	if properties_to_write.empty():
+	if properties_to_write.is_empty():
 		properties_to_write = data.keys()
 	
 	if DirNavHelper.is_file_existing(cfg_path):

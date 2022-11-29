@@ -8,7 +8,7 @@ class_name DestructibleBehaviour
 # If it has a DestroySound child (should be a AudioStreamPlayer or a AudioStreamPlayer2D)
 # a play_sound_effect event will be called when the destroy method is called
 
-# If it has a Particles2D child (should be a Particles2D)
+# If it has a GPUParticles2D child (should be a GPUParticles2D)
 # a play_particule_FX event will be called when the destroy method is called
 
 # Then the destroy_animation_started signal will be called (before the animation starts)
@@ -16,18 +16,18 @@ class_name DestructibleBehaviour
 # then the destroyed signal is called when the animation is over
 
 
-onready var animation_player = get_node_or_null("AnimationPlayer")
-onready var damage_computer = get_node_or_null("DamageComputer")
-onready var destroy_sound = get_node_or_null("DestroySound")
-onready var approch_area = get_node_or_null("ApprochArea")
-onready var particules = get_node_or_null("Particles2D")
+@onready var animation_player = get_node_or_null("AnimationPlayer")
+@onready var damage_computer = get_node_or_null("DamageComputer")
+@onready var destroy_sound = get_node_or_null("DestroySound")
+@onready var approch_area = get_node_or_null("ApprochArea")
+@onready var particules = get_node_or_null("GPUParticles2D")
 
-export var max_hp : int = 1 setget set_max_hp
-export var hp : int = max_hp setget set_hp, get_hp
+@export var max_hp : int = 1 : set = set_max_hp
+@export var hp : int = max_hp : get = get_hp, set = set_hp
 
-export var free_when_destroyed := true
+@export var free_when_destroyed := true
 
-export var cooldown : float = INF setget set_cooldown
+@export var cooldown : float = INF : set = set_cooldown
 
 var is_destroyed := false
 
@@ -39,7 +39,7 @@ signal destroyed()
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "DestructibleBehaviour" or .is_class(value)
+func is_class(value: String): return value == "DestructibleBehaviour" or super.is_class(value)
 func get_class() -> String: return "DestructibleBehaviour"
 
 func set_max_hp(value: int) -> void:
@@ -66,9 +66,9 @@ func set_cooldown(value: float) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = connect("hp_changed", self, "_on_hp_changed")
+	var __ = connect("hp_changed",Callable(self,"_on_hp_changed"))
 	if approch_area:
-		__ = approch_area.connect("body_entered", self, "_on_body_entered")
+		__ = approch_area.connect("body_entered",Callable(self,"_on_body_entered"))
 	
 	owner.add_to_group("Destructible")
 
@@ -107,7 +107,7 @@ func destroy() -> void:
 	
 	if animation_player && animation_player.has_animation("Destroy"):
 		animation_player.play("Destroy")
-		yield(animation_player, "animation_finished")
+		await animation_player.animation_finished
 	
 	emit_signal("destroyed")
 	

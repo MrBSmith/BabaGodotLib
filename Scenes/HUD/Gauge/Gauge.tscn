@@ -1,32 +1,28 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://dldi1in3xfloo"]
 
-[ext_resource path="res://BabaGodotLib/Scenes/HUD/Gauge/Gauge.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://BabaGodotLib/Scenes/HUD/Gauge/Gauge.gd" id="1"]
 
 [node name="Gauge" type="MarginContainer"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_right = -539.0
-margin_bottom = -348.0
-rect_min_size = Vector2( 101, 12 )
-script = ExtResource( 1 )
+offset_right = -539.0
+offset_bottom = -348.0
+script = ExtResource("1")
+gauge_color = Color(0, 0, 0, 1)
+feedback_gauge_color = Color(0, 0, 0, 1)
 
-[node name="FeedbackGauge" type="TextureProgress" parent="."]
-margin_right = 101.0
-margin_bottom = 12.0
+[node name="FeedbackGauge" type="TextureProgressBar" parent="."]
+layout_mode = 2
+offset_right = 613.0
+offset_bottom = 300.0
 value = 100.0
-tint_progress = Color( 0, 0, 0, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+tint_progress = Color(0, 0, 0, 1)
 
-[node name="Gauge" type="TextureProgress" parent="."]
-margin_right = 101.0
-margin_bottom = 12.0
+[node name="Gauge" type="TextureProgressBar" parent="."]
+layout_mode = 2
+offset_right = 613.0
+offset_bottom = 300.0
 step = 0.1
 value = 100.0
-tint_progress = Color( 0, 0, 0, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Tween" type="Tween" parent="."]
+tint_progress = Color(0, 0, 0, 1)

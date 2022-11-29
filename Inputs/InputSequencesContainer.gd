@@ -3,7 +3,7 @@ class_name InputSequencesContainer
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "InputSequencesContainer" or .is_class(value)
+func is_class(value: String): return value == "InputSequencesContainer" or super.is_class(value)
 func get_class() -> String: return "InputSequencesContainer"
 
 

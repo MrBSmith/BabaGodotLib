@@ -1,6 +1,8 @@
 extends Node
 class_name DirNavHelper
 
+# TO DO: REWRITE OR DELETE WHEN MOVING XION LEAK FROM GODOT 3 -> GODOT 4
+
 const debug : bool = true
 
 enum DIR_FETCH_MODE {
@@ -14,9 +16,9 @@ static func create_dir(dir_path : String):
 	
 	var prefix = _get_path_prefix(dir_path)
 	var dir_path_mod = dir_path.replacen(prefix, "")
-	var splited_path : PoolStringArray = dir_path_mod.split("/")
-	splited_path.remove(splited_path.size() - 1)
-	var parent_path = prefix + splited_path.join("/")
+	var splited_path : PackedStringArray = dir_path_mod.split("/")
+	splited_path.remove_at(splited_path.size() - 1)
+	var parent_path = prefix + "/".join(splited_path)
 
 	if !is_dir_existing(parent_path):
 		var err = dir.make_dir(parent_path)
@@ -76,7 +78,7 @@ static func is_dir_empty(dir_path: String) -> bool:
 	var dir = Directory.new()
 	
 	if dir.open(dir_path) == OK:
-		dir.list_dir_begin(true, true)
+		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 		var file_name = dir.get_next()
 		return file_name == ""
 	else:
@@ -91,7 +93,7 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 	if dir.open(dir_path) == OK:
 		if display_warning: print(dir_path + " has been opened successfully")
 
-		dir.list_dir_begin(true, true)
+		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 		var file_name = dir.get_next()
 
 		if display_warning:
@@ -107,7 +109,7 @@ static func empty_folder(dir_path: String, display_warning : bool = false):
 				if display_warning:
 					print("Found file: " + file_name)
 
-			dir.remove(file_name)
+			dir.remove_at(file_name)
 			file_name = dir.get_next()
 
 		dir.list_dir_end()
@@ -120,7 +122,7 @@ static func delete_folder(dir_path: String):
 	empty_folder(dir_path)
 	var dir = Directory.new()
 	if dir.open(dir_path) == OK:
-		dir.remove(dir_path)
+		dir.remove_at(dir_path)
 
 
 # Transfer every file in the given folder to the given destination
@@ -129,7 +131,7 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 	var dest_dir_savedlevels_path : String = dest_dir + "/saved_levels"
 
 	if dir.open(temp_save_dir) == OK:
-		var err = dir.list_dir_begin(true, true)
+		var err = dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 		if err != OK: push_error("dir navigation error code: " + String(err))
 		var file = dir.get_next()
 
@@ -148,13 +150,13 @@ static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 
 # Fetch the content of the given dir
 # fetch_mode determine if you want to fetch only folders, only files or everything
-static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.FILE_ONLY, ignores := PoolStringArray()) -> Array:
+static func fetch_dir_content(dir_path: String, fetch_mode: int = DIR_FETCH_MODE.FILE_ONLY, ignores := PackedStringArray()) -> Array:
 	var dir = Directory.new()
 	var error = dir.open(dir_path)
 	var files = []
 	
 	if error == OK:
-		dir.list_dir_begin(true, true)
+		dir.list_dir_begin() # TODOGODOT4 fill missing arguments https://github.com/godotengine/godot/pull/40547
 		var file = dir.get_next()
 
 		while file != "":

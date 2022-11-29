@@ -1,22 +1,22 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://BabaGodotLib/UI/Menu/OptionButtons/MenuOptionsBase.gd" type="Script" id=2]
-[ext_resource path="res://BabaGodotLib/UI/Menu/OptionButtons/HoverTextureAnimation/HoverButtonIconAnimation.tres" type="Texture" id=3]
+[ext_resource path="res://BabaGodotLib/UI/Menu/OptionButtons/HoverTextureAnimation/HoverButtonIconAnimation.tres" type="Texture2D" id=3]
 
 [sub_resource type="StyleBoxEmpty" id=1]
 
 [node name="MenuOptionBase" type="MarginContainer"]
-margin_right = 179.0
-margin_bottom = 38.0
+offset_right = 179.0
+offset_bottom = 38.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
 script = ExtResource( 2 )
 text = ""
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 63.0
-margin_right = 115.0
-margin_bottom = 38.0
+offset_left = 63.0
+offset_right = 115.0
+offset_bottom = 38.0
 size_flags_horizontal = 6
 custom_constants/separation = 6
 __meta__ = {
@@ -24,9 +24,9 @@ __meta__ = {
 }
 
 [node name="HoverTexture" type="TextureRect" parent="HBoxContainer"]
-margin_top = 12.0
-margin_right = 14.0
-margin_bottom = 26.0
+offset_top = 12.0
+offset_right = 14.0
+offset_bottom = 26.0
 size_flags_vertical = 6
 texture = ExtResource( 3 )
 __meta__ = {
@@ -35,9 +35,9 @@ __meta__ = {
 
 [node name="Button" type="Button" parent="HBoxContainer"]
 light_mask = 0
-margin_left = 20.0
-margin_right = 32.0
-margin_bottom = 38.0
+offset_left = 20.0
+offset_right = 32.0
+offset_bottom = 38.0
 size_flags_horizontal = 0
 size_flags_vertical = 5
 custom_styles/focus = SubResource( 1 )
@@ -48,10 +48,10 @@ __meta__ = {
 }
 
 [node name="HoverTexture2" type="TextureRect" parent="HBoxContainer"]
-margin_left = 38.0
-margin_top = 12.0
-margin_right = 52.0
-margin_bottom = 26.0
+offset_left = 38.0
+offset_top = 12.0
+offset_right = 52.0
+offset_bottom = 26.0
 size_flags_vertical = 6
 texture = ExtResource( 3 )
 __meta__ = {

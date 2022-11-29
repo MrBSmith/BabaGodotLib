@@ -12,7 +12,7 @@ amount = -9223372036854775808
 icon_texture = null
 
 [node name="TextLabel" type="Label" parent="." index="1"]
-margin_bottom = 540.0
+offset_bottom = 540.0
 size_flags_vertical = 1
 valign = 1
 __meta__ = {
@@ -20,9 +20,9 @@ __meta__ = {
 }
 
 [node name="CounterLabel" type="Label" parent="." index="2"]
-margin_left = 803.0
-margin_right = 960.0
-margin_bottom = 540.0
+offset_left = 803.0
+offset_right = 960.0
+offset_bottom = 540.0
 size_flags_horizontal = 10
 size_flags_vertical = 1
 text = "-9223372036854775808"

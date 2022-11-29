@@ -8,11 +8,11 @@ class_name AwakerBehaviour
 # awake_nearby_bodies as an answer for a signal and connect the signal 
 # from the editor and voilà!
 
-onready var awake_area = $AwakeArea
+@onready var awake_area = $AwakeArea
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "AwakerBehaviour" or .is_class(value)
+func is_class(value: String): return value == "AwakerBehaviour" or super.is_class(value)
 func get_class() -> String: return "AwakerBehaviour"
 
 

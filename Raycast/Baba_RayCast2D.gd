@@ -39,7 +39,7 @@ func _physics_process(_delta):
 	var dist = global_position.distance_to(cast_target.global_position)
 	var relative_target_pos = dir * dist
 		
-	set_cast_to(relative_target_pos)
+	set_target_position(relative_target_pos)
 	var collider = get_collider()
 		
 	if collider == cast_target:

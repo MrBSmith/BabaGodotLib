@@ -6,7 +6,7 @@ class_name GameLoader
 
 
 # Load the content of the .cfg save file located in the save_dir_path folder. 
-# The method will fetch the right save based on its slot_id
+# The method will fetch the right save based checked its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null) -> void:
 	var config_file_path = find_corresponding_save_file(save_dir_path, slot_id)
@@ -56,7 +56,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 static func load_save_config_file(dir: String, slot_id : int) -> ConfigFile:
 	var save_path : String = find_corresponding_save_file(dir, slot_id)
 	if save_path == "":
-		push_error("There is no save with id " + String(slot_id))
+		push_error("There is no save with id " + str(slot_id))
 		return null
 
 	return load_config_file(save_path)
@@ -92,7 +92,7 @@ static func find_corresponding_save_file(dir_path: String, save_id : int) -> Str
 # the dir argument must be the path to the folder containing all the saves
 static func get_save_name(save_path: String) -> String:
 	var path_array = save_path.split("/")
-	if path_array.empty():
+	if path_array.is_empty():
 		push_error("The given path %s isn't a valid save path" % save_path)
 		return ""
 	
@@ -168,7 +168,7 @@ static func get_save_property_value(dir: String, property_name : String, save_id
 	if error == OK:
 		return get_cfg_property_value(config_file, property_name)
 	else:
-		push_error("Failed to load settings cfg file with save id " + String(save_id) + " . error code : " + str(error))
+		push_error("Failed to load settings cfg file with save id " + str(save_id) + " . error code : " + str(error))
 		return null
 
 

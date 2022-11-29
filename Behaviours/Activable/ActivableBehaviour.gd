@@ -1,19 +1,19 @@
 extends Behaviour
 class_name ActivableBehaviour
 
-export var active : bool = false setget set_active, is_active 
-export(float, 0.0, 999.0, 0.1) var active_change_cooldown : float = 0.0
-export var stay_active : bool = false
-export var debug : bool = false
+@export var active : bool = false : get = is_active, set = set_active 
+@export var active_change_cooldown : float = 0.0 # (float, 0.0, 999.0, 0.1)
+@export var stay_active : bool = false
+@export var debug : bool = false
 
 # Instead of being activated, toggle the active variable
-export var togglable : bool = false
+@export var togglable : bool = false
 
 signal active_changed(active)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "ActivableBehaviour" or .is_class(value)
+func is_class(value: String): return value == "ActivableBehaviour" or super.is_class(value)
 func get_class() -> String: return "ActivableBehaviour"
 
 func set_active(value: bool) -> void:

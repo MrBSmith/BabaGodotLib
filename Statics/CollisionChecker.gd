@@ -26,12 +26,14 @@ static func test_collision(caller : PhysicsBody2D, movement: Vector2,
 	if collider is PhysicsBody2D:
 		collider_rect = get_body_rect(collider)
 	elif collider is TileMap:
-		var tile_grid_pos = collider.world_to_map(collision_pos + mov)
+		var tile_grid_pos = collider.local_to_map(collision_pos + mov)
 		var cell_size = collider.cell_size
 		collider_rect = Rect2(tile_grid_pos * cell_size, cell_size)
 	
 	return self_rect.intersects(collider_rect)
 
+
+# TO DO: MOVE THIS TO XION LEAK'S REPO
 
 # Check for a wall collision behind the character
 static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vector2) -> bool:
@@ -43,14 +45,14 @@ static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vec
 	var top_left_corner = body_rect.position
 	var top_right_corner = body_rect.position + Vector2(body_rect.size.x, 0)
 	
-	var wall_tilemap = level.find_node("Walls")
+	var wall_tilemap = level.find_child("Walls")
 	
 	if !wall_tilemap:
 		print("Walls Tilemap can't be found in the scene: " + level.name)
 		return false
 	
-	var top_left_tilemap_pos = wall_tilemap.world_to_map(top_left_corner)
-	var top_right_tilemap_pos = wall_tilemap.world_to_map(top_right_corner)
+	var top_left_tilemap_pos = wall_tilemap.local_to_map(top_left_corner)
+	var top_right_tilemap_pos = wall_tilemap.local_to_map(top_right_corner)
 	var used_wall_cells = wall_tilemap.get_used_cells()
 	
 	return top_left_tilemap_pos in used_wall_cells or top_right_tilemap_pos in used_wall_cells

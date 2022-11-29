@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=3 format=3 uid="uid://t8rjucc6u20y"]
 
-[ext_resource path="res://BabaGodotLib/UI/LineContainer/LineContainer.tscn" type="PackedScene" id=1]
-[ext_resource path="res://BabaGodotLib/UI/LineContainer/IconsLineContainer.gd" type="Script" id=2]
+[ext_resource type="PackedScene" uid="uid://doe1162pwacqu" path="res://BabaGodotLib/UI/LineContainer/LineContainer.tscn" id="1"]
+[ext_resource type="Script" path="res://BabaGodotLib/UI/LineContainer/IconsLineContainer.gd" id="2"]
 
-[node name="IconsLineContainer" instance=ExtResource( 1 )]
-script = ExtResource( 2 )
+[node name="IconsLineContainer" instance=ExtResource("1")]
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2")

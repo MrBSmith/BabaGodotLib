@@ -1,10 +1,10 @@
-tool
+@tool
 extends Timer
 class_name Cooldown
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "Cooldown" or .is_class(value)
+func is_class(value: String): return value == "Cooldown" or super.is_class(value)
 func get_class() -> String: return "Cooldown"
 
 

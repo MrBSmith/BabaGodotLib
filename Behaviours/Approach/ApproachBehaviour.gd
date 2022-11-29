@@ -8,9 +8,9 @@ class_name ApproachBehaviour
 # It can also have a Baba_Raycast2D as a child. In such case the raycast will
 # check if the body is in clear line of sight before sending the body_approached signal
 
-onready var raycast = get_node_or_null("Baba_Raycast2D")
+@onready var raycast = get_node_or_null("Baba_Raycast2D")
 
-export var wanted_body_class : String = "Player"
+@export var wanted_body_class : String = "Player"
 var tracked_bodies : Array = []
 
 signal body_approached(body)
@@ -18,7 +18,7 @@ signal body_moved_away(body)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "ApproachBehaviour" or .is_class(value)
+func is_class(value: String): return value == "ApproachBehaviour" or super.is_class(value)
 func get_class() -> String: return "ApproachBehaviour"
 
 
@@ -26,7 +26,7 @@ func get_class() -> String: return "ApproachBehaviour"
 
 func _ready() -> void:
 	if raycast:
-		var __ = raycast.connect("target_found", self, "_on_Raycast_target_found")
+		var __ = raycast.connect("target_found",Callable(self,"_on_Raycast_target_found"))
 
 #### VIRTUALS ####
 
@@ -39,7 +39,7 @@ func is_body_tracked(body: Node2D) -> bool:
 
 
 func is_tracked_bodies_empty() -> bool:
-	return tracked_bodies.empty()
+	return tracked_bodies.is_empty()
 
 
 func _track_body(body: Node2D) -> void:

@@ -1,20 +1,17 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://ca5mlhblv0hdd"]
 
-[ext_resource path="res://BabaGodotLib/Transitions/FadeTransition.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://BabaGodotLib/Transitions/FadeTransition.gd" id="1"]
 
 [node name="FadeTransition" type="CanvasLayer"]
-pause_mode = 2
+process_mode = 2
 layer = 128
-script = ExtResource( 1 )
+script = ExtResource("1")
 
 [node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-color = Color( 0, 0, 0, 0 )
-__meta__ = {
-"_edit_lock_": true,
-"_edit_use_anchors_": false
-}
-
-[node name="Tween" type="Tween" parent="."]
+color = Color(0, 0, 0, 0)

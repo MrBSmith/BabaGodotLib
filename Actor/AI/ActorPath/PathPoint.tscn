@@ -1,9 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=2 format=3 uid="uid://u1lgf2edoc2f"]
 
-[ext_resource path="res://BabaGodotLib/Actor/AI/ActorPath/PathPointBase.gd" type="Script" id=1]
+[ext_resource type="Script" path="res://BabaGodotLib/Actor/AI/ActorPath/PathPointBase.gd" id="1"]
 
-[node name="PathPoint" type="Position2D"]
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_lock_": true
-}
+[node name="PathPoint" type="Marker2D"]
+script = ExtResource("1")

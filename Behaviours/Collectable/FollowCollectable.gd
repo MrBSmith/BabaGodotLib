@@ -1,16 +1,16 @@
 extends Collectable
 class_name FollowCollectable
 
-onready var state_machine = get_node("StateMachine")
+@onready var state_machine = get_node("StateMachine")
 
-export var default_state : String = ""
+@export var default_state : String = ""
 
 var speed := 0.0
-export var acceleration := 10.0
+@export var acceleration := 10.0
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "FollowCollectable" or .is_class(value)
+func is_class(value: String): return value == "FollowCollectable" or super.is_class(value)
 func get_class() -> String: return "FollowCollectable"
 
 func set_state(state): state_machine.set_state(state)
@@ -20,7 +20,7 @@ func get_state_name(): return state_machine.get_state_name()
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = $FollowArea.connect("body_entered", self, "_on_follow_area_body_entered")
+	var __ = $FollowArea.connect("body_entered",Callable(self,"_on_follow_area_body_entered"))
 
 
 #### VIRTUALS ####
@@ -30,7 +30,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func collect() -> void:
-	.collect()
+	super.collect()
 	set_state("Collect")
 	EVENTS.emit_signal("collect", owner, collectable_name)
 

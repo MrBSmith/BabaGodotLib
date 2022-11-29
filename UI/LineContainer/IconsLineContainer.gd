@@ -1,16 +1,16 @@
 extends LineContainer
 class_name IconsLineContainer
 
-var icons_array : Array = [] setget set_icons_array, get_icons_array
+var icons_array : Array = [] : get = get_icons_array, set = set_icons_array
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "IconsLineContainer" or .is_class(value)
+func is_class(value: String): return value == "IconsLineContainer" or super.is_class(value)
 func get_class() -> String: return "IconsLineContainer"
 
 func set_icons_array(value: Array):
 	if !is_ready:
-		yield(self, "ready")
+		await self.ready
 	
 	icons_array = value
 	

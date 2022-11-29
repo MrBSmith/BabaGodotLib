@@ -1,31 +1,31 @@
-tool
+@tool
 extends State
 class_name ActorActionState
 
-onready var impact_sound = get_node_or_null("ImpactSound")
+@onready var impact_sound = get_node_or_null("ImpactSound")
 
-export var interact_frame : int = 2
+@export var interact_frame : int = 2
 
 var action_hitbox_node : Area2D
 var hit_box_shape : Node
 
 var has_damaged : bool = false
 
-export var animated_sprite_path : NodePath
-onready var animated_sprite = get_node(animated_sprite_path)
+@export var animated_sprite_path : NodePath
+@onready var animated_sprite = get_node(animated_sprite_path)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "RT_ActorActionState" or .is_class(value)
+func is_class(value: String): return value == "RT_ActorActionState" or super.is_class(value)
 func get_class() -> String: return "RT_ActorActionState"
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	yield(owner, "ready")
+	await owner.ready
 	
-	var __ = animated_sprite.connect("frame_changed", self, "_on_animation_frame_changed")
+	var __ = animated_sprite.connect("frame_changed",Callable(self,"_on_animation_frame_changed"))
 	action_hitbox_node = owner.get_node_or_null("ActionHitBox")
 	hit_box_shape = action_hitbox_node.get_node_or_null("CollisionShape2D")
 
@@ -43,7 +43,7 @@ func interact():
 	var interact_areas = action_hitbox_node.get_overlapping_areas()
 	damage()
 	
-	# Check if one on the areas in the hitbox area is an interative one, and interact with it if it is
+	# Check if one checked the areas in the hitbox area is an interative one, and interact with it if it is
 	# Also verify if no block were broke in this use of the action state
 	if !has_damaged:
 		for area in interact_areas:
@@ -93,7 +93,7 @@ func is_wrong_interaction() -> bool:
 	var has_external_elem = false
 	
 	for body in bodies:
-		if owner.is_a_parent_of(body) or body == owner:
+		if owner.is_ancestor_of(body) or body == owner:
 			continue
 		
 		has_external_elem = true

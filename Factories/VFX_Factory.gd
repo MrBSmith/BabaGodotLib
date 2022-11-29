@@ -2,19 +2,19 @@ extends Factory
 class_name VFX_Factory
 
 ### ADD A ALGO THAT REPLACE THE PATH OF EACH VFX SCENE BY ITS CORRESPONDING LOADED PACKED SCENE ###
-export var vfx_dict : Dictionary = {}
+@export var vfx_dict : Dictionary = {}
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "VFX_Factory" or .is_class(value)
+func is_class(value: String): return value == "VFX_Factory" or super.is_class(value)
 func get_class() -> String: return "VFX_Factory"
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var _err = EVENTS.connect("play_VFX", self, "play_VFX")
-	_err = EVENTS.connect("play_VFX_scene", self, "play_VFX_scene")
+	var _err = EVENTS.connect("play_VFX",Callable(self,"play_VFX"))
+	_err = EVENTS.connect("play_VFX_scene",Callable(self,"play_VFX_scene"))
 
 #### VIRTUALS ####
 
@@ -32,7 +32,7 @@ func play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> vo
 
 
 func play_VFX_scene(scene: PackedScene, pos: Vector2, state_dict : Dictionary = {}) -> void:
-	var fx_node = scene.instance()
+	var fx_node = scene.instantiate()
 	fx_node.set_global_position(pos)
 	
 	for key in state_dict.keys():

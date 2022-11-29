@@ -2,19 +2,19 @@ extends Node2D
 class_name Astar2DVisualizer
 
 var astar : AStar2D
-export var cell_size := Vector2.ONE
+@export var cell_size := Vector2.ONE
 
-export var normal_color := Color.blue
-export var disabled_coloe := Color.red
+@export var normal_color := Color.BLUE
+@export var disabled_coloe := Color.RED
 
-export var connection_width : float = 3.0
-export var points_radius : float = 4.0
+@export var connection_width : float = 3.0
+@export var points_radius : float = 4.0
 
-export var id_key : int = 666
+@export var id_key : int = 666
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "Astar2DVisualizer" or .is_class(value)
+func is_class(value: String): return value == "Astar2DVisualizer" or super.is_class(value)
 func get_class() -> String: return "Astar2DVisualizer"
 
 

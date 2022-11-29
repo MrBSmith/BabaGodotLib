@@ -5,20 +5,20 @@ class_name FadeTransition
 
 enum FADE_MODE {FADE_IN_OUT, FADE_IN, FADE_OUT}
 
-onready var tween = $Tween
+@export var start_color := Color.TRANSPARENT
+@export var fade_color := Color.BLACK
 
-export var start_color := Color.transparent
-export var fade_color := Color.black
-
-var running : bool = false setget , is_running
+var tween : Tween = null
+var running : bool = false : get = is_running
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "FadeTransition" or .is_class(value)
+func is_class(value: String): return value == "FadeTransition" or super.is_class(value)
 func get_class() -> String: return "FadeTransition"
 
 func set_visible(value: bool):
 	$ColorRect.set_visible(value)
+	visible = value
 
 func is_running() -> bool: return running
 
@@ -26,11 +26,11 @@ func is_running() -> bool: return running
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("fade_transition", self, "_on_EVENTS_fade_transition")
-	__ = EVENTS.connect("fade_transition_with_pause", self, "_on_EVENTS_fade_transition_with_pause")
+	EVENTS.fade_transition.connect(_on_EVENTS_fade_transition)
+	EVENTS.fade_transition_with_pause.connect(_on_EVENTS_fade_transition_with_pause)
 	
 	$ColorRect.set_anchors_preset(Control.PRESET_WIDE)
-	$ColorRect.set_frame_color(start_color)
+	$ColorRect.set_color(start_color)
 
 
 #### VIRTUALS ####
@@ -43,37 +43,37 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 	running = true
 	var duration = fade_time / 2 if fade_mode == FADE_MODE.FADE_IN_OUT else fade_time
 	
+	var tween = create_tween()
+	
 	if fade_mode != FADE_MODE.FADE_IN:
-		tween.interpolate_property($ColorRect, "color", Color(0.0, 0.0, 0.0, 0.0), fade_color,
-					 duration, Tween.TRANS_LINEAR, Tween.EASE_IN, delay)
+		tween.set_ease(Tween.EASE_IN)
+		tween.tween_property($ColorRect, "color:a", fade_color.a, duration).set_delay(delay)
 		
-		tween.start()
-		yield(tween, "tween_all_completed")
+		await tween.finished
 		
 		if fade_mode == FADE_MODE.FADE_IN_OUT:
-			EVENTS.emit_signal("transition_middle")
+			EVENTS.transition_middle.emit()
 	
 	if fade_mode == FADE_MODE.FADE_IN_OUT && pause_time > 0.0:
-		yield(get_tree().create_timer(pause_time), "timeout")
-		EVENTS.emit_signal("transition_pause_finished")
+		await get_tree().create_timer(pause_time).timeout
+		EVENTS.transition_pause_finished.emit()
 	
 	if fade_mode != FADE_MODE.FADE_OUT:
-		tween.interpolate_property($ColorRect, "color", fade_color, Color(0.0, 0.0, 0.0, 0.0),
-					 duration, Tween.TRANS_LINEAR, Tween.EASE_OUT, delay)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property($ColorRect, "color:a",  0.0, duration).set_delay(delay)
 		
-		tween.start()
-		yield(tween, "tween_all_completed")
+		await tween.finished
 	
 	running = false
-	EVENTS.emit_signal("transition_finished")
+	EVENTS.transition_finished.emit()
 
 
 func set_to_black() -> void:
-	$ColorRect.set_frame_color(Color.black)
+	$ColorRect.set_color(Color.BLACK)
 
 
 func set_to_transparent() -> void:
-	$ColorRect.set_frame_color(Color.transparent)
+	$ColorRect.set_color(Color.TRANSPARENT)
 
 
 #### INPUTS ####
@@ -91,6 +91,7 @@ func _on_EVENTS_fade_transition_with_pause(duration: float, fade_mode: int, dela
 
 
 func _on_EVENTS_interupt_transition() -> void:
-	tween.stop_all()
-	tween.remove_all()
+	if tween != null:
+		tween.kill()
+	
 	set_to_transparent()

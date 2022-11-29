@@ -6,12 +6,12 @@ class_name AwakableBehaviour
 
 # It defines how a RigidBody2D can fall asleep or be awaken
 
-signal awake
-signal asleep
+signal woke
+signal put_to_sleep
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "AwakableBehaviour" or .is_class(value)
+func is_class(value: String): return value == "AwakableBehaviour" or super.is_class(value)
 func get_class() -> String: return "AwakableBehaviour"
 
 
@@ -38,14 +38,14 @@ func awake() -> void:
 	owner.set_sleeping(false)
 	owner.set_physics_process(true)
 	
-	emit_signal("awake")
+	woke.emit()
 
 
 func asleep() -> void:
 	if disabled:
 		return
 
-	if not owner is PhysicsBody2D && owner.get_mode() == RigidBody2D.MODE_STATIC:
+	if not owner is PhysicsBody2D && owner.get_mode() == RigidBody2D.FREEZE_MODE_STATIC:
 		return
 
 	if !owner.can_sleep:
@@ -55,7 +55,7 @@ func asleep() -> void:
 	owner.set_sleeping(true)
 	owner.set_physics_process(false)
 	
-	emit_signal("asleep")
+	put_to_sleep.emit()
 
 
 #### INPUTS ####

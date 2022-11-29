@@ -3,7 +3,7 @@ class_name LineData
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "LineData" or .is_class(value)
+func is_class(value: String): return value == "LineData" or super.is_class(value)
 func get_class() -> String: return "LineData"
 
 

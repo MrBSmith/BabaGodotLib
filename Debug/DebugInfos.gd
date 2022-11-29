@@ -13,14 +13,8 @@ class_name DebugInfo
 func _process(_delta: float) -> void:
 	if visible:
 		for child in get_children():
-			var property = child.name.to_lower()
-			var value
-			var getter_name = "get_%s" % property
-			
-			if owner.has_method(getter_name):
-				value = owner.call(getter_name)
-			else:
-				value = owner.get(property)
+			var property = str(child.name).to_lower()
+			var value = owner.get(property)
 			
 			if value == null:
 				continue
