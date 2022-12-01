@@ -179,6 +179,8 @@ func enter_current_level():
 	else:
 		if GAME.progression.is_level_path_visited(path):
 			PLAYERS_DATA.reset_level_data()
+		else:
+			PLAYERS_DATA._reset_level_time_passed()
 		
 		EVENTS.emit_signal("go_to_level_by_path", path, true)
 
