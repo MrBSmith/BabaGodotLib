@@ -48,7 +48,7 @@ static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vec
 	var wall_tilemap = level.find_child("Walls")
 	
 	if !wall_tilemap:
-		print("Walls Tilemap can't be found in the scene: " + level.name)
+		print("Walls Tilemap can't be found in the scene: " + str(level.name))
 		return false
 	
 	var top_left_tilemap_pos = wall_tilemap.local_to_map(top_left_corner)

@@ -134,7 +134,7 @@ static func circle2poly(radius: float) -> PackedVector2Array:
 	var points_array = PackedVector2Array()
 	var nb_points = 20
 	for i in range(nb_points):
-		var angle = deg_to_rad((360 / nb_points) * i)
+		var angle = deg_to_rad((360.0 / float(nb_points)) * i)
 		var point = angle_to_v2(angle) * radius
 		points_array.append(point)
 	
@@ -150,18 +150,18 @@ static func capsule2poly(height: float, radius: float) -> PackedVector2Array:
 	
 	var nb_circle_points = 20
 	for i in range(nb_circle_points):
-		var angle = deg_to_rad((360 / nb_circle_points) * i)
+		var angle = deg_to_rad((360.0 / float(nb_circle_points)) * i)
 		var point = angle_to_v2(angle) * radius
 		
-		if i == 0 or i == nb_circle_points / 2:
+		if i == 0 or i == int(float(nb_circle_points) / 2.0):
 			continue
 
-		if i < nb_circle_points / 2:
+		if i < int(float(nb_circle_points) / 2.0):
 			point += bottom_circle_center
 			points_array.insert(2 + i, point)
 		else:
 			point += top_circle_center
-			points_array.insert(i - nb_circle_points / 2, point)
+			points_array.insert(i - int(float(nb_circle_points) / 2.0), point)
 	
 	return points_array
 

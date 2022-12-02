@@ -19,7 +19,7 @@ func _process(_delta: float) -> void:
 			if value == null:
 				continue
 			
-			child.set_text("%s : %s" % [property, String(value)])
+			child.set_text("%s : %s" % [property, str(value)])
 
 
 #### VIRTUALS ####
