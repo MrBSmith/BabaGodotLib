@@ -8,7 +8,7 @@ onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_pa
 
 onready var sprite_offset = offset
  
-signal animation_changed(anim)
+signal animation_changed(anim, backwards)
 
 #### ACCESSORS ####
 
