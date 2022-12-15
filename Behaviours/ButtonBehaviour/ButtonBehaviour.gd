@@ -45,8 +45,10 @@ func set_state(value: int) -> void:
 		emit_signal("state_changed")
 		
 		if print_logs:
-			print("%s changed state to: %s" % [get_parent().name, STATE.keys()[state]])
+			print("%s changed state to: %s" % [get_parent().name, get_state_name()])
 			print_stack()
+func get_state_name() -> String:
+	return STATE.keys()[state]
 
 func set_toggled(value: bool) -> void:
 	if value != toggled:
