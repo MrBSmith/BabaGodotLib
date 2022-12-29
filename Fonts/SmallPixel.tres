@@ -1,7 +1,23 @@
-[gd_resource type="FontFile" load_steps=2 format=2]
+[gd_resource type="FontFile" load_steps=2 format=3 uid="uid://d3umrme8fheqa"]
 
-[ext_resource path="res://BabaGodotLib/Fonts/SmallPixel.ttf" type="FontFile" id=1]
+[ext_resource type="FontFile" uid="uid://v3phgngnv3n2" path="res://BabaGodotLib/Fonts/SmallPixel.ttf" id="1"]
 
 [resource]
-use_mipmaps = true
-font_data = ExtResource( 1 )
+fallbacks = [ExtResource("1")]
+face_index = null
+embolden = null
+transform = null
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/16/0/kerning_overrides/50/0 = Vector2(0, 0)
+cache/0/50/0/ascent = 0.0
+cache/0/50/0/descent = 0.0
+cache/0/50/0/underline_position = 0.0
+cache/0/50/0/underline_thickness = 0.0
+cache/0/50/0/scale = 1.0
+cache/0/50/0/kerning_overrides/16/0 = Vector2(0, 0)
+cache/0/50/0/kerning_overrides/50/0 = Vector2(0, 0)
