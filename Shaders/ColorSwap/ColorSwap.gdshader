@@ -10,6 +10,7 @@ void fragment(){
 		discard;
 	}
 	
+	float alpha = COLOR.a;
 	float value = (color.r + color.g + color.b) / 3.0;
 	int color_index = 0;
 	
@@ -17,8 +18,6 @@ void fragment(){
 		value = 1.0 - value;
 	}
 	
-	vec4 new_color = texture(palette_texture, vec2(float(value), 0.0));
-	
-	COLOR = new_color;
+	COLOR = vec4(texture(palette_texture, vec2(float(value), 0.0)).rgb, alpha);
 }
 
