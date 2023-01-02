@@ -29,6 +29,8 @@ func set_hidden(value: bool) -> void:
 
 func _ready() -> void:
 	var __ = EVENTS.connect("collectable_amount_updated", self, "_on_collectable_amount_updated")
+	
+	set_amount(GAME.progression.collectables[collectable_type], true)
 
 
 #### VIRTUALS ####

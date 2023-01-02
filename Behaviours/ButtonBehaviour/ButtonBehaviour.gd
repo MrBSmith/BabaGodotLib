@@ -30,6 +30,7 @@ var is_ready : bool = false
 signal state_changed
 signal pressed
 signal toggled(value)
+signal focus_changed
 
 #### ACCESSORS ####
 
@@ -62,7 +63,10 @@ func set_disabled(value: bool) -> void:
 		disabled = value
 		_update_state()
 
-func set_focused(value: int) -> void:
+func set_focused(value: bool) -> void:
+	if value != (state in [STATE.TOGGLED_FOCUSED, STATE.FOCUSED]):
+		emit_signal("focus_changed", value)
+	
 	if value:
 		if state == STATE.TOGGLED:
 			set_state(STATE.TOGGLED_FOCUSED)
