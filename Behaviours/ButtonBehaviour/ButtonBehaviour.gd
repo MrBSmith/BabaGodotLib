@@ -79,6 +79,10 @@ func _ready() -> void:
 
 #### LOGIC ####
 
+func get_state_name() -> String:
+	return STATE.keys()[STATE.values().find(state)].to_lower()
+
+
 func set_focused(value: int) -> void:
 	if value:
 		if state == STATE.TOGGLED:
@@ -88,9 +92,9 @@ func set_focused(value: int) -> void:
 	else:
 		state = STATE.NORMAL
 
+
 func is_focused() -> bool:
 	return state in [STATE.FOCUSED, STATE.TOGGLED_FOCUSED]
-
 
 
 func _update_state() -> void:
@@ -133,7 +137,7 @@ func toggle() -> void:
 
 
 func _on_gui_input(event: InputEvent) -> void:
-	if Engine.editor_hint or state == STATE.DISABLED or disabled:
+	if Engine.is_editor_hint() or state == STATE.DISABLED or disabled:
 		return
 	
 	if event.is_pressed(): 

@@ -2,6 +2,7 @@ shader_type canvas_item;
 
 uniform sampler2D palette_texture;
 uniform bool inverted = false;
+uniform float blend : hint_range(0.0, 1.0) = 1.0;
 
 void fragment(){
 	vec4 color = texture(TEXTURE, UV);
@@ -17,7 +18,8 @@ void fragment(){
 	if (inverted){
 		value = 1.0 - value;
 	}
-	
-	COLOR = vec4(texture(palette_texture, vec2(float(value), 0.0)).rgb, alpha);
+
+	vec4 result_color = vec4(texture(palette_texture, vec2(float(value), 0.0)).rgb, alpha);
+	COLOR = mix(color, result_color, blend);
 }
 
