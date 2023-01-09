@@ -6,13 +6,13 @@ uniform float blend : hint_range(0.0, 1.0) = 1.0;
 
 void fragment(){
 	vec4 color = texture(TEXTURE, UV);
-	
+
 	if(color.a == 0.0){
 		discard;
 	}
 	
 	float alpha = COLOR.a;
-	float value = (color.r + color.g + color.b) / 3.0;
+	float value = (COLOR.r + COLOR.g + COLOR.b) / 3.0;
 	int color_index = 0;
 	
 	if (inverted){
