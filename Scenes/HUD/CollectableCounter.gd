@@ -1,8 +1,28 @@
+tool
 extends HBoxContainer
 class_name CollectableCounter
 
+enum SPRITE_SIZE_PRESET {
+	BIG,
+	MEDIUM,
+	SMALL,
+	MONOCHROME_SMALL
+}
+
+enum COLLECTABLE_TYPE {
+	SCREW,
+	GEAR
+}
+
+export(SPRITE_SIZE_PRESET) var sprite_preset : int = SPRITE_SIZE_PRESET.MEDIUM setget set_sprite_preset
+
+export var screw_sprites_array = []
+export var gear_sprites_array = []
+
 export var maximum_amount : int = 0
-export var collectable_type : String = ""
+export(COLLECTABLE_TYPE) var collectable_type : int = COLLECTABLE_TYPE.SCREW setget set_collectable_type
+
+onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
 onready var counter_label = $CounterLabel
 onready var base_texture_scale = $Texture.get_scale()
@@ -11,6 +31,8 @@ signal collectable_animation_finished
 
 var hidden : bool = false setget set_hidden
 var tween : SceneTreeTween 
+
+var is_ready : bool = false
 
 signal hidden_changed
 
@@ -25,12 +47,35 @@ func set_hidden(value: bool) -> void:
 		emit_signal("hidden_changed")
 
 
+func set_sprite_preset(value: int) -> void:
+	if value < 0 or value > SPRITE_SIZE_PRESET.size() - 1:
+		push_error("The given sprite preset value %d is out of range" % value)
+		return
+	
+	sprite_preset = value
+	_update_texture()
+
+
+func set_collectable_type(value: int) -> void:
+	if value < 0 or value > COLLECTABLE_TYPE.size() - 1:
+		push_error("The given collectable type value %d is out of range" % value)
+		return
+	
+	collectable_type = value
+	_update_texture()
+
+
 #### BUILT-IN ####
 
 func _ready() -> void:
 	var __ = EVENTS.connect("collectable_amount_updated", self, "_on_collectable_amount_updated")
 	
-	set_amount(GAME.progression.collectables[collectable_type], true)
+	var collectable_name = COLLECTABLE_TYPE.keys()[collectable_type].to_lower().capitalize()
+	
+	if !Engine.editor_hint:
+		set_amount(GAME.progression.collectables[collectable_name], true)
+	
+	is_ready = true
 
 
 #### VIRTUALS ####
@@ -38,6 +83,9 @@ func _ready() -> void:
 
 
 #### LOGIC ####
+
+
+
 
 func set_amount(amount: int, instant: bool = false) -> void:
 	if instant:
@@ -62,6 +110,15 @@ func _texture_growth_feedback() -> void:
 	__ = tween.set_ease(Tween.EASE_IN_OUT)
 
 
+func _update_texture() -> void:
+	if !is_ready:
+		yield(self, "ready")
+	
+	$Texture.set_texture(sprites_array[collectable_type][sprite_preset])
+
+
+func get_collectable_type_by_name(collectable_name: String) -> int:
+	return COLLECTABLE_TYPE.keys().find(collectable_name.to_upper().replace(" ", "_"))
 
 
 #### INPUTS ####
@@ -76,7 +133,7 @@ func _on_obj_collect_animation_finished():
 	
 
 func _on_collectable_amount_updated(col_type: String, amount: int):
-	if col_type != collectable_type:
+	if get_collectable_type_by_name(col_type) != collectable_type:
 		return
 	
 	set_amount(amount)
