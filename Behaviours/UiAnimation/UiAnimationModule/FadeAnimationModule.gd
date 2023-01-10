@@ -72,8 +72,8 @@ func _fade_content() -> void:
 	var dur = anim_duration / 2.0 if fade_mode in [FADE_MODE.CONTAINER_THEN_CONTENT, FADE_MODE.CONTENT_THEN_CONTAINER] else anim_duration 
 	var tween = create_tween()
 	
-	var ease_type = ease_type_in if !visible else ease_type_out
 	var trans_type = trans_type_in if !visible else trans_type_out
+	var ease_type = ease_type_in if !visible else ease_type_out
 	
 	tween.set_trans(trans_type)
 	tween.set_ease(ease_type)
@@ -94,7 +94,7 @@ func _fade_container() -> void:
 	var tween = create_tween()
 	
 	var trans_type = trans_type_in if visible else trans_type_out
-	var ease_type = trans_type_in if visible else ease_type_out
+	var ease_type = ease_type_in if visible else ease_type_out
 	
 	tween.set_trans(trans_type)
 	tween.set_ease(ease_type)
