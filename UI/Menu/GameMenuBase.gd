@@ -179,6 +179,10 @@ func _fetch_menu_option_array() -> Array:
 	for child in opt_container.get_children():
 		if child is MenuOptionsBase:
 			menu_option_array.append(child)
+		else:
+			var option = Utils.fetch_first(child, "MenuOptionsBase")
+			if option != null:
+				menu_option_array.append(option)
 	
 	return menu_option_array
 
