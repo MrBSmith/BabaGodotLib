@@ -22,6 +22,8 @@ export var gear_sprites_array = []
 export var maximum_amount : int = 0
 export(COLLECTABLE_TYPE) var collectable_type : int = COLLECTABLE_TYPE.SCREW setget set_collectable_type
 
+export var growth_feedback_duration : float = 0.15
+
 onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
 onready var counter_label = $CounterLabel
@@ -94,17 +96,16 @@ func set_amount(amount: int, instant: bool = false) -> void:
 		counter_label.tween_amount(amount, 0.5)
 
 
-
 func _texture_growth_feedback() -> void:
 	if is_instance_valid(tween) && tween != null:
-		tween.kill()
+		tween.pause()
 	
 	tween = create_tween()
 	
 	var texture = $Texture
 	
-	var __ = tween.tween_property(texture, "rect_scale", base_texture_scale * 1.4, 0.2)
-	__ = tween.tween_property(texture, "rect_scale", base_texture_scale, 0.1)
+	var __ = tween.tween_property(texture, "rect_scale", base_texture_scale * 1.6, growth_feedback_duration * (2.0 / 3.0))
+	__ = tween.tween_property(texture, "rect_scale", base_texture_scale, growth_feedback_duration * (1.0 / 3.0))
 	
 	__ = tween.set_trans(Tween.TRANS_BOUNCE)
 	__ = tween.set_ease(Tween.EASE_IN_OUT)
