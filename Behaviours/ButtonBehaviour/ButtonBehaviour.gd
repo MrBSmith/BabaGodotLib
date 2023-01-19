@@ -17,6 +17,7 @@ enum TOGGLE_MODE {
 	RADIO
 }
 
+@export_group("Logic")
 @export_enum(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
 @export_enum(STATE) var state : int = STATE.NORMAL:
 	set(value):
@@ -25,11 +26,10 @@ enum TOGGLE_MODE {
 	
 		if value != state:
 			state = value
-			emit_signal("state_changed")
+			state_changed.emit()
 			
 			if print_logs:
 				print("%s changed state to: %s" % [get_parent().name, STATE.keys()[state]])
-				print_stack()
 @export var print_logs : bool = false
 
 @export var toggled : bool = false : 
@@ -39,6 +39,9 @@ enum TOGGLE_MODE {
 			_update_state()
 			toggled_changed.emit(toggled)
 
+@export_group("Theme Handeling")
+@export var modulate_based_on_theme : bool = false
+@export var theme_class_override : String = ""
 
 var mouse_inside : bool = false
 
@@ -63,6 +66,8 @@ func _ready() -> void:
 	__ = get_parent().connect("focus_exited", _on_focus_exited)
 	__ = get_parent().connect("gui_input", _on_gui_input)
 	__ = get_parent().connect("visibility_changed", _on_visibility_changed)
+	
+	__ = state_changed.connect(_update_theme)
 	
 	disabled_changed.connect(_on_disable_changed)
 	
@@ -111,6 +116,19 @@ func _update_state() -> void:
 		state = STATE.NORMAL 
 
 
+func _update_theme() -> void:
+	if !modulate_based_on_theme:
+		return
+	
+	var button = get_parent()
+	var theme_class = theme_class_override if theme_class_override != "" else button.get_class()
+	var color_name = "icon_%s_color" % get_state_name().to_lower()
+	
+	var color = button.get_theme_color(color_name, theme_class)
+	button.set_self_modulate(color)
+
+
+
 func toggle() -> void:
 	if disabled:
 		return
@@ -127,6 +145,8 @@ func toggle() -> void:
 		_update_state()
 	
 	emit_signal("toggled", toggled)
+
+
 
 
 #### INPUTS ####
@@ -153,7 +173,7 @@ func _on_gui_input(event: InputEvent) -> void:
 			else:
 				return
 			
-			emit_signal("pressed")
+			pressed.emit()
 	
 	else:
 		if state == STATE.PRESSED:
