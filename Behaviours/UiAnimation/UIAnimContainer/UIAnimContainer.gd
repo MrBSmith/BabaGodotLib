@@ -237,23 +237,23 @@ func _update_size() -> void:
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_X:
 			var size_x = children_axis_sum + nb_intervals * separation
 			if !is_equal_approx(size_x, rect_size.x):
-				rect_min_size.x = size_x
+				rect_size.x = size_x
 		
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_Y:
 			var size_y = biggest_child_axis
 			if !is_equal_approx(size_y, rect_size.y):
-				rect_min_size.y = size_y
+				rect_size.y = size_y
 
 	else:
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_X:
 			var size_x = biggest_child_axis
 			if !is_equal_approx(size_x, rect_size.x):
-				rect_min_size.x = size_x
+				rect_size.x = size_x
 		
 		if adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_Y:
 			var size_y = children_axis_sum + nb_intervals * separation
 			if !is_equal_approx(size_y, rect_size.y):
-				rect_min_size.y = size_y
+				rect_size.y = size_y
 	
 	if print_logs:
 		print("%s updated its size %s" % [name, str(rect_size)])
