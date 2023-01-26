@@ -14,6 +14,9 @@ var has_damaged : bool = false
 export var animated_sprite_path : NodePath
 onready var animated_sprite = get_node(animated_sprite_path)
 
+export var impact_anim_node_path : NodePath
+onready var impact_anim = get_node_or_null(impact_anim_node_path)
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "RT_ActorActionState" or .is_class(value)
@@ -26,6 +29,10 @@ func _ready() -> void:
 	yield(owner, "ready")
 	
 	var __ = animated_sprite.connect("frame_changed", self, "_on_animation_frame_changed")
+	
+	if impact_anim:
+		__ = impact_anim.connect("animation_finished", self, "_on_impact_animation_finished")
+	
 	action_hitbox_node = owner.get_node_or_null("ActionHitBox")
 	hit_box_shape = action_hitbox_node.get_node_or_null("CollisionShape2D")
 
@@ -74,6 +81,11 @@ func damage():
 			if destructible_behaviour:
 				destructible_behaviour.damage()
 				has_damaged = true
+	
+	if has_damaged && impact_anim:
+		impact_anim.set_frame(0)
+		impact_anim.set_visible(true)
+		impact_anim.play()
 
 
 func is_obj_interactable(obj: Object) -> bool:
@@ -117,3 +129,9 @@ func _on_animation_frame_changed() -> void:
 	if animated_sprite.get_frame() == interact_frame:
 		interact()
 
+
+
+func _on_impact_animation_finished() -> void:
+	if impact_anim:
+		impact_anim.stop()
+		impact_anim.set_visible(false)

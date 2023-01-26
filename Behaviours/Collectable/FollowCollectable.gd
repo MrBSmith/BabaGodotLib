@@ -2,6 +2,7 @@ extends Collectable
 class_name FollowCollectable
 
 onready var state_machine = get_node("StateMachine")
+onready var raycast = get_node_or_null("Baba_RayCast2D")
 
 export var default_state : String = ""
 
@@ -52,5 +53,14 @@ func _on_follow_area_body_entered(body: Node):
 		return
 	
 	if body.is_class("Player") or body.is_class("Character"):
+		if raycast != null:
+			raycast.cast_to = raycast.to_local(body.get_global_position())
+			raycast.set_enabled(true)
+			
+			yield(get_tree(), "idle_frame")
+			
+			if raycast.is_colliding():
+				return
+		
 		follow_target(body)
 
