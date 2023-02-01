@@ -17,7 +17,7 @@ export var submerged_gravity_scale : float = 1.5
 export var collision_shape_path : NodePath = ""
 onready var collision_shape : CollisionShape2D = get_node(collision_shape_path)
 
-onready var total_obj_volume = Math.compute_polygon_surface(collision_shape.get_shape().get_points())
+onready var total_obj_volume = Math.compute_polygon_surface(collision_shape.get_shape().get_points()) if not collision_shape.get_shape() is RectangleShape2D else 0.0
 onready var owner_default_gravity_scale = owner.gravity_scale
 
 var liquid_collision_shape : CollisionShape2D = null
