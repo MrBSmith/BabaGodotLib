@@ -4,7 +4,7 @@ class_name ShakeBehaviour
 export var target_path : NodePath
 
 onready var target = get_node_or_null(target_path)
-onready var target_default_pos = target.position if target else Vector2.INF
+var target_default_pos = Vector2.INF
 
 var tween : SceneTreeTween
 
@@ -19,6 +19,11 @@ func is_shaking() -> bool: return is_instance_valid(tween)
 #### BUILT-IN ####
 
 
+func _ready() -> void:
+	if target:
+		yield(get_tree(), "idle_frame")
+		
+		target_default_pos = target.position 
 
 
 #### VIRTUALS ####
@@ -58,8 +63,12 @@ func kill() -> void:
 	
 	if target is Node2D:
 		var return_tween = create_tween()
+		var pos = target_default_pos
 		
-		return_tween.tween_property(target, "position", target_default_pos, 0.1)
+		if owner is Character:
+			pos.x *= Math.bool_to_sign(!owner.facing_left)
+		
+		return_tween.tween_property(target, "position", pos, 0.2)
 
 
 
