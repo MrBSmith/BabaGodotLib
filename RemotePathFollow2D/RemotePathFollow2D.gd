@@ -30,8 +30,9 @@ func _ready() -> void:
 #### LOGIC ####
 
 
-func move_node_along_path(node: Node2D, backwards: bool = false) -> void:
+func move_node_along_path(node: Node2D, backwards: bool = false, dur: float = 1.0) -> void:
 	moved_node_wr = weakref(node)
+	duration = dur
 	
 	var tween = create_tween()
 	var __ = tween.connect("finished", self, "_on_tween_finished")
