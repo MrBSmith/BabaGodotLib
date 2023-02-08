@@ -7,6 +7,7 @@ enum {
 }
 
 export var target_path : NodePath
+export var rot_deviation := 3.0
 
 onready var target : Node2D = get_node_or_null(target_path) setget set_target
 
@@ -71,7 +72,7 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 	shaking = true
 	
 	var nb_jolts = int(jolts_per_sec * duration)
-	var jolt_duration = duration / nb_jolts
+	var jolt_duration = duration / float(nb_jolts)
 	
 	if flags & POSITION: pos_tween = create_tween()
 	if flags & ROTATION: rot_tween = create_tween()
@@ -88,9 +89,10 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 		
 		if flags & ROTATION:
 			var dir_sign = Math.bool_to_sign(i % 2 == 0) 
-			var rot = target_default_rot + rng.randfn(magnitude, 3.0) * dir_sign
+			var rot = target_default_rot + rng.randfn(magnitude, rot_deviation) * dir_sign
+			var dest_rot = rot if i != nb_jolts - 1 else target_default_rot
 			
-			var __ = rot_tween.tween_property(target, "rotation_degrees", rot, jolt_duration)
+			var __ = rot_tween.tween_property(target, "rotation_degrees", dest_rot, jolt_duration)
 			
 
 func kill() -> void:
