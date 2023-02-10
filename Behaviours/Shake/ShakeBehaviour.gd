@@ -69,10 +69,13 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 		push_error("Cannot shake target %s, it must inherit Node2D" % target.name)
 		return
 	
-	shaking = true
+	kill(false)
 	
-	var nb_jolts = int(jolts_per_sec * duration)
-	var jolt_duration = duration / float(nb_jolts)
+	shaking = true
+	var dur = duration if duration != INF else 1.0
+	
+	var nb_jolts = int(jolts_per_sec * dur)
+	var jolt_duration = dur / float(nb_jolts)
 	
 	if flags & POSITION: pos_tween = create_tween()
 	if flags & ROTATION: rot_tween = create_tween()
@@ -93,14 +96,19 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 			var dest_rot = rot if i != nb_jolts - 1 else target_default_rot
 			
 			var __ = rot_tween.tween_property(target, "rotation_degrees", dest_rot, jolt_duration)
-			
+	
+	if duration == INF:
+		for tween in [pos_tween, rot_tween]:
+			if tween:
+				tween.connect("finished", self, "_on_infinite_shake_tween_finished", [magnitude, jolts_per_sec, flags])
 
-func kill() -> void:
+
+func kill(return_to_default_state: bool = true) -> void:
 	for tween in [pos_tween, rot_tween]:
 		if is_instance_valid(tween):
 			tween.kill()
 	
-	if target is Node2D:
+	if return_to_default_state and target is Node2D:
 		var return_tween = create_tween()
 		var pos = target_default_pos
 		
@@ -117,3 +125,7 @@ func kill() -> void:
 
 
 #### SIGNAL RESPONSES ####
+
+func _on_infinite_shake_tween_finished(magnitude: float, jolts_per_sec : int, flags: int) -> void:
+	kill(false)
+	shake(magnitude, INF, jolts_per_sec, flags)
