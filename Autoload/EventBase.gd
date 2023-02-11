@@ -64,7 +64,7 @@ signal checkpoint_reached(checkpoint_id)
 signal play_VFX(fx_name, pos, state_dict)
 signal play_VFX_scene(fx_scene, pos, state_dict)
 signal scatter_object(body, nb_debris, impulse_force)
-signal screen_shake(magnitude, duration)
+signal screen_shake(magnitude, duration, frequency)
 
 signal play_particule_FX(particules, pos)
 

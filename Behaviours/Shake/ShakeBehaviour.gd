@@ -9,6 +9,8 @@ enum {
 export var target_path : NodePath
 export var rot_deviation := 3.0
 
+export(int, FLAGS, "rotation", "position") var shake_mode_flags = ROTATION | POSITION
+
 onready var target : Node2D = get_node_or_null(target_path) setget set_target
 
 var target_default_pos := Vector2.INF
@@ -57,7 +59,7 @@ func _update_target_default_values() -> void:
 	target_default_rot = target.rotation_degrees
 
 
-func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12, flags = POSITION) -> void:
+func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12, flags = shake_mode_flags) -> void:
 	if disabled or flags == 0:
 		return
 	
@@ -81,6 +83,7 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 	if flags & ROTATION: rot_tween = create_tween()
 	
 	var rng = RandomNumberGenerator.new()
+	rng.randomize()
 
 	for i in range(nb_jolts):
 		if flags & POSITION:
