@@ -22,7 +22,7 @@ export var gear_sprites_array = []
 export var maximum_amount : int = 0
 export(COLLECTABLE_TYPE) var collectable_type : int = COLLECTABLE_TYPE.SCREW setget set_collectable_type
 
-export var growth_feedback_duration : float = 0.15
+export var growth_feedback_duration : float = 0.08
 
 onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
@@ -32,7 +32,7 @@ onready var base_texture_scale = $Texture.get_scale()
 signal collectable_animation_finished
 
 var hidden : bool = false setget set_hidden
-var tween : SceneTreeTween 
+var tween : SceneTreeTween
 
 var is_ready : bool = false
 
@@ -97,18 +97,13 @@ func set_amount(amount: int, instant: bool = false) -> void:
 
 
 func _texture_growth_feedback() -> void:
-	if is_instance_valid(tween) && tween != null:
-		tween.pause()
-	
 	tween = create_tween()
 	
 	var texture = $Texture
+	var __ = tween.set_trans(Tween.TRANS_CUBIC)
 	
-	var __ = tween.tween_property(texture, "rect_scale", base_texture_scale * 1.6, growth_feedback_duration * (2.0 / 3.0))
+	__ = tween.tween_property(texture, "rect_scale", base_texture_scale * 1.6, growth_feedback_duration * (2.0 / 3.0))
 	__ = tween.tween_property(texture, "rect_scale", base_texture_scale, growth_feedback_duration * (1.0 / 3.0))
-	
-	__ = tween.set_trans(Tween.TRANS_BOUNCE)
-	__ = tween.set_ease(Tween.EASE_IN_OUT)
 
 
 func _update_texture() -> void:
@@ -144,5 +139,5 @@ func _on_CounterLabel_amount_changed(previous_amount : int , new_amount : int) -
 	if hidden:
 		yield(self, "hidden_changed")
 	
-	if new_amount > previous_amount:
+	if new_amount > previous_amount and (tween == null or !tween.is_running()):
 		_texture_growth_feedback()

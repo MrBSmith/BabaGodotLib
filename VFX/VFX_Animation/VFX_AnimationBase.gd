@@ -20,6 +20,7 @@ func _ready():
 	
 	is_ready = true
 
+
 func play_animation():
 	if anim_player:
 		anim_player.play(default_anim_name)
@@ -29,8 +30,7 @@ func play_animation():
 		$AudioStreamPlayer2D.play()
 
 
-
-func _input(event: InputEvent) -> void:
+func _input(_event: InputEvent) -> void:
 	if !debug:
 		return
 	

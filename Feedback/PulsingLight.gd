@@ -39,7 +39,9 @@ func get_current_color() -> Color: return current_color
 func set_pulsing(value: bool): 
 	if value != pulsing:
 		pulsing = value
-		emit_signal("pulsing_changed")
+		
+		if Engine.editor_hint == active_in_editor:
+			emit_signal("pulsing_changed")
 func is_pulsing() -> bool: return pulsing
 
 
@@ -53,6 +55,7 @@ func _init() -> void:
 func _ready() -> void:
 	var __ = tween_node.connect("tween_all_completed", self, "_on_tween_all_completed")
 	__ = timer_node.connect("timeout", self, "_on_timer_timeout")
+
 
 
 #### VIRTUALS ####
@@ -93,6 +96,9 @@ func _on_timer_timeout():
 
 
 func _on_pulsing_changed() -> void:
+	if !visible:
+		return
+	
 	if !is_inside_tree():
 		yield(self, "ready")
 	
