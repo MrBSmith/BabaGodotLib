@@ -11,6 +11,8 @@ onready var travelling_sound = get_node_or_null("CollectSound")
 onready var animation_player = get_node_or_null("AnimationPlayer")
 onready var collect_area = get_node_or_null("CollectArea")
 
+export var collect_VFX_name = "collect"
+
 export var collectable_name : String = "" setget set_collectable_name, get_collectable_name
 
 export var average_amount : int = 1

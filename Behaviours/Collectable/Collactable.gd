@@ -25,6 +25,7 @@ func collect() -> void:
 	
 	set_target(null)
 	EVENTS.emit_signal("collect", owner, get_collectable_name())
+	EVENTS.emit_signal("play_VFX", collect_VFX_name, owner.get_global_position())
 	
 	if collect_sound:
 		EVENTS.emit_signal("play_sound_effect", collect_sound)

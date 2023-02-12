@@ -5,6 +5,8 @@ class_name PulsingLight
 onready var tween_node : Tween = $Tween
 onready var timer_node : Timer = $Timer
 
+export var active_in_editor : bool = false
+
 export var pulse_duration : float = 0.5
 export var pulse_delay : float = 0.3
 export var light_color : Color = Color.white setget set_light_color, get_light_color
@@ -62,10 +64,6 @@ func _ready() -> void:
 func start_pulsing():
 	var __ = tween_node.interpolate_property(self, "scale", Vector2.ZERO, initial_scale, 
 						pulse_duration, Tween.TRANS_CUBIC, Tween.EASE_IN_OUT)
-
-	__ = tween_node.interpolate_property($LightMask, "texture_scale", initial_mask_text_scale, 1.0, 
-						pulse_duration, Tween.TRANS_SINE, Tween.EASE_IN)
-	
 	__ = tween_node.start()
 	
 	_fade()
@@ -98,7 +96,7 @@ func _on_pulsing_changed() -> void:
 	if !is_inside_tree():
 		yield(self, "ready")
 	
-	if pulsing:
+	if pulsing and (Engine.editor_hint == active_in_editor):
 		start_pulsing()
 	else:
 		_fade(get_current_color(), Color.transparent, 0.0)
