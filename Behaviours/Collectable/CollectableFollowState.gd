@@ -27,13 +27,12 @@ func update_state(delta: float):
 		
 		var obj_pos = obj.get_position()
 		var target_pos = target.get_position()
-		var target_dir = obj_pos.direction_to(target_pos)
-		var velocity = target_dir * owner.speed * delta
 		
 		if obj_pos.distance_to(target_pos) < owner.speed * delta:
 			obj.set_position(target_pos)
 		else:
-			obj.set_position(obj_pos + velocity)
+			obj.set_position(obj_pos.move_toward(target_pos, owner.speed * delta))
+
 
 #### LOGIC ####
 
