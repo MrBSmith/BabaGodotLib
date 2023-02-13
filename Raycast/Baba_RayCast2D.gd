@@ -15,11 +15,8 @@ func _ready():
 
 # Activate the ray cast, until it find a specific target
 func search_for_target(target : Node):
-	if target == null:
-		return
-	
 	cast_target = target
-	set_activate(true)
+	set_activate(target != null)
 
 
 func set_activate(value: bool):
@@ -38,7 +35,7 @@ func _physics_process(_delta):
 	var dir = global_position.direction_to(cast_target.global_position)
 	var dist = global_position.distance_to(cast_target.global_position)
 	var relative_target_pos = dir * dist
-		
+	
 	set_cast_to(relative_target_pos)
 	var collider = get_collider()
 		
