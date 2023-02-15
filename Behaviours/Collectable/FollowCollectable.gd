@@ -22,7 +22,10 @@ func get_state_name(): return state_machine.get_state_name()
 
 func _ready() -> void:
 	var __ = $FollowArea.connect("body_entered", self, "_on_follow_area_body_entered")
-
+	__ = $FollowArea.connect("body_exited", self, "_on_follow_area_body_exited")
+	
+	if raycast:
+		raycast.connect("target_found", self, "_on_raycast_target_found")
 
 #### VIRTUALS ####
 
@@ -52,15 +55,20 @@ func _on_follow_area_body_entered(body: Node):
 	if is_disabled():
 		return
 	
-	if body.is_class("Player") or body.is_class("Character"):
-		if raycast != null:
-			raycast.cast_to = raycast.to_local(body.get_global_position())
-			raycast.set_enabled(true)
-			
-			yield(get_tree(), "idle_frame")
-			
-			if raycast.is_colliding():
-				return
-		
+	if raycast != null:
+		raycast.search_for_target(body)
+	else:
 		follow_target(body)
+
+
+func _on_follow_area_body_exited(body: Node):
+	yield(get_tree(), "idle_frame")
+	
+	if $FollowArea.get_overlapping_bodies().empty():
+		raycast.set_enabled(false)
+
+
+func _on_raycast_target_found(target: Node) -> void:
+	follow_target(target)
+	raycast.set_enabled(false)
 

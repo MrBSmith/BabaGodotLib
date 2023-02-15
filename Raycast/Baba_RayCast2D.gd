@@ -7,6 +7,7 @@ class_name Baba_RayCast2D
 
 signal target_found(target)
 
+export var disable_on_target_found : bool = false
 var cast_target : Node = null 
 
 func _ready():
@@ -27,8 +28,8 @@ func set_activate(value: bool):
 		cast_target = null
 
 
-func _physics_process(_delta):
-	if cast_target == null:
+func _physics_process(_delta: float) -> void:
+	if cast_target == null or !enabled:
 		set_activate(false)
 		return
 	
@@ -41,4 +42,6 @@ func _physics_process(_delta):
 		
 	if collider == cast_target:
 		emit_signal("target_found", cast_target)
-		set_activate(false)
+		
+		if disable_on_target_found:
+			set_activate(false)
