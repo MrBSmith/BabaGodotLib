@@ -70,7 +70,7 @@ func set_collectable_type(value: int) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("collectable_amount_updated", self, "_on_collectable_amount_updated")
+	var __ = EVENTS.connect("collectable_amount_updated", self, "_on_EVENTS_collectable_amount_updated")
 	
 	var collectable_name = COLLECTABLE_TYPE.keys()[collectable_type].to_lower().capitalize()
 	
@@ -128,7 +128,7 @@ func _on_obj_collect_animation_finished():
 	emit_signal("collectable_animation_finished", name)
 	
 
-func _on_collectable_amount_updated(col_type: String, amount: int):
+func _on_EVENTS_collectable_amount_updated(col_type: String, amount: int):
 	if get_collectable_type_by_name(col_type) != collectable_type:
 		return
 	
