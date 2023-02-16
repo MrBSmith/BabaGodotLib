@@ -26,7 +26,7 @@ export var growth_feedback_duration : float = 0.08
 
 onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
-onready var counter_label = $CounterLabel
+onready var counter_label = $"%CounterLabel"
 onready var base_texture_scale = $Texture.get_scale()
 
 signal collectable_animation_finished
