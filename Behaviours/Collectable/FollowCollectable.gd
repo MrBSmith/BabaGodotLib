@@ -40,6 +40,9 @@ func collect() -> void:
 
 
 func follow_target(new_target: Node):
+	if $AnimationPlayer.has_animation("Follow"):
+		$AnimationPlayer.play("Follow")
+	
 	set_target(new_target)
 	set_state("Follow")
 
