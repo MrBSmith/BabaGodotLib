@@ -59,5 +59,5 @@ func method_call():
 		queue_free()
 
 
-func _on_area_body_entered(body: Node2D) -> void:
+func _on_area_body_entered(_body: Node2D) -> void:
 	event()
