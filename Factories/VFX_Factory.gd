@@ -24,7 +24,7 @@ func _ready() -> void:
 
 func play_VFX(fx_name: String, pos: Vector2, state_dict : Dictionary = {}) -> void:
 	if not fx_name in vfx_dict.keys():
-		print("The fx named " + fx_name + " doesn't exist in the dictionnary")
+		push_error("The fx named " + fx_name + " doesn't exist in the dictionnary")
 		return
 	
 	var scene = vfx_dict[fx_name]
