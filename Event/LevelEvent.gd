@@ -1,10 +1,15 @@
 extends Event
 class_name LevelEvent
 
+
+export(float, 0.0, 9999.0) var delay : float = 0.0
+export var autoload_target_name : String
 export var target_path_array : Array
 export var method_name : String = ""
 export var arguments_array : Array = []
 export var queue_free_after_trigger : bool = true
+
+export var debug_logs : bool = false
 
 # If this is true, the event will trigger only the first time play a level
 export var once_per_level : bool = false
@@ -21,6 +26,11 @@ func _ready() -> void:
 
 
 func event():
+	if delay > 0.0:
+		yield(get_tree().create_timer(delay), "timeout")
+	
+	if debug_logs: print(name, " event triggered")
+	
 	if once_per_level:
 		if GAME.progression.is_level_visited(GAME.current_level):
 			return
@@ -38,6 +48,12 @@ func method_call():
 	
 	var target_array : Array = []
 	
+	if autoload_target_name != "":
+		var autoload = get_tree().get_root().get_node_or_null(autoload_target_name)
+		
+		if autoload:
+			target_array.append(autoload)
+	
 	for target_path in target_path_array:
 		var target = get_node_or_null(target_path)
 		
@@ -48,6 +64,8 @@ func method_call():
 	# Call the method in every target, and pass every argument in the array
 	for target in target_array:
 		if target.has_method(method_name) or GDScript:
+			if debug_logs: print(method_name, " called in ", target.name)
+			
 			var call_def_funcref := funcref(target, method_name)
 			call_def_funcref.call_funcv(arguments_array)
 		

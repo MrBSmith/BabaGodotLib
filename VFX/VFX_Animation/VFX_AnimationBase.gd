@@ -3,6 +3,7 @@ class_name VFX_AnimationBase
 
 onready var start_offset = offset
 onready var anim_player = get_node_or_null("AnimationPlayer")
+onready var on_screen_rect = get_node_or_null("OnScreenRect")
 
 export var debug := false
 export var default_anim_name := "default"
