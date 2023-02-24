@@ -26,6 +26,9 @@ func _ready() -> void:
 
 
 func event():
+	if event_disabled:
+		return
+	
 	if delay > 0.0:
 		yield(get_tree().create_timer(delay), "timeout")
 	
