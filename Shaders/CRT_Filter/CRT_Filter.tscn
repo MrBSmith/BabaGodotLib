@@ -1,0 +1,82 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://BabaGodotLib/Shaders/CRT_Filter/CRT_Filter.tres" type="Shader" id=2]
+[ext_resource path="res://BabaGodotLib/Shaders/Hologram/HologramMask.png" type="Texture" id=4]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 2 )
+shader_param/apply = true
+shader_param/displace_amount = 0
+shader_param/aberation_amount = 0.912
+
+[sub_resource type="Shader" id=3]
+code = "shader_type canvas_item;
+
+const vec4 WHITE = vec4(0.0, 0.0, 0.0, 1.0);
+const vec4 BLACK = vec4(1.0);
+const float PI = 3.14159265358979323846;
+
+uniform vec2 aspect_ratio = vec2(1.0);
+
+uniform float masked_opacity : hint_range(0.0, 1.0) = 0.4;
+uniform vec4 render_mask_color : hint_color = vec4(1.0);
+uniform float frequency = 6.0;
+uniform sampler2D mask_texture;
+
+uniform float deform_speed = 0.0;
+uniform float deform_freq = 4.0;
+uniform vec2 deform_amp = vec2(0.1, 0.0);
+
+void fragment(){
+	vec2 sin_movement = deform_amp * vec2(sin(TIME * vec2(deform_speed, 0.0) * 2.0 * PI));
+	vec2 offset = sin_movement * sin(UV.y * deform_freq * 2.0 * PI);
+	
+	vec4 color = texture(SCREEN_TEXTURE, offset + SCREEN_UV);
+	vec4 mask_texture_color = texture(mask_texture, SCREEN_UV * aspect_ratio);
+	vec4 mask_color;
+	
+	if (sin(2.0 * PI * frequency * float(TIME)) > 0.0){
+		mask_color = WHITE;
+	} else {
+		mask_color = BLACK;
+	}
+	
+	if (mask_texture_color == mask_color){
+		COLOR = color;
+	} else {
+		COLOR = mix(color, render_mask_color, masked_opacity);
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+render_priority = -1
+shader = SubResource( 3 )
+shader_param/aspect_ratio = Vector2( 24, 9 )
+shader_param/masked_opacity = 0.1
+shader_param/render_mask_color = Color( 0, 0, 0, 1 )
+shader_param/frequency = 6.0
+shader_param/deform_speed = 0.0
+shader_param/deform_freq = 1.73
+shader_param/deform_amp = Vector2( 0.1, 0 )
+shader_param/mask_texture = ExtResource( 4 )
+
+[node name="CRT_Filter" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 127
+
+[node name="ChromaticAberation" type="ColorRect" parent="CanvasLayer"]
+material = SubResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="SreenBandEffect" type="ColorRect" parent="CanvasLayer"]
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_lock_": true
+}

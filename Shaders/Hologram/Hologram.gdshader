@@ -4,6 +4,8 @@ const vec4 WHITE = vec4(0.0, 0.0, 0.0, 1.0);
 const vec4 BLACK = vec4(1.0);
 const float PI = 3.14159265358979323846;
 
+uniform vec2 aspect_ratio = vec2(1.0);
+
 uniform float masked_opacity : hint_range(0.0, 1.0) = 0.4;
 uniform float frequency = 6.0;
 uniform sampler2D mask_texture;
@@ -17,7 +19,7 @@ void fragment(){
 	vec2 offset = sin_movement * sin(UV.y * deform_freq * 2.0 * PI);
 	
 	vec4 color = texture(TEXTURE, offset + UV);
-	vec4 mask_texture_color = texture(mask_texture, UV);
+	vec4 mask_texture_color = texture(mask_texture, UV * aspect_ratio);
 	vec4 mask_color;
 	
 	if (sin(2.0 * PI * frequency * float(TIME)) > 0.0){

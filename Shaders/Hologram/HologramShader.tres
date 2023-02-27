@@ -5,6 +5,7 @@
 
 [resource]
 shader = ExtResource( 2 )
+shader_param/aspect_ratio = Vector2( 1, 1 )
 shader_param/masked_opacity = 0.4
 shader_param/frequency = 6.0
 shader_param/deform_speed = 0.0
