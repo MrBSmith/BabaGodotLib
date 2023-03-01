@@ -27,6 +27,7 @@ export var growth_feedback_duration : float = 0.08
 onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
 onready var counter_label = $"%CounterLabel"
+onready var unfilled_counter = $"%UnfilledCounter"
 onready var base_texture_scale = $Texture.get_scale()
 
 signal collectable_animation_finished
@@ -141,3 +142,12 @@ func _on_CounterLabel_amount_changed(previous_amount : int , new_amount : int) -
 	
 	if new_amount > previous_amount and (tween == null or !tween.is_running()):
 		_texture_growth_feedback()
+
+
+func _on_CounterLabel_text_changed(text: String) -> void:
+	var nb_zeros = 5 - text.length()
+	
+	unfilled_counter.set_text("")
+	
+	for i in range(nb_zeros):
+		unfilled_counter.text += "0"

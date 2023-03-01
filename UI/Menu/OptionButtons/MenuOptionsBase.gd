@@ -134,6 +134,10 @@ func _ready() -> void:
 		emit_signal("focus_changed", self, is_focused())
 	
 	is_ready = true
+	
+	yield(get_tree(), "idle_frame")
+	
+	$HBoxContainer.set_pivot_offset($HBoxContainer.rect_size / 2.0)
 
 
 #### LOGIC ####
@@ -142,7 +146,6 @@ func set_hover_icons_modulate(color: Color) -> void:
 	for child in h_box_container.get_children():
 		if child is TextureRect:
 			child.set_modulate(color)
-
 
 
 #### SIGNAL RESPONSES ####
@@ -169,6 +172,7 @@ func _on_mouse_exited():
 func _on_focus_entered():
 	if !hidden:
 		set_focused(true)
+		$AnimationPlayer.play("Focused")
 
 
 func _on_focus_exited():

@@ -4,6 +4,7 @@ class_name CounterLabel
 
 export var amount : int = 0 setget set_amount 
 
+signal text_changed(text)
 signal amount_changed(previous_amount, amount)
 signal amount_tweening_finished()
 
@@ -55,5 +56,8 @@ func tween_amount(new_amount: int, duration: float = 0.3,
 func _on_amount_changed(_previous_amount: int, _new_amount: int) -> void:
 	set_visible(amount != INF)
 	set_text(str(amount))
+	
+	emit_signal("text_changed", text)
+
 
 
