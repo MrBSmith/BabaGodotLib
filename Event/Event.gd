@@ -6,7 +6,9 @@ class_name Event
 ### Whenever the tiggered signal is received from one of its Trigger children
 ### and if event_disabled is false -> the virtual method event() is called
 
+export(float, 0.0, 9999.0) var delay : float = 0.0
 export var event_disabled : bool = false
+export var queue_free_after_trigger : bool = true
 
 func is_class(value: String): return value == "Event" or .is_class(value)
 func get_class() -> String: return "Event"
@@ -22,7 +24,8 @@ func _ready():
 
 # Here is what happens when every area has been triggered
 func event():
-	queue_free()
+	if queue_free_after_trigger:
+		queue_free()
 
 
 #### SIGNAL_RESPONSES ####

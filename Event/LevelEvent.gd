@@ -1,13 +1,10 @@
 extends Event
 class_name LevelEvent
 
-
-export(float, 0.0, 9999.0) var delay : float = 0.0
 export var autoload_target_name : String
 export var target_path_array : Array
 export var method_name : String = ""
 export var arguments_array : Array = []
-export var queue_free_after_trigger : bool = true
 
 export var debug_logs : bool = false
 
@@ -40,6 +37,8 @@ func event():
 	
 	if !is_queued_for_deletion():
 		method_call()
+	
+	.event()
 
 
 # Call the given method in a single target or a group target
@@ -74,10 +73,7 @@ func method_call():
 		
 		else:
 			push_error("The event's %s target has no method called %s" % [name, method_name])
-	
-	# Queue free this event if it should be
-	if queue_free_after_trigger:
-		queue_free()
+
 
 
 func _on_area_body_entered(_body: Node2D) -> void:

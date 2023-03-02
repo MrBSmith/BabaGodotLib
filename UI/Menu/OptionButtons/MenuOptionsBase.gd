@@ -100,6 +100,9 @@ func set_hover_texture(value: Texture) -> void:
 	for sprite in hover_sprites:
 		sprite.set_texture(hover_texture)
 func set_hover_texture_flags(value: int) -> void:
+	if !is_ready:
+		yield(self, "ready")
+	
 	hover_texture_flags = value
 	
 	$HBoxContainer/HoverTexture.set_visible(hover_texture_flags & TEXTURE_FLAGS.LEFT)

@@ -149,5 +149,5 @@ func _on_CounterLabel_text_changed(text: String) -> void:
 	
 	unfilled_counter.set_text("")
 	
-	for i in range(nb_zeros):
+	for _i in range(nb_zeros):
 		unfilled_counter.text += "0"
