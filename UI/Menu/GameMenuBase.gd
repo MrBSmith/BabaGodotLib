@@ -84,7 +84,7 @@ func focus_first_option() -> void:
 	
 	for button in opt_container.get_children():
 #		if not button is Button or not button is MenuOptionsBase:
-#			continue 
+#			continue
 		
 		if !button.is_disabled():
 			if button.has_method("set_focused"):
