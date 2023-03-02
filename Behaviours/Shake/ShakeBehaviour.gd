@@ -11,7 +11,7 @@ export var rot_deviation := 3.0
 
 export(int, FLAGS, "rotation", "position") var shake_mode_flags = ROTATION | POSITION
 
-onready var target : Node2D = get_node_or_null(target_path) setget set_target
+onready var target : Node = get_node_or_null(target_path) setget set_target
 
 var target_default_pos := Vector2.INF
 var target_default_rot := 0.0
@@ -30,6 +30,8 @@ func is_shaking() -> bool: return shaking
 
 func set_target(value: Node2D) -> void:
 	if value != target:
+		assert(target is Node2D or target is Control, "The target of a ShakeBehaviour must inherit Node2D or Control")
+		
 		target = value
 		_update_target_default_values()
 
@@ -55,8 +57,8 @@ func _update_target_default_values() -> void:
 	if target == null:
 		return
 	
-	target_default_pos = target.position
-	target_default_rot = target.rotation_degrees
+	target_default_pos = target.position if target is Node2D else target.rect_position 
+	target_default_rot = target.rotation_degrees if target is Node2D else target.rect_rotation
 
 
 func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12, flags = shake_mode_flags) -> void:
@@ -65,10 +67,6 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 	
 	if target == null:
 		push_error("Cannot shake, target is null")
-		return
-
-	if not target is Node2D:
-		push_error("Cannot shake target %s, it must inherit Node2D" % target.name)
 		return
 	
 	kill(false)
@@ -90,15 +88,17 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 			var rdm_angle = deg2rad(rand_range(0.0, 360.0))
 			var dir = Vector2.RIGHT.rotated(rdm_angle)
 			var dest = target_default_pos + dir * magnitude if i != nb_jolts - 1 else target_default_pos 
+			var pos_property_name = "position" if target is Node2D else "rect_position" 
 			
-			var __ = pos_tween.tween_property(target, "position", dest, jolt_duration)
+			var __ = pos_tween.tween_property(target, pos_property_name, dest, jolt_duration)
 		
 		if flags & ROTATION:
 			var dir_sign = Math.bool_to_sign(i % 2 == 0) 
 			var rot = target_default_rot + rng.randfn(magnitude, rot_deviation) * dir_sign
 			var dest_rot = rot if i != nb_jolts - 1 else target_default_rot
+			var rot_property_name = "rotation_degrees" if target is Node2D else "rect_rotation" 
 			
-			var __ = rot_tween.tween_property(target, "rotation_degrees", dest_rot, jolt_duration)
+			var __ = rot_tween.tween_property(target, rot_property_name, dest_rot, jolt_duration)
 	
 	if duration == INF:
 		for tween in [pos_tween, rot_tween]:
