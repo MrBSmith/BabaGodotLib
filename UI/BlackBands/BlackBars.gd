@@ -3,6 +3,7 @@ extends Control
 class_name BlackBars
 
 export var bars_width : float = 24.0 setget set_bars_width
+export var debug_logs : bool = false
 
 onready var top_bar_hidden_pos = $TopBar.get_position()
 onready var bottom_bar_hidden_pos = $BottomBar.get_position()
@@ -38,6 +39,10 @@ func _ready() -> void:
 
 func appear(disappear: bool = false, duration: float = 1.5) -> void:
 	set_visible(true)
+	
+	if debug_logs: 
+		var debug_string = "appear" if !disappear else "disappear"
+		print("Black bars %s transition started" % debug_string)
 	
 	var tween
 	
