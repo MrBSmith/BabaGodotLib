@@ -14,8 +14,8 @@ onready var gauge : TextureProgress = $Gauge
 onready var feedback_gauge : TextureProgress = $FeedbackGauge
 onready var starting_position = rect_position
 
-export var gauge_color : Color setget set_gauge_color
-export var feedback_gauge_color : Color setget set_feedback_gauge_color
+export var gauge_color := Color.white setget set_gauge_color
+export var feedback_gauge_color := Color.white setget set_feedback_gauge_color
 
 export var gauge_value : int = 100 setget set_gauge_value, get_gauge_value
 export var gauge_max_value : int = 100 setget set_gauge_max_value, get_gauge_max_value
@@ -95,7 +95,12 @@ func _ready() -> void:
 	
 	is_ready = true
 	
+	gauge.set_max(gauge_max_value)
+	gauge.set_value(gauge_value)
 	gauge.set_tint_progress(gauge_color)
+	
+	feedback_gauge.set_max(gauge_max_value)
+	feedback_gauge.set_value(gauge_value)
 	feedback_gauge.set_tint_progress(feedback_gauge_color)
 
 
