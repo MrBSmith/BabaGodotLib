@@ -11,8 +11,11 @@ enum ALIGN {
 
 export var title_text : String = "Title: " setget set_title_text, get_title_text
 export var body_text: String = "Body" setget set_body_text, get_body_text
-export(ALIGN) var align : int = ALIGN.LEFT setget set_align, get_align
+export(ALIGN) var title_align : int = ALIGN.LEFT setget set_title_align, get_title_align
+export(ALIGN) var body_align : int = ALIGN.RIGHT setget set_body_align, get_body_align
 
+export var title_font : DynamicFont = null setget set_title_font
+export var body_font : DynamicFont = null setget set_body_font
 
 #### ACCESSORS ####
 
@@ -29,16 +32,21 @@ func set_body_text(value: String):
 	$Body.set_text(body_text)
 func get_body_text() -> String: return body_text
 
-func set_align(value: int) -> void:
+func set_title_align(value: int) -> void:
 	if !value in range(ALIGN.size()):
 		return
 	
-	align = value
+	title_align = value
+	$Title.set_align(title_align)
+func get_title_align() -> int: return title_align
+
+func set_body_align(value: int) -> void:
+	if !value in range(ALIGN.size()):
+		return
 	
-	for child in get_children():
-		if child.has_method("set_align"):
-			child.set_align(align)
-func get_align() -> int: return align
+	body_align = value
+	$Body.set_align(body_align)
+func get_body_align() -> int: return body_align
 
 func set_title_font_color(color: Color) -> void:
 	$Title.add_color_override("font_color", color)

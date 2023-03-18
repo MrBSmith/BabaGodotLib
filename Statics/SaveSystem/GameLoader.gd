@@ -14,6 +14,7 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 	config_file.load(config_file_path)
 	
 	var input_mapper = InputMapper.new()
+	input_mapper.map_player_settings_inputs(config_file_path)
 
 	for section in config_file.get_sections():
 		match(section):
@@ -22,11 +23,6 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 					var value = config_file.get_value(section, key)
 					var bus_id = AudioServer.get_bus_index(key.capitalize())
 					AudioServer.set_bus_volume_db(bus_id, value)
-					
-			"controls":
-				for action_name in config_file.get_section_keys(section):
-					var value = config_file.get_value(section, action_name)
-					input_mapper.remap_action_key(action_name, value)
 			
 			"progression":
 				if progression == null:
