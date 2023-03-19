@@ -65,8 +65,6 @@ func _on_follow_area_body_entered(body: Node):
 
 
 func _on_follow_area_body_exited(_body: Node):
-	yield(get_tree(), "idle_frame")
-	
 	if $FollowArea.get_overlapping_bodies().empty():
 		raycast.set_enabled(false)
 
