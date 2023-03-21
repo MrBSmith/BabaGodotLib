@@ -250,7 +250,10 @@ func _resume_game():
 func cancel():
 	match(cancel_action):
 		CANCEL_ACTION.RESUME_GAME:
-			_resume_game()
+			if GAME.current_level:
+				_resume_game()
+			else:
+				_go_to_last_menu()
 		CANCEL_ACTION.GO_TO_LAST_MENU:
 			_go_to_last_menu()
 
