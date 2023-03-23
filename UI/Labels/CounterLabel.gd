@@ -2,6 +2,7 @@ tool
 extends Label
 class_name CounterLabel
 
+onready var increment_sound = get_node_or_null("IncrementSound")
 export var amount : int = 0 setget set_amount 
 
 signal text_changed(text)
@@ -53,11 +54,14 @@ func tween_amount(new_amount: int, duration: float = 0.3,
 #### SIGNAL RESPONSES ####
 
 
-func _on_amount_changed(_previous_amount: int, _new_amount: int) -> void:
+func _on_amount_changed(previous_amount: int, new_amount: int) -> void:
 	set_visible(amount != INF)
 	set_text(str(amount))
 	
 	emit_signal("text_changed", text)
-
+	
+	if new_amount > previous_amount:
+		if increment_sound:
+			increment_sound.play()
 
 

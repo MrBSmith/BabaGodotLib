@@ -114,16 +114,19 @@ static func get_save_time(save_dir: String, save_id: int, time_component_array: 
 	var save_time_dict = get_save_property_value(save_dir, "time", save_id)
 	var save_time := ""
 	for component in time_component_array:
-		save_time += str(save_time_dict.get(component))
+		var elem = str(save_time_dict.get(component))
 		var sufix = ""
+		
+		if elem.length() == 1:
+			elem = "0" + elem
 		
 		match(component):
 			"day", "month" : sufix = "/"
 			"year": sufix = " "
 			"hour": sufix = "h"
-			"minute": sufix= ""
+			"minute": sufix = ""
 		
-		save_time += sufix
+		save_time += elem + sufix
 	return save_time
 
 

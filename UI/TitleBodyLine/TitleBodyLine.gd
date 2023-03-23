@@ -14,8 +14,8 @@ export var body_text: String = "Body" setget set_body_text, get_body_text
 export(ALIGN) var title_align : int = ALIGN.LEFT setget set_title_align, get_title_align
 export(ALIGN) var body_align : int = ALIGN.RIGHT setget set_body_align, get_body_align
 
-export var title_font : DynamicFont = null setget set_title_font
-export var body_font : DynamicFont = null setget set_body_font
+export var title_font : DynamicFont setget set_title_font
+export var body_font : DynamicFont setget set_body_font
 
 #### ACCESSORS ####
 

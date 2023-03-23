@@ -17,6 +17,8 @@ onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
 
 onready var options_array = _fetch_menu_option_array() setget set_options_array
 
+export var resume_scenes = ["ViewManager", "WorldMap"]
+
 export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
 export var focus_first_option_on_ready : bool = true
 
@@ -241,6 +243,14 @@ func _go_to_last_menu() -> void:
 	EVENTS.emit_signal("navigate_menu_back_query")
 
 
+func can_resume_game() -> bool:
+	var current_scene = get_tree().get_current_scene()
+	
+	for scene_type in resume_scenes:
+		if current_scene.is_class(scene_type):
+			return true
+	return false
+
 func _resume_game():
 	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
@@ -250,10 +260,11 @@ func _resume_game():
 func cancel():
 	match(cancel_action):
 		CANCEL_ACTION.RESUME_GAME:
-			if GAME.current_level:
+			if can_resume_game():
 				_resume_game()
 			else:
 				_go_to_last_menu()
+		
 		CANCEL_ACTION.GO_TO_LAST_MENU:
 			_go_to_last_menu()
 
