@@ -22,7 +22,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func play(stream_player : Node, pitch_range: float = 0.0) -> void:
+func play(stream_player : Node) -> void:
 	if stream_player == null:
 		push_error("The given stream_player is null")
 		return
@@ -41,7 +41,6 @@ func play(stream_player : Node, pitch_range: float = 0.0) -> void:
 		var pos = stream_player.get_global_position()
 		new_stream_player.set_global_position(pos)
 	
-	new_stream_player.pitch_scale += rand_range(0.0, pitch_range) * Math.rand_sign()
 	new_stream_player.call_deferred("play")
 	
 	yield(new_stream_player, "finished")
@@ -55,8 +54,8 @@ func play(stream_player : Node, pitch_range: float = 0.0) -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_EVENTS_play_sound_effect(stream_player: Node, pitch_range: float = 0.0):
+func _on_EVENTS_play_sound_effect(stream_player: Node):
 	if stream_player is AudioStreamPlayer or stream_player is AudioStreamPlayer2D:
-		play(stream_player, pitch_range)
+		play(stream_player)
 	else:
 		push_warning("The given value is of type %s where it shouild be a AudioStreamPlayer or a AudioStreamPlayer2D" % stream_player.get_class())

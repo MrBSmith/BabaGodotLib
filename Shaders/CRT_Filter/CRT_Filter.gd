@@ -13,6 +13,8 @@ export(float, 0.0, 999.0) var movement_amount_variance : float = 0.5
 export(float, 0.0, 999.0) var movement_dur : float = 0.7
 export(float, 0.0, 999.0) var movement_dur_variance : float = 0.3
 
+signal animation_finished
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "CRT_Filter" or .is_class(value)
@@ -72,13 +74,16 @@ func transition_animation(duration := 0.3, delay := 0.2, aberation := 30.0, disp
 	if delay > 0.0:
 		yield(get_tree().create_timer(delay), "timeout")
 	
+	EVENTS.emit_signal("play_sound_effect", $GlitchSound)
 	var tween = create_tween()
 	tween.set_trans(Tween.TRANS_ELASTIC)
 	tween.set_ease(Tween.EASE_IN)
 	
 	tween.tween_property(chromatic_aberation.material, "shader_param/aberation_amount", aberation, duration)
-	tween.parallel().tween_property(chromatic_aberation.material, "shader_param/displace_amount", displace, duration)
+	tween.parallel().tween_property(chromatic_aberation.material, "shader_param/displace_amount", int(displace), duration)
 	
+	yield(tween, "finished")
+	emit_signal("animation_finished")
 
 
 #### INPUTS ####
