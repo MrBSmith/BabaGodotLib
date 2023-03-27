@@ -1,31 +1,66 @@
 extends Node
 class_name Serializer
 
+const debug_logs = false
+
 
 # Find recursivly every wanted nodes, and extract their wanted properties
 static func fetch_branch_state(property_dict: Dictionary, root_node: Node, ignored_classes := PoolStringArray(),
-								 dict_to_fill : Dictionary = {}, node: Node = null) -> Dictionary:
+								 dict_to_fill : Dictionary = {}, node: Node = null, return_at_first_found : bool = false) -> Dictionary:
 	
-	var class_path_array = property_dict.keys()
+	var class_array = property_dict.keys()
+	
 	if node == null: 
 		node = root_node
 	
-	for class_path in class_path_array:
-		var found_nodes_array = Utils.fetch_from_class_path(node, class_path, ignored_classes)
+	# Check for direct children to find a matching class
+	for child in node.get_children():
+		var matched_class = Utils.match_classv(child, class_array)
 		
-		for found_node in found_nodes_array:
-			var object_properties = get_object_properties(property_dict, found_node)
+		if matched_class != "":
+			var object_properties = get_object_properties(property_dict[matched_class], child)
 			
-			dict_to_fill[root_node.get_path_to(found_node)] = object_properties
+			dict_to_fill[root_node.get_path_to(child)] = object_properties
+			if return_at_first_found:
+				return dict_to_fill
 	
+	# Check for indirect children to find a matching class
 	for child in node.get_children():
 		for _class in ignored_classes:
 			if child.is_class(_class):
 				return dict_to_fill
 		
 		var __ = fetch_branch_state(property_dict, root_node, ignored_classes, dict_to_fill, child)
-	
+
 	return dict_to_fill
+
+
+
+static func fetch_groupped_nodes_state(group_array: Array, scene_root: Node, property_dict: Dictionary, ignored_classes := PoolStringArray()) -> Dictionary:
+	var dict = {}
+	
+	for group in group_array:
+		var nodes_array = scene_root.get_tree().get_nodes_in_group(group)
+		var class_array = property_dict.keys()
+		
+		for node in nodes_array:
+			if Utils.match_classv(node, ignored_classes) != "":
+				continue
+			
+			var matched_class = Utils.match_classv(node, class_array)
+			
+			if matched_class != "":
+				var object_properties = get_object_properties(property_dict[matched_class], node)
+				dict[scene_root.get_path_to(node)] = object_properties
+				
+				continue
+			
+			dict = fetch_branch_state(property_dict, scene_root, 
+									ignored_classes, dict,
+									node, true)
+	
+	return dict
+
 
 
 # Recursivly get every persistant objects direct/indirect children of the given node
@@ -47,43 +82,37 @@ static func get_every_persistant_object(node: Node, persistants_classes := PoolS
 # The state_dict must be structured this way:
 # Keys are the path to the node, relative to the branch_root, then the value is another dict where keys
 # are the name of the property and the value its value
-static func branch_apply_state(branch_root: Node, state_dict : Dictionary, persistant_classes := PoolStringArray(), ignored_classes := PoolStringArray()) -> void:
-	var persitiant_objects : Array = []
-	var undestructed_obj : Array = []
-
-	for object_path in state_dict.keys():
-		var object = branch_root.get_node_or_null(object_path)
+static func branch_apply_state(branch_root: Node, groups_array: Array, state_dict : Dictionary) -> void:
+	var state_paths_array = state_dict.keys()
+	
+	for group in groups_array:
+		var nodes_array = branch_root.get_tree().get_nodes_in_group(group)
 		
-		if object == null:
-			var path_as_string = String(object_path).replace("@", "")
-			object = branch_root.get_node_or_null(path_as_string)
-			
-			if object == null:
-				push_warning("The object with path : " + object_path + " couldn't be found")
+		for node in nodes_array:
+			if node == null or node.is_queued_for_deletion():
 				continue
-		
-		if is_node_state_ignored(object, ignored_classes):
-			continue
-		
-		if not object in undestructed_obj:
-			undestructed_obj.append(object)
-
-		for property in state_dict[object_path].keys():
-			var value = state_dict[object_path][property]
-			var setter = "set_" + property
-			if object.has_method(setter):
-				object.call(setter, value)
-			else:
-				object.set(property, value)
-	
-	if !branch_root.is_inside_tree():
-		yield(branch_root, "ready")
-	
-	persitiant_objects = get_every_persistant_object(branch_root, persistant_classes)
-	
-	for obj in persitiant_objects:
-		if not obj in undestructed_obj:
-			obj.queue_free()
+			
+			var node_path = branch_root.get_path_to(node)
+			
+			# Found node to apply state to 
+			if node_path in state_paths_array:
+				for property in state_dict[node_path].keys():
+					if property == "name":
+						continue
+					
+					var value = state_dict[node_path][property]
+					var setter = "set_" + property
+					if node.has_method(setter):
+						node.call(setter, value)
+					else:
+						node.set(property, value)
+					
+					if debug_logs: print("Node ", node.name, ", property: ", property, " set to: ", value)
+			
+			# Found node to destroy 
+			elif Utils.match_classv(node, SaveData.level_property_to_serialize.keys()) != "":
+				if debug_logs: print("Node ", node.name, " freed")
+				node.queue_free()
 
 
 static func is_node_state_ignored(node: Node, state_classes_ignored := PoolStringArray()) -> bool:
@@ -94,27 +123,18 @@ static func is_node_state_ignored(node: Node, state_classes_ignored := PoolStrin
 
 
 # Take an object, find every properties needed in it and retrun the data as a dict
-static func get_object_properties(property_dict: Dictionary, object : Object) -> Dictionary:
-	
-	var class_path = ""
-	
-	for path in property_dict.keys():
-		var _class = path.split("/")[-1]
-		if object.is_class(_class):
-			class_path = path
-			break
-	
-	var property_list : Array = property_dict[class_path]
+static func get_object_properties(properties: Array, object : Object) -> Dictionary:
 	var property_data_dict : Dictionary = {}
 	property_data_dict['name'] = object.get_name()
 	
-	for property in property_list:
+	for property in properties:
 		if property in object:
 			property_data_dict[property] = object.get(property)
+		
 		elif object.has_method("get_" + property):
 			property_data_dict[property] = object.call("get_" + property)
+		
 		else:
 			push_error("Property : " + property + " could not be found in " + object.name)
-
+	
 	return property_data_dict
-

@@ -1,4 +1,4 @@
-extends Collectable
+extends CollectableBehaviour
 class_name FollowCollectable
 
 onready var state_machine = get_node("StateMachine")

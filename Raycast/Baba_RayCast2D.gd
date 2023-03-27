@@ -29,7 +29,7 @@ func set_activate(value: bool):
 
 
 func _physics_process(_delta: float) -> void:
-	if cast_target == null or !enabled:
+	if !is_instance_valid(cast_target) or !enabled:
 		set_activate(false)
 		return
 	

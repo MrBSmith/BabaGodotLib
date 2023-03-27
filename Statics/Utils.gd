@@ -242,6 +242,15 @@ static func secs_to_formated_time(seconds: float) -> String:
 	return "%s:%s:%s" % [str_min, str_sec, str_mil_sec]
 
 
+static func match_classv(obj: Object, class_array: Array) -> String:
+	for cls in class_array:
+		if obj.is_class(cls):
+			return cls
+	return ""
+
+
+
+
 #### STRINGS ####
 
 static func to_snake(string: String) -> String:
