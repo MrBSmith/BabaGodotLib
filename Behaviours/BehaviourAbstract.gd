@@ -12,6 +12,11 @@ class_name Behaviour
 # Behaviours can be disabled by changing the disabled variable's value 
 # But you will have to write yourself how the Behaviour will behave with disabled to true
 
+
+onready var holder = get_node(holder_path)
+
+export var holder_path = NodePath("..")
+
 export var behaviour_type: String = "" setget , get_behaviour_type
 export var disabled : bool = false setget set_disabled, is_disabled
 
@@ -33,7 +38,7 @@ func is_disabled() -> bool: return disabled
 #### BUILT-IN ####
 
 func _ready() -> void:
-	owner.add_to_group(behaviour_type)
+	holder.add_to_group(behaviour_type)
 
 
 #### VIRTUALS ####

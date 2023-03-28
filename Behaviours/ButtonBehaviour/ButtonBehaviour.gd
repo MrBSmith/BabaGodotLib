@@ -22,7 +22,12 @@ export(STATE) var state : int = STATE.NORMAL setget set_state
 export var print_logs : bool = false
 
 export var toggled : bool = false setget set_toggled
+export var theme_class : String = "Button"
+export var theme_color_prefix : String = "font_color"
 
+export var modulate_button_color : bool = true
+
+var theme : Theme 
 var mouse_inside : bool = false
 
 var is_ready : bool = false
@@ -78,6 +83,8 @@ func set_focused(value: bool) -> void:
 func is_focused() -> bool:
 	return state in [STATE.FOCUSED, STATE.TOGGLED_FOCUSED]
 
+func is_pressed() -> bool:
+	return state == STATE.PRESSED
 
 #### BUILT-IN ####
 
@@ -88,8 +95,12 @@ func _ready() -> void:
 	__ = get_parent().connect("focus_exited", self, "_on_focus_exited")
 	__ = get_parent().connect("gui_input", self, "_on_gui_input")
 	__ = get_parent().connect("visibility_changed", self, "_on_visibility_changed")
+	__ = connect("state_changed", self, "_on_state_changed")
 	
 	is_ready = true
+	
+	_update_theme()
+	_on_state_changed()
 	
 	if toggled:
 		emit_signal("toggled")
@@ -101,6 +112,18 @@ func _ready() -> void:
 
 
 #### LOGIC ####
+
+func _update_theme() -> void:
+	var theme_path = ProjectSettings.get_setting("gui/theme/custom")
+	theme = load(theme_path)
+	
+	if holder is Control:
+		var holder_theme = holder.get_theme()
+		if holder_theme:
+			theme = holder_theme
+	
+	if !theme and modulate_button_color:
+		push_warning("Cannot modulate the holder: no theme to fetch colors from, please set the gui/theme/custom project setting to the wanted default game theme")
 
 
 func _update_state() -> void:
@@ -204,3 +227,17 @@ func _on_focus_exited() -> void:
 
 func _on_visibility_changed() -> void:
 	_update_state()
+
+
+func _on_state_changed() -> void:
+	if !modulate_button_color or !theme:
+		return
+	
+	var state_name = get_state_name().to_lower()
+	
+	var color_name = theme_color_prefix + "_" + state_name if state_name != "normal" else theme_color_prefix
+	if print_logs: print("theme_class: ", theme_class, " color_name: ", color_name)
+	var color = theme.get_color(color_name, theme_class)
+	
+	holder.set_modulate(color)
+
