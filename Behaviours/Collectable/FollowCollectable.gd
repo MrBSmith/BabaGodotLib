@@ -34,9 +34,20 @@ func _ready() -> void:
 #### LOGIC ####
 
 func collect() -> void:
-	.collect()
+	if is_disabled():
+		return
+	
 	set_state("Collect")
-	EVENTS.emit_signal("collect", owner, collectable_name)
+	
+	set_target(null)
+	EVENTS.emit_signal("collect", owner, get_collectable_name())
+	EVENTS.emit_signal("play_VFX", collect_VFX_name, owner.get_global_position())
+	
+	if collect_sound:
+		EVENTS.emit_signal("play_sound_effect", collect_sound)
+	
+	trigger_collect_animation()
+	.collect()
 
 
 func follow_target(new_target: Node):
@@ -46,6 +57,21 @@ func follow_target(new_target: Node):
 	set_target(new_target)
 	set_state("Follow")
 
+
+func trigger_collect_animation() -> void:
+	if animation_player.has_animation("Collect"):
+		animation_player.play("Collect")
+	else:
+		_collect_success()
+
+
+func compute_amount_collected() -> int:
+	return int(average_amount * (1 + rand_range(-amount_variance, amount_variance)))
+
+
+func _collect_success() -> void:
+	EVENTS.emit_signal("increment_collectable_amount", get_collectable_name(), compute_amount_collected())
+	owner.queue_free()
 
 
 #### INPUTS ####
@@ -73,3 +99,19 @@ func _on_raycast_target_found(target: Node) -> void:
 	follow_target(target)
 	raycast.set_enabled(false)
 
+
+func _on_collect_area_body_entered(body: PhysicsBody2D):
+	if body == null or is_disabled():
+		return
+	
+	if body.is_class("Player") or body.is_class("Character"):
+		collect()
+
+
+func _on_collect_animation_finished() -> void:
+	_collect_success()
+
+
+func _on_AnimationPlayer_animation_finished(anim_name: String) -> void:
+	if anim_name == "Collect":
+		emit_signal("collect_animation_finished")
