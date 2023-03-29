@@ -1,7 +1,7 @@
 extends Node
 class_name Serializer
 
-const debug_logs = false
+const debug_logs = true
 
 
 # Find recursivly every wanted nodes, and extract their wanted properties

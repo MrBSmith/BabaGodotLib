@@ -123,6 +123,15 @@ static func delete_folder(dir_path: String):
 		dir.remove(dir_path)
 
 
+# Empty the given folder, then removes it
+static func delete_file(file_path: String):
+	if is_file_existing(file_path):
+		var dir = Directory.new()
+		dir.remove(file_path)
+	else:
+		push_error("Cannot delete a non existant file at path %s" % file_path)
+
+
 # Transfer every file in the given folder to the given destination
 static func transfer_dir_content(temp_save_dir: String, dest_dir: String):
 	var dir := Directory.new()

@@ -249,6 +249,41 @@ static func match_classv(obj: Object, class_array: Array) -> String:
 	return ""
 
 
+static func get_cfg_game_version(file_path: String) -> String:
+	var cfg = ConfigFile.new()
+	
+	if cfg.load(file_path) == OK:
+		return cfg.get_value("system", "game_version", "")
+	else:
+		push_error("Cannot open the config file at path %s" % file_path)
+	
+	return ""
+
+# Return true if the game_version of the file is prior to the given version
+# Or if the file has no metion of game_version at all
+static func cfg_game_verion_is_prior(file_path: String, target_version : String, debug: bool = false) -> bool:
+	var file_version = get_cfg_game_version(file_path)
+	
+	if file_version == "":
+		if debug: print("The file has no version mention of any kind: it is considered prior")
+		return true
+	
+	if debug: print("The file version is ", file_version)
+	if debug: print("The target_version is ", target_version)
+	
+	var file_version_splitted = file_version.split(".")
+	var target_version_splited = target_version.split(".")
+	
+	for i in range(target_version_splited.size()):
+		if i > file_version_splitted.size() - 1:
+			break
+		
+		if file_version_splitted[i].to_int() < target_version_splited[i].to_int():
+			if debug: print("The file version is prior the target_version")
+			return true
+	
+	if debug: print("The file version is NOT prior the target_version")
+	return false
 
 
 #### STRINGS ####
