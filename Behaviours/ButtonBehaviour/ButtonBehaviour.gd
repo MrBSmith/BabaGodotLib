@@ -4,10 +4,10 @@ class_name ButtonBehaviour
 enum STATE {
 	NORMAL,
 	HOVER,
-	FOCUSED,
+	FOCUS,
 	PRESSED,
 	TOGGLED,
-	TOGGLED_FOCUSED,
+	TOGGLED_FOCUS,
 	DISABLED
 }
 
@@ -26,6 +26,7 @@ export var theme_class : String = "Button"
 export var theme_color_prefix : String = "font_color"
 
 export var modulate_button_color : bool = true
+export var no_glow : bool = false
 
 var theme : Theme 
 var mouse_inside : bool = false
@@ -69,19 +70,19 @@ func set_disabled(value: bool) -> void:
 		_update_state()
 
 func set_focused(value: bool) -> void:
-	if value != (state in [STATE.TOGGLED_FOCUSED, STATE.FOCUSED]):
+	if value != (state in [STATE.TOGGLED_FOCUS, STATE.FOCUS]):
 		emit_signal("focus_changed", value)
 	
 	if value:
 		if state == STATE.TOGGLED:
-			set_state(STATE.TOGGLED_FOCUSED)
+			set_state(STATE.TOGGLED_FOCUS)
 		else:
-			set_state(STATE.FOCUSED)
+			set_state(STATE.FOCUS)
 	else:
 		set_state(STATE.NORMAL)
 
 func is_focused() -> bool:
-	return state in [STATE.FOCUSED, STATE.TOGGLED_FOCUSED]
+	return state in [STATE.FOCUS, STATE.TOGGLED_FOCUS]
 
 func is_pressed() -> bool:
 	return state == STATE.PRESSED
@@ -151,7 +152,7 @@ func toggle() -> void:
 	toggled = !toggled
 	
 	if toggled && is_focused():
-		set_state(STATE.TOGGLED_FOCUSED)
+		set_state(STATE.TOGGLED_FOCUS)
 	else:
 		_update_state()
 	
@@ -211,15 +212,15 @@ func _on_mouse_exited() -> void:
 func _on_focus_entered() -> void:
 	if not state in [STATE.DISABLED, STATE.PRESSED] && !is_focused():
 		match(state):
-			STATE.TOGGLED: set_state(STATE.TOGGLED_FOCUSED)
-			_: set_state(STATE.FOCUSED)
+			STATE.TOGGLED: set_state(STATE.TOGGLED_FOCUS)
+			_: set_state(STATE.FOCUS)
 
 
 func _on_focus_exited() -> void:
 	match(state):
-		STATE.FOCUSED:
+		STATE.FOCUS:
 			set_state(STATE.NORMAL)
-		STATE.TOGGLED_FOCUSED:
+		STATE.TOGGLED_FOCUS:
 			set_state(STATE.TOGGLED)
 		_:
 			_update_state()
@@ -238,6 +239,11 @@ func _on_state_changed() -> void:
 	var color_name = theme_color_prefix + "_" + state_name if state_name != "normal" else theme_color_prefix
 	if print_logs: print("theme_class: ", theme_class, " color_name: ", color_name)
 	var color = theme.get_color(color_name, theme_class)
+	
+	if no_glow:
+		color.r = clamp(color.r, 0.0, 1.0)
+		color.g = clamp(color.g, 0.0, 1.0)
+		color.b = clamp(color.b, 0.0, 1.0)
 	
 	holder.set_modulate(color)
 
