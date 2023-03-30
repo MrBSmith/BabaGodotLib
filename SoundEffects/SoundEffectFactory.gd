@@ -55,6 +55,8 @@ func play(stream_player : Node) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_EVENTS_play_sound_effect(stream_player: Node):
+	print("play sound effect event received")
+	
 	if stream_player is AudioStreamPlayer or stream_player is AudioStreamPlayer2D:
 		play(stream_player)
 	else:

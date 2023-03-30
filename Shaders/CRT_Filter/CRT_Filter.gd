@@ -22,11 +22,10 @@ func get_class() -> String: return "CRT_Filter"
 
 
 func set_aberation_amount(value: float) -> void:
-	if !chromatic_aberation:
-		yield(self, "ready")
-	
 	if value != aberation_amount:
 		aberation_amount = value
+	
+	if chromatic_aberation:
 		chromatic_aberation.material.set_shader_param("aberation_amount", aberation_amount)
 
 
