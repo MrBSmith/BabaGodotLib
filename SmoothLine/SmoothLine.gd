@@ -12,10 +12,6 @@ signal line_curve_changed(curve)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "" or .is_class(value)
-func get_class() -> String: return ""
-
-
 func _set_smooth(value: bool) -> void:
 	if value != _smooth:
 		_smooth = value

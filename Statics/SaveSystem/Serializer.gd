@@ -82,7 +82,7 @@ static func get_every_persistant_object(node: Node, persistants_classes := PoolS
 # The state_dict must be structured this way:
 # Keys are the path to the node, relative to the branch_root, then the value is another dict where keys
 # are the name of the property and the value its value
-static func branch_apply_state(branch_root: Node, groups_array: Array, state_dict : Dictionary) -> void:
+static func branch_apply_state(branch_root: Node, groups_array: Array, state_dict : Dictionary, peristant_classes) -> void:
 	var state_paths_array = state_dict.keys()
 	
 	for group in groups_array:
@@ -111,6 +111,9 @@ static func branch_apply_state(branch_root: Node, groups_array: Array, state_dic
 			
 			# Found node to destroy 
 			elif Utils.match_classv(node, SaveData.level_property_to_serialize.keys()) != "":
+				if Utils.match_classv(node, peristant_classes) != "":
+					continue
+				
 				if debug_logs: print("Node ", node.name, " freed")
 				node.queue_free()
 
