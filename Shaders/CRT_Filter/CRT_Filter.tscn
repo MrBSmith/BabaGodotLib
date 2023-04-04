@@ -65,6 +65,7 @@ shader_param/deform_amp = Vector2( 0.1, 0 )
 shader_param/mask_texture = ExtResource( 4 )
 
 [node name="CRT_Filter" type="Node2D"]
+pause_mode = 2
 script = ExtResource( 3 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
