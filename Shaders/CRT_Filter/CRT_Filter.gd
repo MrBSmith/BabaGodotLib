@@ -34,6 +34,9 @@ func set_aberation_amount(value: float) -> void:
 func _ready() -> void:
 	if !Engine.editor_hint:
 		_start_timer()
+	
+	EVENTS.connect("game_setting_changed", self, "_on_EVENTS_game_setting_changed")
+	_update_epileptic_mode()
 
 
 #### VIRTUALS ####
@@ -85,6 +88,11 @@ func transition_animation(duration := 0.3, delay := 0.2, aberation := 30.0, disp
 	emit_signal("animation_finished")
 
 
+func _update_epileptic_mode() -> void:
+	var epileptic_mode = GAME.settings["epileptic_mode"]
+	$CanvasLayer.set_visible(!epileptic_mode)
+
+
 #### INPUTS ####
 
 
@@ -94,3 +102,9 @@ func transition_animation(duration := 0.3, delay := 0.2, aberation := 30.0, disp
 
 func _on_AberationMovCooldown_timeout() -> void:
 	_aberation_animation()
+
+
+func _on_EVENTS_game_setting_changed(_setting_name: String, _value) -> void:
+	_update_epileptic_mode()
+
+
