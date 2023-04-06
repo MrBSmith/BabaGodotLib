@@ -133,7 +133,7 @@ func _on_EVENTS_collectable_amount_updated(col_type: String, amount: int):
 	if get_collectable_type_by_name(col_type) != collectable_type:
 		return
 	
-	set_amount(amount)
+	set_amount(amount, amount == 0)
 
 
 func _on_CounterLabel_amount_changed(previous_amount : int , new_amount : int) -> void:
