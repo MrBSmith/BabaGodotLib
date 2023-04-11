@@ -228,8 +228,8 @@ static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
 
 # Convert a number of milliseconds into a String formated this way:
 # mm:ss.msms
-static func secs_to_formated_time(seconds: float) -> String:
-	var milliseconds = (seconds - int(seconds)) * 100
+static func secs_to_formated_time(seconds: float, nb_digit_after_sec : int = 2) -> String:
+	var milliseconds = (seconds - int(seconds))
 	var minutes := int(clamp(seconds / 60.0, 0.0, 60.0))
 	
 	if seconds > 0.0:
@@ -237,9 +237,15 @@ static func secs_to_formated_time(seconds: float) -> String:
 	
 	var str_min = str(minutes).pad_zeros(2)
 	var str_sec = str(seconds).pad_zeros(2)
-	var str_mil_sec = str(int(milliseconds)).pad_zeros(2)
 	
-	return "%s:%s.%s" % [str_min, str_sec, str_mil_sec]
+	var final_text = "%s:%s" % [str_min, str_sec]
+	
+	if nb_digit_after_sec > 0:
+		var str_mil_sec = str(milliseconds).pad_decimals(nb_digit_after_sec)
+		str_mil_sec = str_mil_sec.split(".")[-1]
+		final_text += "." + str_mil_sec
+	
+	return final_text
 
 
 static func match_classv(obj: Object, class_array: Array) -> String:

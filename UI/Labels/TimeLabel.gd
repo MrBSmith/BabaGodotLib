@@ -14,7 +14,7 @@ func get_class() -> String: return "TimeLabel"
 
 func set_time(value: float) -> void:
 	time = value
-	var time_formated = Utils.secs_to_formated_time(time)
+	var time_formated = Utils.secs_to_formated_time(time, 1)
 	set_text(time_formated)
 
 

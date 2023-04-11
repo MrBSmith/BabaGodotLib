@@ -21,6 +21,9 @@ var shaking : bool = false
 var pos_tween : SceneTreeTween
 var rot_tween : SceneTreeTween
 
+signal started
+signal stopped
+
 #### ACCESSORS ####
 
 func is_class(value: String): return value == "ShakeBehaviour" or .is_class(value)
@@ -61,7 +64,7 @@ func _update_target_default_values() -> void:
 	target_default_rot = target.rotation_degrees if target is Node2D else target.rect_rotation
 
 
-func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12, flags = shake_mode_flags) -> void:
+func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12, flags = shake_mode_flags, discreate: bool = false) -> void:
 	if disabled or flags == 0:
 		return
 	
@@ -69,7 +72,7 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 		push_error("Cannot shake, target is null")
 		return
 	
-	kill(false)
+	kill(false, true)
 	
 	shaking = true
 	var dur = duration if duration != INF else 1.0
@@ -82,7 +85,8 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 	
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
-
+	
+	
 	for i in range(nb_jolts):
 		if flags & POSITION:
 			var rdm_angle = deg2rad(rand_range(0.0, 360.0))
@@ -104,9 +108,12 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 		for tween in [pos_tween, rot_tween]:
 			if tween:
 				tween.connect("finished", self, "_on_infinite_shake_tween_finished", [magnitude, jolts_per_sec, flags])
+	
+	if !discreate:
+		emit_signal("started")
 
 
-func kill(return_to_default_state: bool = true) -> void:
+func kill(return_to_default_state: bool = true, discreate: bool = false) -> void:
 	for tween in [pos_tween, rot_tween]:
 		if is_instance_valid(tween):
 			tween.kill()
@@ -120,7 +127,9 @@ func kill(return_to_default_state: bool = true) -> void:
 		
 		return_tween.tween_property(target, "position", pos, 0.2)
 		return_tween.parallel().tween_property(target, "rotation_degrees", target_default_rot, 0.2)
-
+	
+	if !discreate:
+		emit_signal("stopped")
 
 
 #### INPUTS ####
@@ -130,5 +139,5 @@ func kill(return_to_default_state: bool = true) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_infinite_shake_tween_finished(magnitude: float, jolts_per_sec : int, flags: int) -> void:
-	kill(false)
-	shake(magnitude, INF, jolts_per_sec, flags)
+	kill(false, true)
+	shake(magnitude, INF, jolts_per_sec, flags, true)
