@@ -141,7 +141,7 @@ static func find_first_save_file_id(dir_path: String, max_slots: int) -> int:
 
 # Returns the number of save dir
 static func get_saves_count(saves_path: String) -> int:
-	return DirNavHelper.fetch_dir_content(saves_path, DirNavHelper.DIR_FETCH_MODE.DIR_ONLY).size()
+	return DirNavHelper.fetch_dir_content(saves_path, DirNavHelper.DIR_FETCH_MODE.FILE_ONLY).size()
 
 
 # Returns an array of .cfg file_path found in the given directory
