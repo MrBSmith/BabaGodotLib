@@ -26,9 +26,7 @@ func set_bars_width(value: float) -> void:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = EVENTS.connect("cutscene_started", self, "_on_cutscene_started")
-	__ = EVENTS.connect("cutscene_finished", self, "_on_cutscene_finished")
-	__ = connect("bars_width_changed", self, "_on_bars_width_changed")
+	var __ = connect("bars_width_changed", self, "_on_bars_width_changed")
 
 
 #### VIRTUALS ####
@@ -78,10 +76,4 @@ func _on_bars_width_changed(width: float) -> void:
 			bar.rect_position.y = -width
 
 
-func _on_cutscene_started() -> void:
-	appear()
-
-
-func _on_cutscene_finished() -> void:
-	disappear()
 

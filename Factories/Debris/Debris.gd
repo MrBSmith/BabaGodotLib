@@ -14,6 +14,6 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	modulate.a = lerp(modulate.a, 0.0, 0.05)
+	modulate.a = lerp(modulate.a, 0.0, 0.03)
 	if modulate.a < 0.05:
 		queue_free()

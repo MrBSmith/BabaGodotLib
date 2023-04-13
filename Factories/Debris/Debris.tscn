@@ -3,6 +3,8 @@
 [ext_resource path="res://BabaGodotLib/Factories/Debris/Debris.gd" type="Script" id=1]
 
 [node name="Debris" type="RigidBody2D"]
+z_index = 6
+z_as_relative = false
 collision_layer = 4
 collision_mask = 5
 gravity_scale = 5.0
