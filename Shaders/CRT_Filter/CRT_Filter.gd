@@ -89,7 +89,10 @@ func transition_animation(duration := 0.3, delay := 0.2, aberation := 30.0, disp
 
 
 func _update_epileptic_mode() -> void:
-	var epileptic_mode = GAME.settings["epileptic_mode"]
+	if !Engine.editor_hint:
+		return
+	
+	var epileptic_mode = GAME.get_settings("epileptic_mode")
 	$CanvasLayer.set_visible(!epileptic_mode)
 
 
