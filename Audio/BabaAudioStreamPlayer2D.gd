@@ -21,7 +21,7 @@ onready var sound_pool = sound_variations_array.duplicate()
 onready var start_pitch := pitch_scale
 onready var start_volume := volume_db
 
-
+var tween : SceneTreeTween
 var sample_id : int = 0
 var running := false
 
@@ -54,7 +54,7 @@ func play(from_position: float = 0.0) -> void:
 	
 	# Auto fade
 	if auto_fade_duration > 0.0 and play_flags & PLAY_FLAG.AUTO_FADE:
-		var __ = fade()
+		fade()
 	
 	pitch_scale = start_pitch + rand_range(0.0, pitch_range) * Math.rand_sign()
 	
@@ -77,29 +77,32 @@ func stop() -> void:
 	running = false
 	
 	if play_flags & PLAY_FLAG.AUTO_FADE:
-		yield(fade(true), "finished")
-	
-	if print_logs: print("stop")
-	.stop()
+		fade(true)
+	else:
+		.stop()
 
 
-func fade(out: bool = false) -> SceneTreeTween:
+func fade(out: bool = false) -> void:
 	if print_logs:
 		var sufix = "out" if out else "in" 
 		print(name, " fade ", sufix)
 	
-	var tween = create_tween()
+	if is_instance_valid(tween):
+		tween.kill()
+	
+	tween = create_tween()
+	var __ = tween.connect("finished", self, "_on_tween_finished", [out])
+	
 	var ease_type = Tween.EASE_IN if out else Tween.EASE_OUT
 	var from = start_volume if out else -80.0
 	var to = -80.0 if out else start_volume
 	
-	tween.set_ease(ease_type)
-	tween.set_trans(Tween.TRANS_EXPO)
+	__ = tween.set_ease(ease_type)
+	__ = tween.set_trans(Tween.TRANS_EXPO)
 	
 	set_volume_db(from)
-	tween.tween_property(self, "volume_db", to, auto_fade_duration)
-	
-	return tween
+	__ = tween.tween_property(self, "volume_db", to, auto_fade_duration)
+
 
 #### INPUTS ####
 
@@ -115,3 +118,8 @@ func _on_sound_finished() -> void:
 				return
 		
 		play()
+
+
+func _on_tween_finished(out: bool = false) -> void:
+	if out:
+		.stop()
