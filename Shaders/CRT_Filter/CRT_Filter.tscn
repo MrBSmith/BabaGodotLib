@@ -67,6 +67,9 @@ shader_param/mask_texture = ExtResource( 4 )
 [node name="CRT_Filter" type="Node2D"]
 pause_mode = 2
 script = ExtResource( 3 )
+movement_freq = 8.0
+movement_amount = 1.5
+movement_dur = 0.5
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 127
