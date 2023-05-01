@@ -28,7 +28,7 @@ func get_class() -> String: return "CollectState"
 
 func enter_state():
 	root_scene.set_z_index(999)
-	owner.set_disabled(true)
+	owner.call_deferred("set_disabled", true)
 	root_scene.set_scale(root_scene.get_scale() / 3)
 	var rdm_angle = deg2rad(rand_range(0.0, 360.0))
 	initial_dir = Vector2(cos(rdm_angle), sin(rdm_angle))
