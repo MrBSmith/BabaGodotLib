@@ -32,7 +32,7 @@ func event():
 	if debug_logs: print(name, " event triggered")
 	
 	if once_per_level:
-		if GAME.progression.is_level_visited(GAME.current_level):
+		if PROGRESSION.is_level_visited(VIEW_MANAGER.level):
 			return
 	
 	if !is_queued_for_deletion():

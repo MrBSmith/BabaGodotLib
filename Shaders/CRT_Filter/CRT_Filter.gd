@@ -92,7 +92,7 @@ func _update_epileptic_mode() -> void:
 	if Engine.editor_hint:
 		return
 	
-	var epileptic_mode = GAME.get_setting("epileptic_mode")
+	var epileptic_mode = SETTINGS.get_setting("epileptic_mode")
 	$CanvasLayer.set_visible(!epileptic_mode)
 
 

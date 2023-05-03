@@ -76,7 +76,7 @@ func _ready() -> void:
 	var collectable_name = COLLECTABLE_TYPE.keys()[collectable_type].to_lower().capitalize()
 	
 	if !Engine.editor_hint:
-		set_amount(GAME.progression.collectables[collectable_name], true)
+		set_amount(PROGRESSION.collectables[collectable_name], true)
 	
 	is_ready = true
 

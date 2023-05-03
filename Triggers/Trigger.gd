@@ -21,7 +21,7 @@ func _ready() -> void:
 	if trigger_on_level_started:
 		yield(EVENTS, "level_ready")
 		
-		GAME.current_level.connect("level_started", self, "_on_level_started")
+		VIEW_MANAGER.level.connect("level_started", self, "_on_level_started")
 
 #### VIRTUALS ####
 
