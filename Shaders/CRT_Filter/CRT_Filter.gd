@@ -35,7 +35,7 @@ func _ready() -> void:
 	if !Engine.editor_hint:
 		_start_timer()
 	
-	EVENTS.connect("game_setting_changed", self, "_on_EVENTS_game_setting_changed")
+	var __ = EVENTS.connect("game_setting_changed", self, "_on_EVENTS_game_setting_changed")
 	_update_epileptic_mode()
 
 
