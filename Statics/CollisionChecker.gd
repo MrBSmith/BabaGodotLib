@@ -43,6 +43,9 @@ static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vec
 	var top_left_corner = body_rect.position
 	var top_right_corner = body_rect.position + Vector2(body_rect.size.x, 0)
 	
+	if !level:
+		return false
+	
 	var wall_tilemap = level.find_node("Walls")
 	
 	if !wall_tilemap:
