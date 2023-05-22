@@ -57,7 +57,7 @@ signal increment_collectable_amount(collectable_type)
 signal collectable_amount_updated(collectable_type, amount)
 signal update_HUD()
 signal approch_collactable(obj)
-signal checkpoint_reached(checkpoint_id)
+signal checkpoint_reached(spawn_points_array)
 
 #### VFX ####
 
