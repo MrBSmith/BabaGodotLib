@@ -32,7 +32,7 @@ func awake_nearby_bodies():
 	
 	var bodies_nearby = awake_area.get_overlapping_bodies()
 	for body in bodies_nearby:
-		if body is PhysicsBody2D && body != self:
+		if body is PhysicsBody2D && body != owner:
 			if body.is_in_group("Awakable"):
 				var awake_behaviour = Utils.find_behaviour(body, "Awakable")
 				awake_behaviour.call_deferred("awake")
