@@ -223,12 +223,12 @@ func _update_size() -> void:
 	var biggest_child_axis := 0.0
 	
 	for child in visible_children:
-		if sorting_type == SORTING_TYPE.HORIZONTAL && adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_X:
+		if sorting_type == SORTING_TYPE.HORIZONTAL:
 			children_axis_sum += child.rect_size.x
 			if child.rect_size.y > biggest_child_axis:
 				biggest_child_axis = child.rect_size.y
 			
-		if sorting_type == SORTING_TYPE.VERTICAL && adapt_flags & ADAPT_FLAGS.CONTAINER_SIZE_Y:
+		if sorting_type == SORTING_TYPE.VERTICAL:
 			children_axis_sum += child.rect_size.y
 			if child.rect_size.x > biggest_child_axis:
 				biggest_child_axis = child.rect_size.x
