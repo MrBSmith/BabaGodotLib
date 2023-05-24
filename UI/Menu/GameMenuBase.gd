@@ -247,8 +247,12 @@ func can_resume_game() -> bool:
 	var current_scene = get_tree().get_current_scene()
 	
 	for scene_type in resume_scenes:
-		if current_scene.is_class(scene_type):
+		if current_scene != null and current_scene.is_class(scene_type):
 			return true
+	
+		elif VIEW_MANAGER.level != null:
+			return true
+	
 	return false
 
 func _resume_game():
