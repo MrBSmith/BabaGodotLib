@@ -94,6 +94,9 @@ static func branch_apply_state(branch_root: Node, groups_array: Array, state_dic
 			
 			var node_path = branch_root.get_path_to(node)
 			
+			if Utils.match_classv(node, peristant_classes) != "":
+				continue
+			
 			# Found node to apply state to 
 			if node_path in state_paths_array:
 				for property in state_dict[node_path].keys():
@@ -111,8 +114,6 @@ static func branch_apply_state(branch_root: Node, groups_array: Array, state_dic
 			
 			# Found node to destroy 
 			elif Utils.match_classv(node, SaveData.level_property_to_serialize.keys()) != "":
-				if Utils.match_classv(node, peristant_classes) != "":
-					continue
 				
 				if debug_logs: print("Node ", node.name, " freed")
 				node.queue_free()
