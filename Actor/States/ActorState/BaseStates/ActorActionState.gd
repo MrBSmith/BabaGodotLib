@@ -6,9 +6,11 @@ export var animated_sprite_path : NodePath
 export var hitboxes_container_path : NodePath
 export var impact_anim_node_path : NodePath
 export var wrong_impact_hitbox_path : NodePath
+export var hit_raycast_path : NodePath
 
 export var interact_frame : int = -1
 
+onready var hit_raycast : RayCast2D = get_node_or_null(hit_raycast_path) as RayCast2D
 onready var wrong_impact_hitbox = get_node_or_null(wrong_impact_hitbox_path)
 onready var hitboxes_container = get_node_or_null(hitboxes_container_path)
 onready var animated_sprite = get_node(animated_sprite_path)
@@ -44,6 +46,10 @@ func interact():
 		return
 	
 	var damaged_bodies = []
+
+	if hit_raycast:
+		hit_raycast.set_enabled(true)
+		yield(get_tree(), "physics_frame")
 	
 	# Damage every bodies found in hitboxes
 	for hitbox in hitboxes_container.get_children():
@@ -54,7 +60,7 @@ func interact():
 			if body in damaged_bodies or body == owner:
 				continue
 			
-			if is_obj_interactable(body):
+			if is_obj_interactable(body) and !has_obstacle_in_the_way(body):
 				damage(body)
 				damaged_bodies.append(body)
 	
@@ -74,6 +80,23 @@ func interact():
 	# Play the sound effect
 	if (has_damaged or wrong_impact) && impact_sound:
 		EVENTS.emit_signal("play_sound_effect", impact_sound)
+	
+	if hit_raycast:
+		hit_raycast.set_enabled(false)
+
+
+
+func has_obstacle_in_the_way(body: PhysicsBody2D) -> bool:
+	if !is_instance_valid(hit_raycast) or !is_instance_valid(body):
+		return false
+	
+	hit_raycast.clear_exceptions()
+	hit_raycast.add_exception(body)
+	hit_raycast.set_cast_to(hit_raycast.to_local(body.global_position))
+	hit_raycast.force_raycast_update()
+	
+	return hit_raycast.is_colliding()
+
 
 
 # Damage a block if it is in the hitbox area, and if his type correspond to the current robot breakable type
