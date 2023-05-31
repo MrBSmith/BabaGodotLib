@@ -2,20 +2,19 @@ tool
 extends State
 class_name ActorActionState
 
-onready var impact_sound = get_node_or_null("ImpactSound")
-
-export var interact_frame : int = 2
-
-var action_hitbox_node : Area2D
-var hit_box_shape : Node
-
-var has_damaged : bool = false
-
 export var animated_sprite_path : NodePath
-onready var animated_sprite = get_node(animated_sprite_path)
-
+export var hitboxes_container_path : NodePath
 export var impact_anim_node_path : NodePath
+export var wrong_impact_hitbox_path : NodePath
+
+export var interact_frame : int = -1
+
+onready var wrong_impact_hitbox = get_node_or_null(wrong_impact_hitbox_path)
+onready var hitboxes_container = get_node_or_null(hitboxes_container_path)
+onready var animated_sprite = get_node(animated_sprite_path)
+onready var impact_sound = get_node_or_null("ImpactSound")
 onready var impact_anim = get_node_or_null(impact_anim_node_path)
+
 
 #### ACCESSORS ####
 
@@ -32,9 +31,7 @@ func _ready() -> void:
 	
 	if impact_anim:
 		__ = impact_anim.connect("animation_finished", self, "_on_impact_animation_finished")
-	
-	action_hitbox_node = owner.get_node_or_null("ActionHitBox")
-	hit_box_shape = action_hitbox_node.get_node_or_null("CollisionShape2D")
+
 
 
 #### VIRTUALS ####
@@ -43,49 +40,54 @@ func _ready() -> void:
 #### LOGIC ####
 
 func interact():
-	if !action_hitbox_node.monitoring:
+	if !is_instance_valid(hitboxes_container):
 		return
 	
-	# Get every area in the hitbox area
-	var interact_areas = action_hitbox_node.get_overlapping_areas()
-	damage()
+	var damaged_bodies = []
 	
-	# Check if one on the areas in the hitbox area is an interative one, and interact with it if it is
-	# Also verify if no block were broke in this use of the action state
-	if !has_damaged:
-		for area in interact_areas:
-			if is_obj_interactable(area):
-				area.interact(hit_box_shape.global_position)
+	# Damage every bodies found in hitboxes
+	for hitbox in hitboxes_container.get_children():
+		if not hitbox is Area2D or !hitbox.monitoring:
+			continue
+		
+		for body in hitbox.get_overlapping_bodies():
+			if body in damaged_bodies or body == owner:
+				continue
+			
+			if is_obj_interactable(body):
+				damage(body)
+				damaged_bodies.append(body)
 	
+	var has_damaged = !damaged_bodies.empty()
+	var wrong_impact = has_wrong_impact()
 	
-	if is_wrong_interaction() && animated_sprite.get_sprite_frames().has_animation("WrongAction"):
-		animated_sprite.play("WrongAction")
+	# Play the animation
+	if !has_damaged and wrong_impact:
+		if animated_sprite.get_sprite_frames().has_animation("WrongAction"):
+			animated_sprite.play("WrongAction")
+	else:
+		if impact_anim:
+			impact_anim.set_frame(0)
+			impact_anim.set_visible(true)
+			impact_anim.play()
 	
-	if (has_damaged or is_wrong_interaction()) && impact_sound:
+	# Play the sound effect
+	if (has_damaged or wrong_impact) && impact_sound:
 		EVENTS.emit_signal("play_sound_effect", impact_sound)
 
 
 # Damage a block if it is in the hitbox area, and if his type correspond to the current robot breakable type
-func damage():
-	var bodies_in_hitbox = action_hitbox_node.get_overlapping_bodies()
+func damage(body: PhysicsBody2D) -> void:
+	if !is_instance_valid(body):
+		return
 	
-	for body in bodies_in_hitbox:
-		if body == owner or body.owner == owner or body is TileMap:
-			continue
-		
-		var average_pos = (body.global_position + action_hitbox_node.global_position) / 2
-		EVENTS.emit_signal("play_VFX", "great_hit", average_pos, {})
-		
-		if body.is_in_group("Destructible") && is_obj_interactable(body):
-			var destructible_behaviour = Utils.find_behaviour(body, "Destructible")
-			if destructible_behaviour:
-				destructible_behaviour.damage()
-				has_damaged = true
+	var average_pos = (body.global_position + owner.global_position) / 2
+	EVENTS.emit_signal("play_VFX", "great_hit", average_pos, {})
 	
-	if has_damaged && impact_anim:
-		impact_anim.set_frame(0)
-		impact_anim.set_visible(true)
-		impact_anim.play()
+	if body.is_in_group("Destructible") && is_obj_interactable(body):
+		var destructible_behaviour = Utils.find_behaviour(body, "Destructible")
+		if destructible_behaviour:
+			destructible_behaviour.damage()
 
 
 func is_obj_interactable(obj: Object) -> bool:
@@ -100,19 +102,14 @@ func is_obj_interactable(obj: Object) -> bool:
 	return false
 
 
-func is_wrong_interaction() -> bool:
-	var bodies = action_hitbox_node.get_overlapping_bodies()
-	var has_external_elem = false
-	
-	for body in bodies:
-		if owner.is_a_parent_of(body) or body == owner:
+func has_wrong_impact() -> bool:
+	for body in wrong_impact_hitbox.get_overlapping_bodies():
+		if body == owner:
 			continue
 		
-		has_external_elem = true
-		if is_obj_interactable(body):
-			return false
-	
-	return has_external_elem
+		if !is_obj_interactable(body):
+			return true
+	return false
 
 
 
