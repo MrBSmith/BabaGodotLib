@@ -6,11 +6,9 @@ export var animated_sprite_path : NodePath
 export var hitboxes_container_path : NodePath
 export var impact_anim_node_path : NodePath
 export var wrong_impact_hitbox_path : NodePath
-export var hit_raycast_path : NodePath
 
 export var interact_frame : int = -1
 
-onready var hit_raycast : RayCast2D = get_node_or_null(hit_raycast_path) as RayCast2D
 onready var wrong_impact_hitbox = get_node_or_null(wrong_impact_hitbox_path)
 onready var hitboxes_container = get_node_or_null(hitboxes_container_path)
 onready var animated_sprite = get_node(animated_sprite_path)
@@ -46,23 +44,29 @@ func interact():
 		return
 	
 	var damaged_bodies = []
-
-	if hit_raycast:
-		hit_raycast.set_enabled(true)
-		yield(get_tree(), "physics_frame")
 	
 	# Damage every bodies found in hitboxes
 	for hitbox in hitboxes_container.get_children():
 		if not hitbox is Area2D or !hitbox.monitoring:
 			continue
 		
+		var raycast = hitbox.get_node_or_null("RayCast2D")
+		
+		if raycast:
+			raycast.set_enabled(true)
+			yield(get_tree(), "physics_frame")
+		
 		for body in hitbox.get_overlapping_bodies():
 			if body in damaged_bodies or body == owner:
 				continue
 			
-			if is_obj_interactable(body) and !has_obstacle_in_the_way(body):
+			
+			if is_obj_interactable(body) and !has_obstacle_in_the_way(body, raycast):
 				damage(body)
 				damaged_bodies.append(body)
+		
+		if raycast:
+			raycast.set_enabled(false)
 	
 	var has_damaged = !damaged_bodies.empty()
 	var wrong_impact = has_wrong_impact()
@@ -80,22 +84,19 @@ func interact():
 	# Play the sound effect
 	if (has_damaged or wrong_impact) && impact_sound:
 		EVENTS.emit_signal("play_sound_effect", impact_sound)
-	
-	if hit_raycast:
-		hit_raycast.set_enabled(false)
 
 
 
-func has_obstacle_in_the_way(body: PhysicsBody2D) -> bool:
-	if !is_instance_valid(hit_raycast) or !is_instance_valid(body):
+func has_obstacle_in_the_way(body: PhysicsBody2D, raycast: RayCast2D) -> bool:
+	if !is_instance_valid(raycast) or !is_instance_valid(body):
 		return false
 	
-	hit_raycast.clear_exceptions()
-	hit_raycast.add_exception(body)
-	hit_raycast.set_cast_to(hit_raycast.to_local(body.global_position))
-	hit_raycast.force_raycast_update()
+	raycast.clear_exceptions()
+	raycast.add_exception(body)
+	raycast.set_cast_to(raycast.to_local(body.global_position))
+	raycast.force_raycast_update()
 	
-	return hit_raycast.is_colliding()
+	return raycast.is_colliding()
 
 
 
