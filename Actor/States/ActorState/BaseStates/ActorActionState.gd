@@ -44,6 +44,7 @@ func interact():
 		return
 	
 	var damaged_bodies = []
+	var wrong_impact = false
 	
 	# Damage every bodies found in hitboxes
 	for hitbox in hitboxes_container.get_children():
@@ -60,16 +61,24 @@ func interact():
 			if body in damaged_bodies or body == owner:
 				continue
 			
-			
-			if is_obj_interactable(body) and !has_obstacle_in_the_way(body, raycast):
-				damage(body)
-				damaged_bodies.append(body)
+			if !has_obstacle_in_the_way(body, raycast):
+				var is_interactable = is_obj_interactable(body)
+				
+				if is_interactable:
+					damage(body)
+					damaged_bodies.append(body)
+				
+				if hitbox == wrong_impact_hitbox:
+					if !is_interactable:
+						wrong_impact = true
+				else:
+					if !is_interactable and not body is TileMap:
+						wrong_impact = true
 		
 		if raycast:
 			raycast.set_enabled(false)
 	
 	var has_damaged = !damaged_bodies.empty()
-	var wrong_impact = has_wrong_impact()
 	
 	# Play the feedbacks animations
 	if has_damaged:
@@ -126,15 +135,6 @@ func is_obj_interactable(obj: Object) -> bool:
 			return true
 	return false
 
-
-func has_wrong_impact() -> bool:
-	for body in wrong_impact_hitbox.get_overlapping_bodies():
-		if body == owner:
-			continue
-		
-		if !is_obj_interactable(body):
-			return true
-	return false
 
 
 
