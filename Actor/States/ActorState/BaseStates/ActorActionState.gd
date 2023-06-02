@@ -71,15 +71,16 @@ func interact():
 	var has_damaged = !damaged_bodies.empty()
 	var wrong_impact = has_wrong_impact()
 	
-	# Play the animation
-	if !has_damaged and wrong_impact:
-		if animated_sprite.get_sprite_frames().has_animation("WrongAction"):
-			animated_sprite.play("WrongAction")
-	else:
+	# Play the feedbacks animations
+	if has_damaged:
 		if impact_anim:
 			impact_anim.set_frame(0)
 			impact_anim.set_visible(true)
 			impact_anim.play()
+	
+	elif wrong_impact:
+		if animated_sprite.get_sprite_frames().has_animation("WrongAction"):
+			animated_sprite.play("WrongAction")
 	
 	# Play the sound effect
 	if (has_damaged or wrong_impact) && impact_sound:
