@@ -114,6 +114,9 @@ func shake(magnitude: float = 8, duration: float = 1.0, jolts_per_sec : int = 12
 
 
 func kill(return_to_default_state: bool = true, discreate: bool = false) -> void:
+	if !is_inside_tree():
+		return
+	
 	for tween in [pos_tween, rot_tween]:
 		if is_instance_valid(tween):
 			tween.kill()
