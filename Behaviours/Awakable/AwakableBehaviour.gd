@@ -33,10 +33,9 @@ func awake() -> void:
 	if not owner is PhysicsBody2D:
 		return
 	
-	owner.set_mode(RigidBody2D.MODE_RIGID)
-	
-	owner.set_sleeping(false)
-	owner.set_physics_process(true)
+	owner.call_deferred("set_mode", RigidBody2D.MODE_RIGID)
+	owner.call_deferred("set_sleeping", false)
+	owner.call_deferred("set_physics_process", true)
 	
 	emit_signal("awake")
 
@@ -51,9 +50,9 @@ func asleep() -> void:
 	if !owner.can_sleep:
 		return
 
-	owner.set_mode(RigidBody2D.MODE_RIGID)
-	owner.set_sleeping(true)
-	owner.set_physics_process(false)
+	owner.call_deferred("set_mode", RigidBody2D.MODE_STATIC)
+	owner.call_deferred("set_sleeping", true)
+	owner.call_deferred("set_physics_process", false)
 	
 	emit_signal("asleep")
 

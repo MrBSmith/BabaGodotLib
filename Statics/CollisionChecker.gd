@@ -19,7 +19,7 @@ static func test_collision(caller : PhysicsBody2D, movement: Vector2,
 	var collider = collision2D.get_collider()
 	var collision_pos = collision2D.get_position()
 	var collider_rect : Rect2
-	var mov = Vector2(0, movement.y) if vertical else Vector2(movement.x, 0)
+	var mov = Vector2(0.0, movement.y) if vertical else Vector2(movement.x, 0.0)
 	
 	var self_rect = get_body_rect(caller, movement)
 	
@@ -35,13 +35,13 @@ static func test_collision(caller : PhysicsBody2D, movement: Vector2,
 
 # Check for a wall collision behind the character
 static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vector2) -> bool:
-	if movement.x == 0 or !body:
+	if movement.x == 0.0 or !body:
 		return false
 	
 	var body_rect = get_body_rect(body, movement)
 	
 	var top_left_corner = body_rect.position
-	var top_right_corner = body_rect.position + Vector2(body_rect.size.x, 0)
+	var top_right_corner = body_rect.position + Vector2(body_rect.size.x, 0.0)
 	
 	if !level:
 		return false
@@ -64,6 +64,7 @@ static func get_body_rect(body: PhysicsBody2D, movement := Vector2.ZERO) -> Rect
 	var col_shape = body.get_node_or_null("CollisionShape2D")
 	
 	if col_shape == null:
+		print("No colshape found")
 		return Rect2()
 	
 	var shape = col_shape.get_shape()
@@ -73,7 +74,7 @@ static func get_body_rect(body: PhysicsBody2D, movement := Vector2.ZERO) -> Rect
 		return Rect2(Vector2.ZERO, Vector2.ZERO)
 	
 	var extents = shape.get_extents()
-	return Rect2(body.get_global_position() - extents + movement, extents * 2)
+	return Rect2(col_shape.get_global_position() - extents + movement, extents * 2)
 
 
 #### VIRTUALS ####
