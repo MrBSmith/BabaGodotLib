@@ -38,8 +38,8 @@ signal game_setting_changed(setting_name, value)
 
 signal network_game_started()
 signal network_game_ended()
-signal network_client_left()
-signal network_client_action(action)
+signal network_client_left(player_id)
+signal network_client_action(player_id, action)
 signal network_event(events) #events should be a Dictionary of every events happened. Example: "events":{"event1",:value1,"event2":value2,...}
 signal network_xl_destructible_object_destroyed(destructible_object) # Reference to the destructible object being destroyed
 
