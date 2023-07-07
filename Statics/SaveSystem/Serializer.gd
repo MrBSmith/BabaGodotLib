@@ -55,9 +55,14 @@ static func fetch_groupped_nodes_state(group_array: Array, scene_root: Node, pro
 				
 				continue
 			
-			dict = fetch_branch_state(property_dict, scene_root, 
-									ignored_classes, dict,
-									node, true)
+			dict = fetch_branch_state(
+				property_dict, 
+				scene_root, 
+				ignored_classes,
+				dict,
+				node,
+				true
+			)
 	
 	return dict
 
