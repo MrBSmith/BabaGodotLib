@@ -6,8 +6,6 @@ export var target_path_array : Array
 export var method_name : String = ""
 export var arguments_array : Array = []
 
-export var debug_logs : bool = false
-
 # If this is true, the event will trigger only the first time play a level
 export var once_per_level : bool = false
 
