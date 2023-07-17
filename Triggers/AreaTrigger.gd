@@ -45,7 +45,7 @@ func setup() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_area_body_entered(body: PhysicsBody2D) -> void:
-	if !is_instance_valid(body) or not body is ActorBase:
+	if !is_instance_valid(body) or not body is Actor:
 		return
 
 	if body.is_class(wanted_class) or wanted_class == "":
@@ -70,7 +70,7 @@ func _on_area_area_entered(area: Area2D) -> void:
 
 
 func _on_area_body_exited(body: PhysicsBody2D) -> void:
-	if !is_instance_valid(body) or not body is ActorBase:
+	if !is_instance_valid(body) or not body is Actor:
 		return
 	
 	if body.is_class(wanted_class) or wanted_class == "":

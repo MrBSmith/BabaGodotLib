@@ -83,6 +83,34 @@ static func get_every_persistant_object(node: Node, persistants_classes := PoolS
 	return array_to_fill
 
 
+static func node_serialize_state(node: Node, properties: PoolStringArray) -> Dictionary:
+	var state = {}
+	
+	if !is_instance_valid(node):
+		push_error("The given node isn't a valid instance, cannot fetch any state from it")
+		return {}
+	
+	for property in properties:
+		if property in node:
+			state[property] = node.get(property)
+		else:
+			push_error("Property %s not found in node %s" % [property, node.name])
+	
+	return state
+
+
+static func node_apply_state(node: Node, state: Dictionary) -> void:
+	if !is_instance_valid(node):
+		push_error("The given node isn't a valid instance, cannot apply any state to it")
+		return
+	
+	for property in state.keys():
+		if property in node:
+			 node.set(property, state[property])
+		else:
+			push_error("Property %s not found in node %s" % [property, node.name])
+
+
 # Apply a state to the given branch
 # The state_dict must be structured this way:
 # Keys are the path to the node, relative to the branch_root, then the value is another dict where keys
