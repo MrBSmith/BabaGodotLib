@@ -79,7 +79,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func damage() -> void:
+remotesync func damage() -> void:
 	if $Cooldown.is_running():
 		return
 	
@@ -92,7 +92,7 @@ func damage() -> void:
 		$Cooldown.start()
 
 
-func destroy() -> void:
+remotesync func destroy() -> void:
 	if is_destroyed:
 		push_warning("This object has already been destroyed")
 		return
