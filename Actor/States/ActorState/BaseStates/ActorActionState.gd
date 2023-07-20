@@ -117,9 +117,6 @@ func damage(body: PhysicsBody2D) -> void:
 	var average_pos = (body.global_position + owner.global_position) / 2
 	EVENTS.emit_signal("play_VFX", "great_hit", average_pos, {})
 	
-	if NETWORK.is_client():
-		return
-	
 	if body.is_in_group("Destructible") && is_obj_interactable(body):
 		var destructible_behaviour = Utils.find_behaviour(body, "Destructible")
 		if destructible_behaviour:

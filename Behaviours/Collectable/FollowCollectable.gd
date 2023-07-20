@@ -109,9 +109,6 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 
 
 func _on_collect_animation_finished() -> void:
-	if NETWORK.is_client():
-		return
-	
 	NETWORK.rpc_or_direct_call(self, "_collect_success")
 
 

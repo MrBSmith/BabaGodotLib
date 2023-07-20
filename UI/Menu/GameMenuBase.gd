@@ -239,7 +239,7 @@ func set_buttons_default_state():
 		options_array[i].set_disabled(default_button_state[i])
 
 
-func _go_to_last_menu() -> void:
+remotesync func _go_to_last_menu() -> void:
 	EVENTS.emit_signal("navigate_menu_back_query")
 
 
@@ -255,6 +255,7 @@ func can_resume_game() -> bool:
 	
 	return false
 
+
 func _resume_game():
 	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
@@ -265,12 +266,28 @@ func cancel():
 	match(cancel_action):
 		CANCEL_ACTION.RESUME_GAME:
 			if can_resume_game():
-				_resume_game()
+				NETWORK.rpc_or_direct_call(self, "_resume_game", [], NETWORK.RPC_MODE.ONLINE)
 			else:
-				_go_to_last_menu()
+				NETWORK.rpc_or_direct_call(self, "_go_to_last_menu", [], NETWORK.RPC_MODE.ONLINE)
 		
 		CANCEL_ACTION.GO_TO_LAST_MENU:
-			_go_to_last_menu()
+			NETWORK.rpc_or_direct_call(self, "_go_to_last_menu", [], NETWORK.RPC_MODE.ONLINE)
+
+
+remote func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
+	var option = get_node_or_null(option_path)
+	
+	if !is_instance_valid(option) or not option is Control:
+		push_error("No focusable option found at path %s" % str(option_path))
+		return
+	
+	if option is MenuOptionsBase:
+		option.set_focused(focus)
+	else:
+		if focus:
+			option.grab_focus()
+		else:
+			option.release_focus()
 
 
 #### INPUT ####
@@ -283,9 +300,13 @@ func _unhandled_input(event: InputEvent) -> void:
 #### SIGNAL RESPONSES ####
 
 # When a button is aimed (with a mouse for exemple)
-func _on_menu_option_focus_changed(_button : Control, focus: bool) -> void:
+func _on_menu_option_focus_changed(option : Control, focus: bool) -> void:
 	if focus && choice_sound_node != null:
 		choice_sound_node.play()
+	
+	var option_path = get_path_to(option)
+	NETWORK.rpc_or_direct_call(self, "remote_focus_option_changed", [option_path, focus], NETWORK.RPC_MODE.ONLINE)
+
 
 # Virtual method to respond to the signal emited by an option beeing chosen
 # Here you can add the code that tells the game what to do based on what option was chose
