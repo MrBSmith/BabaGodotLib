@@ -83,32 +83,39 @@ static func get_every_persistant_object(node: Node, persistants_classes := PoolS
 	return array_to_fill
 
 
-static func node_serialize_state(node: Node, properties: PoolStringArray) -> Dictionary:
+# Fetch the given properties of the given object and returns it as a Dictionary
+# Where each pair represent a property name as a key and the propery value as a value
+static func serialize_state(obj: Object, properties : PoolStringArray) -> Dictionary:
 	var state = {}
 	
-	if !is_instance_valid(node):
-		push_error("The given node isn't a valid instance, cannot fetch any state from it")
+	if !is_instance_valid(obj):
+		push_error("The given object isn't a valid instance, cannot fetch any state from it")
 		return {}
 	
 	for property in properties:
-		if property in node:
-			state[property] = node.get(property)
+		if property in obj:
+			state[property] = obj.get(property)
 		else:
-			push_error("Property %s not found in node %s" % [property, node.name])
+			push_error("Property %s not found in node %s" % [property, str(obj)])
 	
 	return state
 
 
-static func node_apply_state(node: Node, state: Dictionary) -> void:
-	if !is_instance_valid(node):
-		push_error("The given node isn't a valid instance, cannot apply any state to it")
+static func serialize_whole_state(obj: Object, recursive: bool = false) -> Dictionary:
+	var properties = ClassDB.class_get_property_list(obj.get_class(), recursive)
+	return serialize_state(obj, PoolStringArray(properties))
+
+
+static func apply_state(obj: Object, state: Dictionary) -> void:
+	if !is_instance_valid(obj):
+		push_error("The given object isn't a valid instance, cannot apply any state to it")
 		return
 	
 	for property in state.keys():
-		if property in node:
-			 node.set(property, state[property])
+		if property in obj:
+			 obj.set(property, state[property])
 		else:
-			push_error("Property %s not found in node %s" % [property, node.name])
+			push_error("Property %s not found in obj %s" % [property, str(obj)])
 
 
 # Apply a state to the given branch
