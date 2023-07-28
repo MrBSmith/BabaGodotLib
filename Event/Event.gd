@@ -6,8 +6,6 @@ class_name Event
 ### Whenever the tiggered signal is received from one of its Trigger children
 ### and if event_disabled is false -> the virtual method event() is called
 
-export var debug_logs : bool = false
-
 export(float, 0.0, 9999.0) var delay : float = 0.0
 export var event_disabled : bool = false
 export var queue_free_after_trigger : bool = true

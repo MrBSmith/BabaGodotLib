@@ -1,6 +1,8 @@
 extends Event
 class_name LevelEvent
 
+onready var logger = get_node_or_null("Logger")
+
 export var autoload_target_name : String
 export var target_path_array : Array
 export var method_name : String = ""
@@ -27,7 +29,7 @@ func event():
 	if delay > 0.0:
 		yield(get_tree().create_timer(delay), "timeout")
 	
-	if debug_logs: print(name, " event triggered")
+	if logger: logger.push("%s event triggered", name)
 	
 	if once_per_level:
 		if PROGRESSION.is_level_visited(VIEW_MANAGER.level):
@@ -64,7 +66,7 @@ func method_call():
 	# Call the method in every target, and pass every argument in the array
 	for target in target_array:
 		if target.has_method(method_name) or GDScript:
-			if debug_logs: print(method_name, " called in ", target.name)
+			if logger: logger.push("%s called in %s" % [method_name, target.name])
 			
 			var call_def_funcref := funcref(target, method_name)
 			call_def_funcref.call_funcv(arguments_array)
