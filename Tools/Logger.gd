@@ -14,23 +14,51 @@ enum MODE {
 	TOOL = 8
 }
 
+enum MESSAGE_TYPE {
+	DEBUG,
+	WARNING,
+	ERROR
+}
+
 
 export(int, FLAGS, "Godot console", "Game console") var output_flag = OUTPUT.GODOT_CONSOLE
 export(int, FLAGS, "Editor", "Debug", "Release", "Tool") var mode_flag = MODE.TOOL
 
 var active : bool = false
+var _is_ready = false
 
 func _ready() -> void:
-	if OS.has_feature("Editor") and mode_flag & MODE.EDITOR: active = true
-	elif OS.has_feature("Debug") and mode_flag & MODE.DEBUG: active = true
-	elif OS.has_feature("Release") and mode_flag & MODE.RELEASE: active = true
+	if OS.has_feature("editor") and mode_flag & MODE.EDITOR: active = true
+	elif OS.has_feature("debug") and mode_flag & MODE.DEBUG: active = true
+	elif OS.has_feature("release") and mode_flag & MODE.RELEASE: active = true
 	elif Engine.editor_hint and mode_flag & MODE.TOOL: active = true
+	
+	_is_ready = true
 
 
-func push(msg: String) -> void:
+func _push(msg: String, msg_type: int) -> void:
+	if !_is_ready:
+		yield(self, "ready")
+	
 	if !active:
 		return
 	
-	if output_flag & OUTPUT.GODOT_CONSOLE: CONSOLE.push(msg)
-	if output_flag & OUTPUT.GAME_CONSOLE: print(msg)
+	if output_flag & OUTPUT.GAME_CONSOLE: CONSOLE.push(msg, msg_type)
+	if output_flag & OUTPUT.GODOT_CONSOLE:
+		match(msg_type):
+			MESSAGE_TYPE.DEBUG: print(msg)
+			MESSAGE_TYPE.ERROR: push_error(msg)
+			MESSAGE_TYPE.WARNING: push_warning(msg) 
+
+
+func debug(msg: String) -> void:
+	_push(msg, MESSAGE_TYPE.DEBUG)
+
+
+func warning(msg: String) -> void:
+	_push(msg, MESSAGE_TYPE.WARNING)
+
+
+func error(msg: String) -> void:
+	_push(msg, MESSAGE_TYPE.ERROR)
 

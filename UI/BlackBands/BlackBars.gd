@@ -39,7 +39,7 @@ func appear(disappear: bool = false, duration: float = 1.5) -> void:
 	set_visible(true)
 	
 	var debug_string = "appear" if !disappear else "disappear"
-	logger.push("Black bars %s transition started" % debug_string)
+	logger.debug("Black bars %s transition started" % debug_string)
 	
 	var tween
 	

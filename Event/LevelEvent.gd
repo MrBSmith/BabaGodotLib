@@ -29,7 +29,7 @@ func event():
 	if delay > 0.0:
 		yield(get_tree().create_timer(delay), "timeout")
 	
-	if logger: logger.push("%s event triggered", name)
+	if logger: logger.debug("%s event triggered", name)
 	
 	if once_per_level:
 		if PROGRESSION.is_level_visited(VIEW_MANAGER.level):
@@ -66,7 +66,7 @@ func method_call():
 	# Call the method in every target, and pass every argument in the array
 	for target in target_array:
 		if target.has_method(method_name) or GDScript:
-			if logger: logger.push("%s called in %s" % [method_name, target.name])
+			if logger: logger.debug("%s called in %s" % [method_name, target.name])
 			
 			var call_def_funcref := funcref(target, method_name)
 			call_def_funcref.call_funcv(arguments_array)
