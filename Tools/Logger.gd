@@ -40,7 +40,7 @@ func _push(msg: String, msg_type: int) -> void:
 	if !_is_ready:
 		yield(self, "ready")
 	
-	if !active:
+	if !active and msg_type == MESSAGE_TYPE.DEBUG:
 		return
 	
 	if output_flag & OUTPUT.GAME_CONSOLE: CONSOLE.push(msg, msg_type)
