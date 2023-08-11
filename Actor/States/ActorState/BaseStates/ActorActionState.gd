@@ -65,7 +65,7 @@ func interact():
 				var is_interactable = is_obj_interactable(body)
 				
 				if is_interactable:
-					damage(body)
+					damage_body(body)
 					damaged_bodies.append(body)
 				
 				if hitbox == wrong_impact_hitbox:
@@ -74,6 +74,10 @@ func interact():
 				else:
 					if !is_interactable and not body is TileMap:
 						wrong_impact = true
+		
+		for area in hitbox.get_overlapping_areas():
+			if is_obj_interactable(area):
+				area.interact()
 		
 		if raycast:
 			raycast.set_enabled(false)
@@ -109,15 +113,14 @@ func has_obstacle_in_the_way(body: PhysicsBody2D, raycast: RayCast2D) -> bool:
 	return raycast.is_colliding()
 
 
-# Damage a block if it is in the hitbox area, and if his type correspond to the current robot breakable type
-func damage(body: PhysicsBody2D) -> void:
+func damage_body(body: PhysicsBody2D) -> void:
 	if !is_instance_valid(body):
 		return
 	
-	var average_pos = (body.global_position + owner.global_position) / 2
-	EVENTS.emit_signal("play_VFX", "great_hit", average_pos, {})
-	
 	if body.is_in_group("Destructible") && is_obj_interactable(body):
+		var average_pos = (body.global_position + owner.global_position) / 2
+		EVENTS.emit_signal("play_VFX", "great_hit", average_pos, {})
+		
 		var destructible_behaviour = Utils.find_behaviour(body, "Destructible")
 		if destructible_behaviour:
 			NETWORK.rpc_or_direct_call(destructible_behaviour, "damage")

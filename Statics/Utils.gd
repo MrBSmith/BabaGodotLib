@@ -146,6 +146,18 @@ static func fetch(node: Node, wanted_class: String) -> Array:
 	return array
 
 
+# Search for direct children possesing a given behaviour type, and return the found behaviours
+static func fetch_behaviours(node: Node, wanted_behaviour: String) -> Array:
+	var behaviour_array = [] 
+	
+	for child in node.get_children():
+		var behaviour = find_behaviour(child, wanted_behaviour)
+		if behaviour:
+			behaviour_array.append(behaviour)
+	
+	return behaviour_array
+
+
 static func fetch_recursive(node: Node, wanted_class: String, array: Array = []) -> Array:
 	for child in node.get_children():
 		if child.is_class(wanted_class) && not child in array:
