@@ -97,6 +97,8 @@ remotesync func destroy() -> void:
 		push_warning("This object has already been destroyed")
 		return
 	
+	is_destroyed = true
+	
 	if destroy_sound:
 		EVENTS.emit_signal("play_sound_effect", destroy_sound)
 	
@@ -113,8 +115,7 @@ remotesync func destroy() -> void:
 	
 	if free_when_destroyed:
 		owner.queue_free()
-	else:
-		is_destroyed = true
+
 
 
 #### INPUTS ####
