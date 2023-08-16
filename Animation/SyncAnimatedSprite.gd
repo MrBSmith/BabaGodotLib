@@ -20,7 +20,7 @@ func get_class() -> String: return "SyncAnimatedSprite"
 
 func _ready() -> void:
 	if master_path.is_empty() && get_parent().is_class("SyncAnimatedSprite"):
-		master_anim_sprite = get_parent()	
+		master_anim_sprite = get_parent()
 	
 	if master_anim_sprite != null:
 		var __ = master_anim_sprite.connect("frame_changed", self, "_on_parent_frame_changed")

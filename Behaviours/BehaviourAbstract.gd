@@ -39,6 +39,7 @@ func is_disabled() -> bool: return disabled
 
 func _ready() -> void:
 	holder.add_to_group(behaviour_type)
+	holder.set_meta(behaviour_type, self)
 
 
 #### VIRTUALS ####

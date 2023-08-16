@@ -61,10 +61,10 @@ static func find_dir_name(dir: Vector2) -> String:
 
 
 static func find_behaviour(node: Node, behaviour_name: String) -> Behaviour:
-	for child in node.get_children():
-		if child is Behaviour && child.get_behaviour_type() == behaviour_name:
-			return child
-	return null
+	if node.has_meta(behaviour_name):
+		return node.get_meta(behaviour_name, null)
+	else:
+		return null
 
 
 static func range_wrapi(init_val: int, nb_values: int, min_val: int, max_val: int, increment: int = 1) -> Array:
