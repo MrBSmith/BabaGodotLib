@@ -66,6 +66,9 @@ static func find_behaviour(node: Node, behaviour_name: String) -> Behaviour:
 	else:
 		return null
 
+static func has_behaviour(node: Node, behaviour_name: String) -> bool:
+	return node.has_meta(behaviour_name)
+
 
 static func range_wrapi(init_val: int, nb_values: int, min_val: int, max_val: int, increment: int = 1) -> Array:
 	var range_array = range(0, nb_values, increment)
