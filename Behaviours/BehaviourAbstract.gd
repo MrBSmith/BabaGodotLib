@@ -13,9 +13,9 @@ class_name Behaviour
 # But you will have to write yourself how the Behaviour will behave with disabled to true
 
 
-onready var holder = get_node(holder_path)
+onready var holder = get_node_or_null(holder_path)
 
-export var holder_path = NodePath("..")
+export var holder_path := NodePath()
 
 export var behaviour_type: String = "" setget , get_behaviour_type
 export var disabled : bool = false setget set_disabled, is_disabled
@@ -38,6 +38,9 @@ func is_disabled() -> bool: return disabled
 #### BUILT-IN ####
 
 func _ready() -> void:
+	if holder == null:
+		holder = owner
+	
 	holder.add_to_group(behaviour_type)
 	holder.set_meta(behaviour_type, self)
 
