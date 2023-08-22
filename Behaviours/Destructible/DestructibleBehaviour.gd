@@ -22,11 +22,11 @@ onready var destroy_sound = get_node_or_null("DestroySound")
 onready var approch_area = get_node_or_null("ApprochArea")
 onready var particules = get_node_or_null("Particles2D")
 
-export var max_hp : int = 1 setget set_max_hp
+export(int, 1, 9999) var max_hp : int = 1 setget set_max_hp
 export var hp : int = max_hp setget set_hp, get_hp
 
 export var free_when_destroyed := true
-
+export var invincible : bool = false
 export var cooldown : float = INF setget set_cooldown
 
 var is_destroyed := false
@@ -83,10 +83,13 @@ remotesync func damage() -> void:
 	if $Cooldown.is_running():
 		return
 	
-	if damage_computer:
-		set_hp(Math.clampi(hp - damage_computer.compute_damage(), 0, max_hp))
-	else:
-		set_hp(Math.clampi(hp - 1, 0, max_hp))
+	if !invincible:
+		if damage_computer:
+			set_hp(Math.clampi(hp - damage_computer.compute_damage(), 0, max_hp))
+		else:
+			set_hp(Math.clampi(hp - 1, 0, max_hp))
+	
+	emit_signal("damaged")
 	
 	if $Cooldown.wait_time != INF:
 		$Cooldown.start()
@@ -125,7 +128,6 @@ remotesync func destroy() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_hp_changed(hp_value: int) -> void:
-	emit_signal("damaged")
 	if animation_player && animation_player.has_animation("Damage"):
 		animation_player.play("Damage")
 	
