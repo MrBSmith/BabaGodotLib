@@ -1,10 +1,13 @@
 extends AnimatedSprite
 class_name SyncAnimatedSprite
 
+export var master_path : NodePath
+export var logger_path : NodePath
+
 export var sync_frame_rate : bool = true
 
-export var master_path : NodePath
 onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
+onready var logger : Logger = LoggerFactory.get_from_path(self, logger_path)
 
 onready var sprite_offset = offset
  
@@ -27,7 +30,8 @@ func _ready() -> void:
 		
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
 			__ = master_anim_sprite.connect("animation_changed", self, "_on_parent_animation_changed")
-
+	
+	var __ = connect("frame_changed", self, "_on_frame_changed")
 
 #### VIRTUALS ####
 
@@ -40,6 +44,7 @@ func play(anim: String = "", backwards: bool = false) -> void:
 	if (anim == "" and get_animation() != "default") or anim != get_animation():
 		emit_signal("animation_changed", anim, backwards)
 	
+	logger.debug("Animation %s triggered" % anim)
 	.play(anim, backwards)
 
 
@@ -65,3 +70,6 @@ func _on_parent_frame_changed() -> void:
 func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -> void:
 	if frames != null && frames.has_animation(anim):
 		set_animation(anim)
+
+func _on_frame_changed() -> void:
+	logger.debug("Frame changed %d" % frame)
