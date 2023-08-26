@@ -27,6 +27,8 @@ enum BUTTON_COLOR_MODE {
 const TOGGLED_STATES = [STATE.TOGGLED, STATE.TOGGLED_FOCUS]
 const FOCUSED_STATES = [STATE.FOCUS, STATE.TOGGLED_FOCUS]
 
+onready var logger: Node = $"%Logger"
+
 export(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
 export(STATE) var state : int = STATE.NORMAL setget set_state
 export var print_logs : bool = false
@@ -36,6 +38,8 @@ export var theme_color_prefix : String = "font_color"
 
 export(BUTTON_COLOR_MODE) var button_color_mode : int = BUTTON_COLOR_MODE.MODULATE
 export var no_glow : bool = false
+
+var defaut_focus_mode : int = Control.FOCUS_NONE
 
 var previous_state : int = STATE.NONE
 var theme : Theme 
@@ -122,6 +126,9 @@ func _ready() -> void:
 	__ = connect("state_changed", self, "_on_state_changed")
 	
 	is_ready = true
+	
+	if holder is Control:
+		defaut_focus_mode = holder.focus_mode
 	
 	_update_theme()
 	_on_state_changed()
@@ -252,6 +259,9 @@ func _on_state_changed() -> void:
 	
 	if previous_focused != current_focused:
 		emit_signal("focus_changed", is_focused())
+	
+	if holder is Control:
+		holder.focus_mode = Control.FOCUS_NONE if state == STATE.DISABLED else defaut_focus_mode
 	
 	if button_color_mode == BUTTON_COLOR_MODE.NONE or !theme:
 		return
