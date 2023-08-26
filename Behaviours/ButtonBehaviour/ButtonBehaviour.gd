@@ -87,7 +87,9 @@ func is_toggled() -> bool: return state in TOGGLED_STATES
 
 func set_disabled(value: bool) -> void:
 	if value != disabled:
-		if value:
+		value = disabled
+		
+		if disabled:
 			set_state(STATE.DISABLED)
 		else:
 			set_state(STATE.NORMAL)
