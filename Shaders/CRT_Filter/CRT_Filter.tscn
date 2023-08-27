@@ -12,6 +12,7 @@ shader = ExtResource( 2 )
 shader_param/apply = true
 shader_param/displace_amount = 0
 shader_param/aberation_amount = 0.32
+shader_param/warp_amount = 0.5
 
 [sub_resource type="Shader" id=3]
 code = "shader_type canvas_item;
