@@ -72,4 +72,4 @@ func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -
 		set_animation(anim)
 
 func _on_frame_changed() -> void:
-	logger.debug("Frame changed %d" % frame)
+	logger.debug("Current anim: %s Frame id: %d" % [animation, frame])
