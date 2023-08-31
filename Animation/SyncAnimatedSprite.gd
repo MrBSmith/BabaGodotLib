@@ -48,6 +48,12 @@ func play(anim: String = "", backwards: bool = false) -> void:
 	.play(anim, backwards)
 
 
+func set_animation(anim: String) -> void:
+	if (anim == "" and get_animation() != "default") or anim != get_animation():
+		.set_animation(anim)
+		emit_signal("animation_changed", anim, false)
+
+
 func set_flip_h(value: bool) -> void:
 	.set_flip_h(value)
 	
