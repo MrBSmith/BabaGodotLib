@@ -91,7 +91,7 @@ func _on_follow_area_body_entered(body: Node):
 
 
 func _on_follow_area_body_exited(_body: Node):
-	if $FollowArea.get_overlapping_bodies().empty():
+	if $FollowArea.get_overlapping_bodies().empty() and raycast:
 		raycast.set_enabled(false)
 
 
