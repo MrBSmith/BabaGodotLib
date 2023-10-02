@@ -27,7 +27,7 @@ enum BUTTON_COLOR_MODE {
 const TOGGLED_STATES = [STATE.TOGGLED, STATE.TOGGLED_FOCUS]
 const FOCUSED_STATES = [STATE.FOCUS, STATE.TOGGLED_FOCUS]
 
-onready var logger: Node = $"%Logger"
+onready var logger: Node = get_node_or_null("%Logger")
 
 export(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
 export(STATE) var state : int = STATE.NORMAL setget set_state
