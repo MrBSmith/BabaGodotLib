@@ -182,9 +182,9 @@ func _fetch_menu_option_array() -> Array:
 		if child is MenuOptionsBase:
 			menu_option_array.append(child)
 		else:
-			var option = Utils.fetch_first(child, "MenuOptionsBase")
-			if option != null:
-				menu_option_array.append(option)
+			var options = Utils.fetch_recursive(child, "MenuOptionsBase")
+			if !options.empty():
+				menu_option_array.append(options[0])
 	
 	return menu_option_array
 
