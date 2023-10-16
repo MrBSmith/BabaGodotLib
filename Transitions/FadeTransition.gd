@@ -10,7 +10,6 @@ onready var tween = $Tween
 export var start_color := Color.transparent
 export var fade_color := Color.black
 
-var running : bool = false setget , is_running
 
 #### ACCESSORS ####
 
@@ -19,8 +18,6 @@ func get_class() -> String: return "FadeTransition"
 
 func set_visible(value: bool):
 	$ColorRect.set_visible(value)
-
-func is_running() -> bool: return running
 
 
 #### BUILT-IN ####
@@ -71,6 +68,7 @@ remotesync func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_
 remotesync func interupt_transition() -> void:
 	tween.stop_all()
 	tween.remove_all()
+	running = false
 	set_to_transparent()
 
 
