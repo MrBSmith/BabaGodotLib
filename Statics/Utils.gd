@@ -229,6 +229,13 @@ static func fetch_scene_instances(node: Node, scene_name: String) -> Array:
 	return array
 
 
+static func is_obj_of_class_list(obj: Object, class_list: Array) -> bool:
+	for cls in class_list:
+		if obj.is_class(cls):
+			return true
+	return false 
+
+
 static func compute_astar_point_id(cell: Vector2, key: int = 666) -> int:
 	return int(abs(cell.x + key * cell.y))
 
