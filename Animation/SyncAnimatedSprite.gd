@@ -12,6 +12,9 @@ onready var logger : Logger = LoggerFactory.get_from_path(self, logger_path)
 onready var sprite_offset = offset
  
 signal animation_changed(anim, backwards)
+signal flip_changed()
+
+var is_ready = false
 
 #### ACCESSORS ####
 
@@ -26,12 +29,15 @@ func _ready() -> void:
 		master_anim_sprite = get_parent()
 	
 	if master_anim_sprite != null:
-		var __ = master_anim_sprite.connect("frame_changed", self, "_on_parent_frame_changed")
+		var __ = master_anim_sprite.connect("frame_changed", self, "_on_master_frame_changed")
 		
+		master_anim_sprite.connect("flip_changed", self, "_on_master_flipped_changed")
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
-			__ = master_anim_sprite.connect("animation_changed", self, "_on_parent_animation_changed")
+			__ = master_anim_sprite.connect("animation_changed", self, "_on_master_animation_changed")
 	
 	var __ = connect("frame_changed", self, "_on_frame_changed")
+	
+	is_ready = true
 
 #### VIRTUALS ####
 
@@ -57,9 +63,13 @@ func set_animation(anim: String) -> void:
 func set_flip_h(value: bool) -> void:
 	.set_flip_h(value)
 	
+	if !is_ready:
+		yield(self, "ready")
+	
 	# Flip the sprite's x position
-	position.x = abs(position.x) * Math.bool_to_sign(!value)
 	offset.x = sprite_offset.x * Math.bool_to_sign(!value)
+	
+	emit_signal("flip_changed")
 
 
 #### INPUTS ####
@@ -68,14 +78,19 @@ func set_flip_h(value: bool) -> void:
 
 #### SIGNAL RESPONSES ####
 
-func _on_parent_frame_changed() -> void:
+func _on_master_frame_changed() -> void:
 	if sync_frame_rate && frames != null:
 		set_frame(get_parent().get_frame())
 
 
-func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -> void:
+func _on_master_animation_changed(anim: String = "", _backwards: bool = false) -> void:
 	if frames != null && frames.has_animation(anim):
 		set_animation(anim)
 
 func _on_frame_changed() -> void:
 	logger.debug("Current anim: %s Frame id: %d" % [animation, frame])
+
+
+func _on_master_flipped_changed() -> void:
+	set_flip_h(master_anim_sprite.flip_h)
+	set_flip_v(master_anim_sprite.flip_v)
