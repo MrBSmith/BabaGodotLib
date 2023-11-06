@@ -31,7 +31,7 @@ func _ready() -> void:
 	if master_anim_sprite != null:
 		var __ = master_anim_sprite.connect("frame_changed", self, "_on_master_frame_changed")
 		
-		master_anim_sprite.connect("flip_changed", self, "_on_master_flipped_changed")
+		__ = master_anim_sprite.connect("flip_changed", self, "_on_master_flipped_changed")
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
 			__ = master_anim_sprite.connect("animation_changed", self, "_on_master_animation_changed")
 	
