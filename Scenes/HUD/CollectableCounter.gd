@@ -1,5 +1,5 @@
 tool
-extends HBoxContainer
+extends Control
 class_name CollectableCounter
 
 enum SPRITE_SIZE_PRESET {
@@ -24,11 +24,16 @@ export(COLLECTABLE_TYPE) var collectable_type : int = COLLECTABLE_TYPE.SCREW set
 
 export var growth_feedback_duration : float = 0.08
 
+export(int, 3, 9) var nb_digits = 4 
+
 onready var sprites_array = [screw_sprites_array, gear_sprites_array] 
 
-onready var counter_label = $"%CounterLabel"
+onready var counter_label = $"%Counter"
 onready var unfilled_counter = $"%UnfilledCounter"
-onready var base_texture_scale = $Texture.get_scale()
+onready var counter_shadow = get_node_or_null("%CounterShadow")
+
+onready var collectable_texture = $"%CollectableTexture"
+onready var base_texture_scale = collectable_texture.get_scale()
 
 signal collectable_animation_finished
 
@@ -72,6 +77,8 @@ func set_collectable_type(value: int) -> void:
 
 func _ready() -> void:
 	var __ = EVENTS.connect("collectable_amount_updated", self, "_on_EVENTS_collectable_amount_updated")
+	__ = counter_label.connect("text_changed", self, "_on_CounterLabel_text_changed")
+	__ = counter_label.connect("amount_changed", self, "_on_CounterLabel_amount_changed")
 	
 	var collectable_name = COLLECTABLE_TYPE.keys()[collectable_type].to_lower().capitalize()
 	
@@ -145,9 +152,12 @@ func _on_CounterLabel_amount_changed(previous_amount : int , new_amount : int) -
 
 
 func _on_CounterLabel_text_changed(text: String) -> void:
-	var nb_zeros = 5 - text.length()
+	var nb_zeros = nb_digits - text.length()
 	
-	unfilled_counter.set_text("")
+	unfilled_counter.set_text(text)
 	
 	for _i in range(nb_zeros):
 		unfilled_counter.text += "0"
+	
+	if counter_shadow:
+		counter_shadow.set_text(unfilled_counter.text)
