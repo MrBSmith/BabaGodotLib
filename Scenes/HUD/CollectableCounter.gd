@@ -107,7 +107,7 @@ func set_amount(amount: int, instant: bool = false) -> void:
 func _texture_growth_feedback() -> void:
 	tween = create_tween()
 	
-	var texture = $Texture
+	var texture = collectable_texture
 	var __ = tween.set_trans(Tween.TRANS_CUBIC)
 	
 	__ = tween.tween_property(texture, "rect_scale", base_texture_scale * 1.6, growth_feedback_duration * (2.0 / 3.0))
@@ -118,7 +118,7 @@ func _update_texture() -> void:
 	if !is_ready:
 		yield(self, "ready")
 	
-	$Texture.set_texture(sprites_array[collectable_type][sprite_preset])
+	collectable_texture.set_texture(sprites_array[collectable_type][sprite_preset])
 
 
 func get_collectable_type_by_name(collectable_name: String) -> int:
