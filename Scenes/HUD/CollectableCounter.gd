@@ -153,11 +153,14 @@ func _on_CounterLabel_amount_changed(previous_amount : int , new_amount : int) -
 
 func _on_CounterLabel_text_changed(text: String) -> void:
 	var nb_zeros = nb_digits - text.length()
-	
-	unfilled_counter.set_text(text)
+	var zeros = ""
 	
 	for _i in range(nb_zeros):
-		unfilled_counter.text += "0"
+		zeros += "0"
+	
+	var unfilled_text = zeros + text
+	
+	unfilled_counter.set_text(unfilled_text)
 	
 	if counter_shadow:
-		counter_shadow.set_text(unfilled_counter.text)
+		counter_shadow.set_text(unfilled_text)
