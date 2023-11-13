@@ -1,3 +1,4 @@
+tool
 extends AnimatedSprite
 class_name SyncAnimatedSprite
 
