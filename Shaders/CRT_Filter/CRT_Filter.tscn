@@ -17,11 +17,11 @@ shader_param/warp_amount = 0.5
 [sub_resource type="Shader" id=3]
 code = "shader_type canvas_item;
 
+const vec2 MASK_SIZE = vec2(2.0);
+const vec2 SCREEN_SIZE = vec2(960.0, 540.0);
 const vec4 WHITE = vec4(0.0, 0.0, 0.0, 1.0);
 const vec4 BLACK = vec4(1.0);
 const float PI = 3.14159265358979323846;
-
-uniform vec2 aspect_ratio = vec2(1.0);
 
 uniform float masked_opacity : hint_range(0.0, 1.0) = 0.4;
 uniform vec4 render_mask_color : hint_color = vec4(1.0);
@@ -35,6 +35,7 @@ uniform vec2 deform_amp = vec2(0.1, 0.0);
 void fragment(){
 	vec2 sin_movement = deform_amp * vec2(sin(TIME * vec2(deform_speed, 0.0) * 2.0 * PI));
 	vec2 offset = sin_movement * sin(UV.y * deform_freq * 2.0 * PI);
+	vec2 aspect_ratio = SCREEN_SIZE / MASK_SIZE;
 	
 	vec4 color = texture(SCREEN_TEXTURE, offset + SCREEN_UV);
 	vec4 mask_texture_color = texture(mask_texture, SCREEN_UV * aspect_ratio);
@@ -56,7 +57,6 @@ void fragment(){
 [sub_resource type="ShaderMaterial" id=2]
 render_priority = -1
 shader = SubResource( 3 )
-shader_param/aspect_ratio = Vector2( 24, 9 )
 shader_param/masked_opacity = 0.1
 shader_param/render_mask_color = Color( 0, 0, 0, 1 )
 shader_param/frequency = 6.0
