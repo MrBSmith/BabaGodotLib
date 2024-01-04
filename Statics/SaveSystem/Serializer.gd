@@ -1,7 +1,7 @@
 extends Node
 class_name Serializer
 
-const debug_logs = false
+const debug_logs = true
 
 
 # Find recursivly every wanted nodes, and extract their wanted properties
@@ -124,9 +124,11 @@ static func apply_state(obj: Object, state: Dictionary) -> void:
 # are the name of the property and the value its value
 static func branch_apply_state(branch_root: Node, groups_array: Array, state_dict : Dictionary, peristant_classes: Array = []) -> void:
 	var state_paths_array = state_dict.keys()
+	var grouped_nodes = []
 	
 	for group in groups_array:
 		var nodes_array = branch_root.get_tree().get_nodes_in_group(group)
+		grouped_nodes += nodes_array
 		
 		for node in nodes_array:
 			if node == null or node.is_queued_for_deletion():
@@ -136,27 +138,42 @@ static func branch_apply_state(branch_root: Node, groups_array: Array, state_dic
 			
 			if Utils.match_classv(node, peristant_classes) != "":
 				continue
-			
-			# Found node to apply state to 
-			if node_path in state_paths_array:
-				for property in state_dict[node_path].keys():
-					if property == "name":
-						continue
-					
-					var value = state_dict[node_path][property]
-					var setter = "set_" + property
-					if node.has_method(setter):
-						node.call(setter, value)
-					else:
-						node.set(property, value)
-					
-					if debug_logs: print("Node ", node.name, ", property: ", property, " set to: ", value)
-			
+
 			# Found node to destroy 
-			elif Utils.match_classv(node, SaveData.level_property_to_serialize.keys()) != "":
+			elif Utils.match_classv(node, SaveData.level_property_to_serialize.keys()) != "" \
+			 and not node_path in state_paths_array:
 				
 				if debug_logs: print("Node ", node.name, " freed")
 				node.queue_free()
+	
+	# Found node to apply state to 
+	for node_path in state_paths_array:
+		var node = branch_root.get_node_or_null(node_path)
+		
+		if node == null or node.is_queued_for_deletion() or \
+			Utils.match_classv(node, peristant_classes) != "" or \
+			is_node_grouped(grouped_nodes, node):
+			continue
+		
+		for property in state_dict[node_path].keys():
+			if property == "name":
+				continue
+			
+			var value = state_dict[node_path][property]
+			var setter = "set_" + property
+			if node.has_method(setter):
+				node.call(setter, value)
+			else:
+				node.set(property, value)
+			
+			if debug_logs: print("Node ", node.name, ", property: ", property, " set to: ", value)
+
+
+static func is_node_grouped(grouped_nodes: Array, node: Node) -> bool:
+	for grouped_node in grouped_nodes:
+		if grouped_node.is_a_parent_of(node):
+			return true
+	return false
 
 
 static func is_node_state_ignored(node: Node, state_classes_ignored := PoolStringArray()) -> bool:
