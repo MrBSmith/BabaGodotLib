@@ -303,12 +303,12 @@ static func cfg_game_verion_is_prior(file_path: String, target_version : String,
 	var target_version_splited = target_version.split(".")
 	
 	for i in range(target_version_splited.size()):
-		if file_version_splitted[i].to_int() > target_version_splited[i].to_int():
+		if file_version_splitted[i].to_int() < target_version_splited[i].to_int():
 			if debug: print("The file version is prior the target_version")
-			return false
+			return true
 	
 	if debug: print("The file version is NOT prior the target_version")
-	return true
+	return false
 
 
 #### STRINGS ####
