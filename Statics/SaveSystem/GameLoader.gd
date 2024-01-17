@@ -18,12 +18,6 @@ static func load_save_slot(save_dir_path: String, slot_id : int, progression: No
 
 	for section in config_file.get_sections():
 		match(section):
-			"audio":
-				for key in config_file.get_section_keys(section):
-					var value = config_file.get_value(section, key)
-					var bus_id = AudioServer.get_bus_index(key.capitalize())
-					AudioServer.set_bus_volume_db(bus_id, value)
-			
 			"progression":
 				if progression == null:
 					print_debug("No progression node passed; progression could not be loaded")
