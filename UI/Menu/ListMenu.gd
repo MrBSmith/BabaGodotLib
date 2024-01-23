@@ -305,7 +305,7 @@ func navigate_upstream_menu():
 
 #### INPUTS ####
 
-func _input(_event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
 	var focused_option = get_focus_owner()
 	if focused_option == null:
 		return

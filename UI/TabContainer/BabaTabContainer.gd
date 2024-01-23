@@ -37,7 +37,7 @@ func _is_focus_free() -> bool:
 
 #### INPUTS ####
 
-func _input(_event: InputEvent) -> void:
+func _unhandled_input(_event: InputEvent) -> void:
 	if frozen:
 		return
 	

@@ -293,7 +293,7 @@ remote func remote_focus_option_changed(option_path: NodePath, focus: bool) -> v
 #### INPUT ####
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+	if event.is_action_pressed("ui_cancel") and !get_tree().is_input_handled():
 		cancel()
 
 

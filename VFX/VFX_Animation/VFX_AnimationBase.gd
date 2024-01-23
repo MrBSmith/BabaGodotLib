@@ -31,7 +31,7 @@ func play_animation():
 		$AudioStreamPlayer2D.play()
 
 
-func _input(_event: InputEvent) -> void:
+func _unhandled_input(_event: InputEvent) -> void:
 	if !debug:
 		return
 	
