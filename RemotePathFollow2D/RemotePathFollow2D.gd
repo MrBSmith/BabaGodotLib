@@ -1,12 +1,20 @@
 extends PathFollow2D
 class_name RemotePathFollow2D
 
+onready var path : Path2D = get_parent()
+
+const MIN_DIST_TO_POINT = 6.0
+
 var moved_node_wr : WeakRef
+var moving : bool = false
 var duration : float = 1.0
 var is_ready = false
 
+var unreached_points = []
+
 signal unit_offset_changed
 signal path_finished
+signal reach_path_point(next_point_dir)
 
 #### ACCESSORS ####
 
@@ -23,6 +31,22 @@ func _ready() -> void:
 	var __ = connect("unit_offset_changed", self, "_on_unit_offset_changed")
 	is_ready = true
 
+
+func _physics_process(_delta: float) -> void:
+	if !moving or unreached_points.empty():
+		return
+	
+	for i in [0, unreached_points.size() - 1]:
+		var point = unreached_points[i]
+		
+		if position.distance_to(point) <= MIN_DIST_TO_POINT:
+			unreached_points.remove(i)
+			var dir_to_next = Vector2.ZERO if unreached_points.empty() else point.direction_to(unreached_points[0])
+			emit_signal("reach_path_point", dir_to_next)
+			break
+
+
+
 #### VIRTUALS ####
 
 
@@ -33,6 +57,9 @@ func _ready() -> void:
 func move_node_along_path(node: Node2D, backwards: bool = false, dur: float = 1.0) -> void:
 	moved_node_wr = weakref(node)
 	duration = dur
+	moving = true
+	
+	unreached_points = _get_path_points()
 	
 	var tween = create_tween()
 	var __ = tween.connect("finished", self, "_on_tween_finished")
@@ -40,7 +67,21 @@ func move_node_along_path(node: Node2D, backwards: bool = false, dur: float = 1.
 	var to = 1.0 if !backwards else 0.0
 	
 	tween.tween_method(self, "set_unit_offset", from, to, duration)
+	
+	yield(tween, "finished")
+	moving = false
 
+
+func _get_path_points() -> Array:
+	if !path or !path.curve:
+		return []
+	
+	var path_points = []
+	
+	for i in range(path.curve.get_point_count()):
+		path_points.append(path.curve.get_point_position(i))
+	
+	return path_points
 
 
 #### INPUTS ####
