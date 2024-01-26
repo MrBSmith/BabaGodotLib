@@ -3,7 +3,7 @@ class_name RemotePathFollow2D
 
 onready var path : Path2D = get_parent()
 
-const MIN_DIST_TO_POINT = 6.0
+const MIN_DIST_TO_POINT = 10.0
 
 var moved_node_wr : WeakRef
 var moving : bool = false
