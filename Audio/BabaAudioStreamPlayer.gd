@@ -24,7 +24,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func play(from_position: float = 0.0) -> void:
-	pitch_scale = start_pitch + rand_range(0.0, pitch_range) * Math.rand_sign()
+	pitch_scale = start_pitch + rand_range(0.0, pitch_range) * float(Math.rand_sign())
 	.play(from_position)
 
 
