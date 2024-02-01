@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Collect.ogg-9051ed55a733059db7e64168a14670d0.oggstr"
+
+[deps]
+
+source_file="res://BabaGodotLib/Scenes/InteractiveObject/Collectable/Collect.ogg"
+dest_files=[ "res://.import/Collect.ogg-9051ed55a733059db7e64168a14670d0.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0
