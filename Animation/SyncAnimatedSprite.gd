@@ -8,25 +8,18 @@ class_name SyncAnimatedSprite
 
 @onready var sprite_offset = offset
  
-signal animation_changed(anim)
-
 #### ACCESSORS ####
-
-func is_class(value: String): return value == "SyncAnimatedSprite" or super.is_class(value)
-func get_class() -> String: return "SyncAnimatedSprite"
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
 	if master_path.is_empty() && get_parent().is_class("SyncAnimatedSprite"):
-		master_anim_sprite = get_parent()	
+		master_anim_sprite = get_parent()
 	
-	if master_anim_sprite != null:
-		var __ = master_anim_sprite.connect("frame_changed",Callable(self,"_on_parent_frame_changed"))
-		
-		if master_anim_sprite.is_class("SyncAnimatedSprite"):
-			__ = master_anim_sprite.connect("animation_changed",Callable(self,"_on_parent_animation_changed"))
+	if master_anim_sprite and master_anim_sprite is AnimatedSprite2D:
+		master_anim_sprite.frame_changed.connect(_on_parent_frame_changed)
+		master_anim_sprite.animation_changed.connect(_on_parent_animation_changed)
 
 
 #### VIRTUALS ####
@@ -35,20 +28,6 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-# FUNCTION OVERRIDE #
-func play(anim := StringName(), backwards: bool = false) -> void:
-	if (anim == "" and get_animation() != "default") or anim != get_animation():
-		emit_signal("animation_changed", anim, backwards)
-	
-	super.play(anim, backwards)
-
-
-func set_flip_h(value: bool) -> void:
-	super.set_flip_h(value)
-	
-	# Flip the sprite's x position
-	position.x = abs(position.x) * Math.bool_to_sign(!value)
-	offset.x = sprite_offset.x * Math.bool_to_sign(!value)
 
 
 #### INPUTS ####
@@ -58,10 +37,10 @@ func set_flip_h(value: bool) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_parent_frame_changed() -> void:
-	if sync_frame_rate && frames != null:
+	if sync_frame_rate && sprite_frames != null:
 		set_frame(get_parent().get_frame())
 
 
 func _on_parent_animation_changed(anim: String = "", _backwards: bool = false) -> void:
-	if frames != null && frames.has_animation(anim):
+	if sprite_frames != null && sprite_frames.has_animation(anim):
 		set_animation(anim)

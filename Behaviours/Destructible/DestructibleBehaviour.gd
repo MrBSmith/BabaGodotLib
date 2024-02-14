@@ -84,9 +84,9 @@ func damage() -> void:
 		return
 	
 	if damage_computer:
-		set_hp(Math.clampi(hp - damage_computer.compute_damage(), 0, max_hp))
+		set_hp(clampi(hp - damage_computer.compute_damage(), 0, max_hp))
 	else:
-		set_hp(Math.clampi(hp - 1, 0, max_hp))
+		set_hp(clampi(hp - 1, 0, max_hp))
 	
 	if $Cooldown.wait_time != INF:
 		$Cooldown.start()

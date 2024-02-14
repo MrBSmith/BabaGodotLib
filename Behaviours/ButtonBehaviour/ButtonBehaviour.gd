@@ -18,8 +18,8 @@ enum TOGGLE_MODE {
 }
 
 @export_group("Logic")
-@export_enum(TOGGLE_MODE) var toggle_mode : int = TOGGLE_MODE.NONE
-@export_enum(STATE) var state : int = STATE.NORMAL:
+@export var toggle_mode : TOGGLE_MODE = TOGGLE_MODE.NONE
+@export var state : STATE = STATE.NORMAL:
 	set(value):
 		if disabled:
 			return
@@ -53,21 +53,18 @@ signal toggled_changed(value)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "ButtonBehaviour" or super.is_class(value)
-func get_class() -> String: return "ButtonBehaviour"
-
 
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = get_parent().connect("mouse_entered", _on_mouse_entered)
-	__ = get_parent().connect("mouse_exited", _on_mouse_exited)
-	__ = get_parent().connect("focus_entered", _on_focus_entered)
-	__ = get_parent().connect("focus_exited", _on_focus_exited)
-	__ = get_parent().connect("gui_input", _on_gui_input)
-	__ = get_parent().connect("visibility_changed", _on_visibility_changed)
+	get_parent().mouse_entered.connect(_on_mouse_entered)
+	get_parent().mouse_exited.connect(_on_mouse_exited)
+	get_parent().focus_entered.connect(_on_focus_entered)
+	get_parent().focus_exited.connect(_on_focus_exited)
+	get_parent().gui_input.connect(_on_gui_input)
+	get_parent().visibility_changed.connect(_on_visibility_changed)
 	
-	__ = state_changed.connect(_update_theme)
+	state_changed.connect(_update_theme)
 	
 	disabled_changed.connect(_on_disable_changed)
 	

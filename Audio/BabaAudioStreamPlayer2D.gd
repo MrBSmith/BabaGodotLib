@@ -8,9 +8,6 @@ class_name BabaAudioStreamPlayer2D
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "BabaAudioStreamPlayer2D" or super.is_class(value)
-func get_class() -> String: return "BabaAudioStreamPlayer2D"
-
 
 #### BUILT-IN ####
 
@@ -24,7 +21,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func play(from_position: float = 0.0) -> void:
-	pitch_scale = start_pitch + randf_range(0.0, pitch_range) * Math.rand_sign()
+	pitch_scale = start_pitch + randfn(1.0, pitch_range)
 	super.play(from_position)
 
 

@@ -26,9 +26,7 @@ class_name AnimationEvent
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "AnimationEvent" or super.is_class(value)
-func get_class() -> String: return "AnimationEvent"
-
+	
 
 #### BUILT-IN ####
 

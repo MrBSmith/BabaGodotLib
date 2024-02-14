@@ -19,9 +19,6 @@ signal disabled_changed(disabled)
 
 #### ACCESSORS ####
 
-func is_class(value: String): return value == "Behaviour" or super.is_class(value)
-func get_class() -> String: return "Behaviour"
-
 func get_behaviour_type() -> String: return behaviour_type
 
 func set_disabled(value: bool) -> void: 
