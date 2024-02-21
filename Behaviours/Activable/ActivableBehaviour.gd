@@ -59,10 +59,13 @@ func trigger() -> void:
 		return
 	
 	if togglable:
-		set_active(!active)
+		toggle()
 	else:
 		set_active(true)
 
+
+func toggle() -> void:
+	set_active(!active)
 
 
 #### INPUTS ####
