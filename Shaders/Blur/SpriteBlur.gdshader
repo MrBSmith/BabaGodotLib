@@ -1,28 +1,34 @@
 shader_type canvas_item;
 
-uniform float SAMPLES = 11.0;
-const float WIDTH = 0.04734573810584494679397346954847;
+uniform int bleed_distance : hint_range(1, 100) = 5;
+uniform float blur_amount : hint_range(0.0, 1.0, 0.01) = 0.5;
+uniform int nb_samples = 1;
 
-uniform vec2 blur_scale = vec2(1, 0);
-
-float gaussian(float x) {
-    float x_squared = x*x;
-
-    return WIDTH * exp((x_squared / (2.0 * SAMPLES)) * -1.0);
-}
-
-void fragment() {
-	vec2 scale = TEXTURE_PIXEL_SIZE * blur_scale;
-	
-	float weight = 0.0;
-	float total_weight = 0.0;
+vec4 getBlurredPixel(sampler2D text, vec2 uv, vec2 offset) {
 	vec4 color = vec4(0.0);
 	
-	for(int i=-int(SAMPLES)/2; i < int(SAMPLES)/2; ++i) {
-		weight = gaussian(float(i));
-		color.rgb += texture(SCREEN_TEXTURE, SCREEN_UV + scale * vec2(float(i))).rgb * weight;
-		total_weight += weight;
+	if (nb_samples < 1) {
+		return texture(text, uv);
 	}
 	
-	COLOR.rgb = color.rgb / total_weight;
+	
+	// Accumulate nearby pixel color
+	for (int i = -nb_samples; i < nb_samples + 1; i++) {
+		for (int j = -nb_samples; j < nb_samples + 1; j++) {
+			color += texture(text, uv + vec2(float(i), float(j)) * (offset / float(nb_samples)));
+		}
+	}
+	
+	// Calculate the average color
+	float total_samples = pow(float(1 + nb_samples * 2), 2);
+	color /= vec4(float(total_samples));
+	
+	// Mix the result with the original color by blur_amount
+	return mix(texture(text, uv), color, blur_amount);
+}
+
+
+void fragment() {
+	vec2 bleeding_offset = TEXTURE_PIXEL_SIZE * float(bleed_distance);
+	COLOR = getBlurredPixel(TEXTURE, UV, bleeding_offset);
 }

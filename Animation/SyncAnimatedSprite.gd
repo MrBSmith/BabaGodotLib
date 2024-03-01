@@ -12,6 +12,8 @@ onready var logger : Logger = LoggerFactory.get_from_path(self, logger_path)
 
 onready var sprite_offset = offset
  
+export var auto_start := false
+
 signal animation_changed(anim, backwards)
 signal flip_changed()
 
@@ -39,6 +41,10 @@ func _ready() -> void:
 	var __ = connect("frame_changed", self, "_on_frame_changed")
 	
 	is_ready = true
+	
+	if auto_start:
+		play(animation)
+
 
 #### VIRTUALS ####
 
