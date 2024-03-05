@@ -27,6 +27,7 @@ export(int, FLAGS, "children_size_x", "children_size_y",
 
 export var print_logs : bool = false
 
+var is_ready = false
 var pending_sort = false
 
 signal sort_children
@@ -91,7 +92,8 @@ func _ready() -> void:
 	for child in get_children():
 		if child is Control:
 			connect_child_signals(child)
-
+	
+	is_ready = true
 
 #### VIRTUALS ####
 
@@ -100,6 +102,9 @@ func _ready() -> void:
 #### LOGIC ####
 
 func _update_container() -> void:
+	if !is_ready:
+		yield(self, "ready")
+	
 	if pending_sort:
 		return
 	
