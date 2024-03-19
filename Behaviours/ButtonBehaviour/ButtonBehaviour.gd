@@ -117,12 +117,12 @@ func is_pressed() -> bool:
 #### BUILT-IN ####
 
 func _ready() -> void:
-	var __ = get_parent().connect("mouse_entered", self, "_on_mouse_entered")
-	__ = get_parent().connect("mouse_exited", self, "_on_mouse_exited")
-	__ = get_parent().connect("focus_entered", self, "_on_focus_entered")
-	__ = get_parent().connect("focus_exited", self, "_on_focus_exited")
-	__ = get_parent().connect("gui_input", self, "_on_gui_input")
-	__ = get_parent().connect("visibility_changed", self, "_on_visibility_changed")
+	var __ = holder.connect("mouse_entered", self, "_on_mouse_entered")
+	__ = holder.connect("mouse_exited", self, "_on_mouse_exited")
+	__ = holder.connect("focus_entered", self, "_on_focus_entered")
+	__ = holder.connect("focus_exited", self, "_on_focus_exited")
+	__ = holder.connect("gui_input", self, "_on_gui_input")
+	__ = holder.connect("visibility_changed", self, "_on_visibility_changed")
 	__ = connect("state_changed", self, "_on_state_changed")
 	
 	is_ready = true
