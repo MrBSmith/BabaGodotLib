@@ -206,8 +206,11 @@ func _on_gui_input(event: InputEvent) -> void:
 		if state == STATE.PRESSED:
 			if event.is_action_released("ui_accept") or \
 				(event is InputEventMouseButton && event.button_index == BUTTON_LEFT):
-
-				_update_state()
+				
+				if toggle_mode == TOGGLE_MODE.NONE && state == STATE.PRESSED:
+					set_state(STATE.FOCUS)
+				else:
+					_update_state()
 
 
 func _on_mouse_entered() -> void:
