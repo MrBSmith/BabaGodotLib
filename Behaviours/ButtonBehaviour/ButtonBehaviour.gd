@@ -77,12 +77,12 @@ func set_toggled(toggled: bool) -> void:
 		return
 	
 	if toggled:
-		if state == STATE.FOCUS:
+		if state in [STATE.FOCUS, STATE.TOGGLED_FOCUS]:
 			set_state(STATE.TOGGLED_FOCUS)
 		else:
 			set_state(STATE.TOGGLED)
 	else:
-		if state == STATE.TOGGLED_FOCUS:
+		if state in [STATE.TOGGLED_FOCUS, STATE.FOCUS]:
 			set_state(STATE.FOCUS)
 		else:
 			set_state(STATE.NORMAL)
@@ -251,6 +251,8 @@ func _on_visibility_changed() -> void:
 
 
 func _on_state_changed() -> void:
+	logger.debug("state changed to: %s" % STATE.keys()[state])
+	
 	var previous_toggle = previous_state in TOGGLED_STATES
 	var current_toggle = state in TOGGLED_STATES
 	
