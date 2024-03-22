@@ -4,17 +4,25 @@ class_name GameLoader
 # A static class, usefull for loading game data
 # The saves are stored as .cfg files in the directory you give it
 
-
 # Load the content of the .cfg save file located in the save_dir_path folder. 
 # The method will fetch the right save based on its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
 static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null) -> void:
-	var config_file_path = find_corresponding_save_file(save_dir_path, slot_id)
+	var save_path = find_corresponding_save_file(save_dir_path, slot_id)
+	
+	load_save(save_path, progression, players_data)
+
+
+
+static func load_save(path: String, progression: Node, players_data: Node) -> void:
 	var config_file = ConfigFile.new()
-	config_file.load(config_file_path)
+	
+	if config_file.load(path) != OK:
+		push_error("Couldn't load save at path %s" % path)
+		return
 	
 	var input_mapper = InputMapper.new()
-	input_mapper.map_player_settings_inputs(config_file_path)
+	input_mapper.map_player_settings_inputs(path)
 
 	for section in config_file.get_sections():
 		match(section):
