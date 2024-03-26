@@ -30,13 +30,14 @@ size_flags_horizontal = 6
 size_flags_vertical = 6
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
+hover_texture = ExtResource( 3 )
 text = ""
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 89.0
-margin_right = 89.0
+margin_left = 69.0
+margin_right = 109.0
 margin_bottom = 38.0
-rect_pivot_offset = Vector2( 6, 19 )
+rect_pivot_offset = Vector2( 20, 19 )
 size_flags_horizontal = 6
 custom_constants/separation = 6
 __meta__ = {
@@ -44,7 +45,6 @@ __meta__ = {
 }
 
 [node name="HoverTexture" type="TextureRect" parent="HBoxContainer"]
-visible = false
 margin_top = 12.0
 margin_right = 14.0
 margin_bottom = 26.0
@@ -56,6 +56,8 @@ __meta__ = {
 
 [node name="Button" type="Button" parent="HBoxContainer"]
 light_mask = 0
+margin_left = 20.0
+margin_right = 20.0
 margin_bottom = 38.0
 size_flags_horizontal = 0
 size_flags_vertical = 5
@@ -67,10 +69,9 @@ __meta__ = {
 }
 
 [node name="HoverTexture2" type="TextureRect" parent="HBoxContainer"]
-visible = false
-margin_left = 38.0
+margin_left = 26.0
 margin_top = 12.0
-margin_right = 52.0
+margin_right = 40.0
 margin_bottom = 26.0
 size_flags_vertical = 6
 texture = ExtResource( 3 )
