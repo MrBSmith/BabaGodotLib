@@ -21,8 +21,10 @@ signal focus_changed(entity, focus)
 signal option_chose(menu_option)
 signal hidden_changed
 signal text_changed(text)
+signal hover_texture_flags_changed()
+signal all_caps_changed()
+signal hover_texture_changed()
 
-var is_ready : bool = false
 var focused : bool = false setget set_focused, is_focused
 
 export var hidden : bool = false setget set_hidden, is_hidden
@@ -33,40 +35,24 @@ export var disabled : bool = false setget set_disabled, is_disabled
 #### ACCESSSORS ####
 
 func set_focused(value: bool):
-	if _button == null: 
-		return
-	if value != focused && !_button.is_disabled():
+	if value != focused:
 		focused = value
-		if focused:
-			_button.grab_focus()
-		else:
-			_button.release_focus()
-		if is_ready:
-			emit_signal("focus_changed", self, focused)
+		emit_signal("focus_changed", self, focused)
+
 func is_focused() -> bool: return focused
 
 func set_all_caps(value: bool):
-	if _button == null: return
-	all_caps = value
-	if all_caps:
-		_button.set_text(_button.get_text().to_upper())
-	else:
-		_button.set_text(_button.get_text().capitalize())
+	if all_caps != value:
+		all_caps = value
+		emit_signal("all_caps_changed")
 
 func set_text(value: String):
-	var text_changed = text != value
-	text = value
-	if _button == null: return
-	if all_caps:
-		_button.set_text(value.to_upper())
-	else:
-		_button.set_text(value)
-	if text_changed:
+	if text != value:
+		text = value
 		emit_signal("text_changed", text)
+
 func get_text() -> String: 
-	if _button == null: 
-		return ""
-	return _button.get_text()
+	return text
 
 func set_hidden(value: bool):
 	if value != hidden:
@@ -75,15 +61,12 @@ func set_hidden(value: bool):
 func is_hidden() -> bool: return hidden
 
 func set_disabled(value: bool):
-	if !is_ready:
-		yield(self, "ready")
-	if value != _button.is_disabled():
+	if value != disabled:
 		disabled = value
-		_button.set_disabled(value)
 		emit_signal("disabled_changed", value)
+
 func is_disabled() -> bool:
-	if _button == null: return false
-	return _button.is_disabled()
+	return disabled
 
 func is_accessible() -> bool:
 	return is_visible() && !is_disabled()
@@ -92,22 +75,14 @@ func get_button() -> Button:
 	return _button
 
 func set_hover_texture(value: Texture) -> void:
-	hover_texture = value
-	
-	if !is_inside_tree():
-		yield(self, "ready")
-	
-	for sprite in hover_sprites:
-		sprite.set_texture(hover_texture)
-func set_hover_texture_flags(value: int) -> void:
-	if !is_ready:
-		yield(self, "ready")
-	
-	hover_texture_flags = value
-	
-	$HBoxContainer/HoverTexture.set_visible(hover_texture_flags & TEXTURE_FLAGS.LEFT)
-	$HBoxContainer/HoverTexture2.set_visible(hover_texture_flags & TEXTURE_FLAGS.RIGHT)
+	if value != hover_texture:
+		hover_texture = value
+		emit_signal("hover_texture_changed")
 
+func set_hover_texture_flags(value: int) -> void:
+	if hover_texture_flags != value:
+		hover_texture_flags = value
+		emit_signal("hover_texture_flags_changed")
 
 func is_class(value: String): return value == "MenuOptionsBase" or .is_class(value)
 func get_class() -> String: return "MenuOptionsBase"
@@ -125,9 +100,13 @@ func _ready() -> void:
 	_err = _button.connect("button_down", self, "_on_button_down")
 	_err = _button.connect("button_up", self, "_on_button_up")
 	
+	_err = connect("hover_texture_flags_changed", self, "_on_hover_texture_flags_changed")
 	_err = connect("disabled_changed", self, "_on_disabled_changed")
 	_err = connect("focus_changed", self, "_on_focus_changed")
+	_err = connect("text_changed", self, "_on_text_changed")
+	_err = connect("all_caps_changed", self, "_update_text")
 	_err = connect("gui_input", self, "_on_gui_input")
+	_err = connect("hover_texture_changed", self, "_on_hover_texture_changed")
 	
 	set_text(text)
 	
@@ -136,7 +115,11 @@ func _ready() -> void:
 		_on_hidden_changed()
 		emit_signal("focus_changed", self, is_focused())
 	
-	is_ready = true
+	_on_disabled_changed(disabled)
+	_on_hover_texture_flags_changed()
+	_on_focus_changed(self, focused)
+	_update_text()
+	_on_hover_texture_changed()
 	
 	yield(get_tree(), "idle_frame")
 	
@@ -150,6 +133,12 @@ func set_hover_icons_modulate(color: Color) -> void:
 		if child is TextureRect:
 			child.set_modulate(color)
 
+
+func _update_text() -> void:
+	if all_caps:
+		_button.set_text(text.to_upper())
+	else:
+		_button.set_text(text)
 
 #### SIGNAL RESPONSES ####
 
@@ -188,10 +177,14 @@ func _on_focus_changed(entity: Control, focus: bool) -> void:
 		var dest_color = button_focus_color if focus else Color.transparent
 		
 		set_hover_icons_modulate(dest_color)
+	
+	if focused:
+		_button.grab_focus()
+	else:
+		_button.release_focus()
 
 
 func _on_hidden_changed() -> void:
-	
 	if hidden:
 		set_modulate(Color.transparent)
 	else:
@@ -211,7 +204,23 @@ func _on_button_up() -> void:
 	set_hover_icons_modulate(focus_color)
 
 
-func _on_disabled_changed(_value: bool) -> void:
+func _on_disabled_changed(value: bool) -> void:
+	_button.set_disabled(value)
+	
 	for sprite in hover_sprites:
 		var alpha = int(!disabled)
 		sprite.self_modulate.a = alpha
+
+
+func _on_hover_texture_flags_changed():
+	$HBoxContainer/HoverTexture.set_visible(hover_texture_flags & TEXTURE_FLAGS.LEFT)
+	$HBoxContainer/HoverTexture2.set_visible(hover_texture_flags & TEXTURE_FLAGS.RIGHT)
+
+
+func _on_text_changed() -> void:
+	_update_text()
+
+
+func _on_hover_texture_changed() -> void:
+	for sprite in hover_sprites:
+		sprite.set_texture(hover_texture)
