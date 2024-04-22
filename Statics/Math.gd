@@ -266,3 +266,11 @@ static func find_line_nearest_point(point: Vector2, line: PoolVector2Array) -> V
 			nearest_point = line_point
 	return nearest_point
 
+
+static func rdm_rect_point(rect: Rect2) -> Vector2:
+	var point = Vector2(
+		rand_range(0.0, rect.size.x),
+		rand_range(0.0, rect.size.y)
+	)
+	
+	return rect.position + point

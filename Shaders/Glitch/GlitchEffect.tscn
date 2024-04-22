@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=6 format=2]
 
+[ext_resource path="res://BabaGodotLib/Tools/Logger.gd" type="Script" id=1]
+[ext_resource path="res://BabaGodotLib/Shaders/Glitch/Sounds/Glitch5.wav" type="AudioStream" id=2]
+[ext_resource path="res://BabaGodotLib/Shaders/Glitch/Sounds/Glitch6.wav" type="AudioStream" id=3]
 [ext_resource path="res://BabaGodotLib/Shaders/Glitch/GlitchEffect.gd" type="Script" id=4]
+[ext_resource path="res://BabaGodotLib/Shaders/Glitch/Sounds/Glitch4.wav" type="AudioStream" id=5]
 
 [node name="GlitchEffect" type="Node"]
 script = ExtResource( 4 )
@@ -17,17 +21,23 @@ one_shot = true
 
 [node name="Sounds" type="Node" parent="."]
 
+[node name="AudioStreamPlayer1" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 2 )
+volume_db = -7.0
+pitch_scale = 2.9
+bus = "Sounds"
+
+[node name="AudioStreamPlayer2" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 3 )
+volume_db = -5.743
+pitch_scale = 0.63
+bus = "Sounds"
+
 [node name="AudioStreamPlayer3" type="AudioStreamPlayer" parent="Sounds"]
-volume_db = -21.412
-pitch_scale = 0.5
-bus = "Glitch"
+stream = ExtResource( 5 )
+volume_db = 4.461
+pitch_scale = 0.64
+bus = "Sounds"
 
-[node name="AudioStreamPlayer5" type="AudioStreamPlayer" parent="Sounds"]
-volume_db = -12.236
-pitch_scale = 2.06
-bus = "Glitch"
-
-[node name="AudioStreamPlayer6" type="AudioStreamPlayer" parent="Sounds"]
-volume_db = -12.236
-pitch_scale = 0.94
-bus = "Glitch"
+[node name="Logger" type="Node" parent="."]
+script = ExtResource( 1 )

@@ -4,8 +4,10 @@ onready var target_texture = get_parent()
 onready var glitch_cool_down = $GlitchCoolDown
 onready var glitch_timer_node = $GlitchDuration
 onready var sub_glitch_timer_node = $SubGlitchDuration
+onready var logger: Node = $Logger
 
 onready var audio_streams_array = $Sounds.get_children()
+onready var shader_material = target_texture.get_material()
 
 export var oneshot : bool = false 
 export var autostart : bool = false
@@ -47,12 +49,23 @@ func _ready():
 
 
 func start():
+	glitch_cool_down.set_wait_time(rand_range(avg_cool_down - cool_down_variance, avg_cool_down + cool_down_variance))
 	glitch_cool_down.start()
+	
+	logger.debug("Glitch generator started")
+
+
+func stop():
+	glitch_timer_node.stop()
+	sub_glitch_timer_node.stop()
+	glitch_cool_down.stop()
+	
+	shader_material.set_shader_param("apply", false)
+	
+	logger.debug("Glitch generator stopped")
 
 
 func _generate_glitch():
-	var shader_material = target_texture.get_material()
-	
 	# Play a random audio stream
 	var stream_rng = randi() % len(audio_streams_array)
 	audio_streams_array[stream_rng].play()
@@ -65,6 +78,8 @@ func _generate_glitch():
 	shader_material.set_shader_param("displace_amount", displace_amount * Math.rand_sign())
 	shader_material.set_shader_param("aberation_amount", aberation_amount)
 	
+	logger.debug("Glitch created: displacement %f aberation %f" % [displace_amount, aberation_amount])
+	
 	sub_glitch_timer_node.set_wait_time(sub_glitch_dur)
 	sub_glitch_timer_node.start()
 
@@ -73,23 +88,22 @@ func _generate_glitch():
 
 
 func _on_glitch_duration_timeout():
-	glitch_timer_node.stop()
-	sub_glitch_timer_node.stop()
-	var shader_material = target_texture.get_material()
-	shader_material.set_shader_param("apply", false)
+	stop()
+	logger.debug("glitch duration timer finished")
 	
 	if !oneshot:
-		glitch_cool_down.set_wait_time(rand_range(avg_cool_down - cool_down_variance, avg_cool_down + cool_down_variance))
-		glitch_cool_down.start()
-
+		start()
+	
 	emit_signal("glitch_finished")
 
 
 func _on_sub_glitch_duration_timeout():
+	logger.debug("Sub glitch duration timer finished")
 	_generate_glitch()
 
 
 func _on_cooldown_timeout():
+	logger.debug("Cooldown fininshed")
 	var dur = duration + rand_range(0.0, duration_variance) * Math.rand_sign()
 	glitch_timer_node.set_wait_time(dur)
 	glitch_timer_node.start()
