@@ -16,18 +16,17 @@ func _ready() -> void:
 
 #### SIGNAL_RESPONSES ####
 
-func _on_scatter_object(body : Node, nb_debris : int, impulse_force: float = 100.0, no_clip := false):
-	var sprite = body.get_node("Sprite") if not body is Sprite else body 
+func _on_scatter_object(sprite : Sprite, nb_debris : int, impulse_force: float = 100.0, no_clip := false):
 	var texture = sprite.get_texture()
 	var is_region = sprite.is_region()
 	var texture_origin = sprite.get_region_rect().position if is_region else Vector2.ZERO
-	var z = body.get_z_index()
-	var z_as_relative = body.is_z_relative()
+	var z = sprite.get_z_index()
+	var z_as_relative = sprite.is_z_relative()
 	
 	var sprite_width : float = texture.get_width() if !is_region else sprite.get_region_rect().size.x
 	var sprite_height : float = texture.get_height() if !is_region else sprite.get_region_rect().size.y
 	
-	var body_global_pos : Vector2 = body.get_global_position()
+	var body_global_pos : Vector2 = sprite.get_global_position()
 	var body_origin : Vector2 = body_global_pos
 	body_origin.x = body_origin.x - (sprite_width / 2)
 	body_origin.y = body_origin.y - (sprite_height / 2)

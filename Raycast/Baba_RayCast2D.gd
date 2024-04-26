@@ -10,9 +10,6 @@ signal target_found(target)
 export var disable_on_target_found : bool = false
 var cast_target : Node = null 
 
-func _ready():
-	set_activate(false)
-
 
 # Activate the ray cast, until it find a specific target
 func search_for_target(target : Node):
@@ -29,19 +26,22 @@ func set_activate(value: bool):
 
 
 func _physics_process(_delta: float) -> void:
-	if !is_instance_valid(cast_target) or !enabled:
-		set_activate(false)
+	if !enabled:
 		return
 	
-	var dir = global_position.direction_to(cast_target.global_position)
-	var dist = global_position.distance_to(cast_target.global_position)
-	var relative_target_pos = dir * dist
+	if is_instance_valid(cast_target):
+		var dir = global_position.direction_to(cast_target.global_position)
+		var dist = global_position.distance_to(cast_target.global_position)
+		var relative_target_pos = dir * dist
+		set_cast_to(relative_target_pos)
 	
-	set_cast_to(relative_target_pos)
 	var collider = get_collider()
+	
+	if collider != null:
+		if cast_target != null and cast_target != collider:
+			return
 		
-	if collider == cast_target:
-		emit_signal("target_found", cast_target)
+		emit_signal("target_found", collider)
 		
 		if disable_on_target_found:
 			set_activate(false)
