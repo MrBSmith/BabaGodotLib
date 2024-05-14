@@ -99,7 +99,7 @@ func _ready() -> void:
 
 func set_amount(amount: int, instant: bool = false) -> void:
 	if instant:
-		counter_label.set_amount(amount)
+		counter_label.reset(amount)
 	else:
 		counter_label.tween_amount(amount, 0.5)
 
