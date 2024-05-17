@@ -96,11 +96,7 @@ remotesync func damage() -> void:
 
 
 remotesync func destroy() -> void:
-	if invincible:
-		return
-	
-	if is_destroyed:
-		push_warning("This object has already been destroyed")
+	if invincible or is_destroyed:
 		return
 	
 	is_destroyed = true

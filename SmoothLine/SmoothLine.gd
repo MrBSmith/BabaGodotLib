@@ -19,9 +19,8 @@ func _set_smooth(value: bool) -> void:
 
 
 func set_line_curve(value: Curve2D) -> void:
-	if line_curve != value:
-		line_curve = value
-		emit_signal("line_curve_changed", value)
+	line_curve = value
+	emit_signal("line_curve_changed", value)
 
 
 #### BUILT-IN ####
