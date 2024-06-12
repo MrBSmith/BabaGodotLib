@@ -6,6 +6,7 @@ export var master_path : NodePath
 export var logger_path : NodePath
 
 export var sync_frame_rate : bool = true
+export var sync_flip : bool = true
 
 onready var master_anim_sprite : SyncAnimatedSprite = get_node_or_null(master_path)
 onready var logger : Logger = LoggerFactory.get_from_path(self, logger_path)
@@ -94,10 +95,12 @@ func _on_master_animation_changed(anim: String = "", _backwards: bool = false) -
 	if frames != null && frames.has_animation(anim):
 		set_animation(anim)
 
+
 func _on_frame_changed() -> void:
 	logger.debug("Current anim: %s Frame id: %d" % [animation, frame])
 
 
 func _on_master_flipped_changed() -> void:
-	set_flip_h(master_anim_sprite.flip_h)
-	set_flip_v(master_anim_sprite.flip_v)
+	if sync_flip:
+		set_flip_h(master_anim_sprite.flip_h)
+		set_flip_v(master_anim_sprite.flip_v)
