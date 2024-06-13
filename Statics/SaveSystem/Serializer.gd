@@ -150,9 +150,11 @@ static func branch_apply_state(branch_root: Node, groups_array: Array, state_dic
 	for node_path in state_paths_array:
 		var node = branch_root.get_node_or_null(node_path)
 		
+		var is_persitant : bool = Utils.match_classv(node, peristant_classes) != ""
+		var is_grouped : bool = is_node_grouped(grouped_nodes, node)
+		
 		if node == null or node.is_queued_for_deletion() or \
-			Utils.match_classv(node, peristant_classes) != "" or \
-			is_node_grouped(grouped_nodes, node):
+			is_persitant or is_grouped:
 			continue
 		
 		for property in state_dict[node_path].keys():
