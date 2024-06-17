@@ -43,7 +43,7 @@ func _ready() -> void:
 	
 	is_ready = true
 	
-	if auto_start:
+	if auto_start and !Engine.editor_hint:
 		play(animation)
 
 
