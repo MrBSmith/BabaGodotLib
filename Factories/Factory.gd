@@ -2,7 +2,7 @@ extends Node
 class_name Factory
 
 export var target_node : NodePath = ""
-onready var target = owner.get_node(target_node) if String(target_node) != "" else owner
+onready var target = get_node(target_node) if String(target_node) != "" else owner
 
 #### ACCESSORS ####
 
