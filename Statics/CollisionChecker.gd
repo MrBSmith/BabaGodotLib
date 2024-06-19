@@ -64,7 +64,6 @@ static func get_body_rect(body: PhysicsBody2D, movement := Vector2.ZERO) -> Rect
 	var col_shape = body.get_node_or_null("CollisionShape2D")
 	
 	if col_shape == null:
-		print("No colshape found")
 		return Rect2()
 	
 	var shape = col_shape.get_shape()
