@@ -6,6 +6,7 @@ onready var raycast = get_node_or_null("Baba_RayCast2D")
 
 export var default_state : String = ""
 
+var collected := false
 var speed := 0.0
 export var acceleration := 10.0
 
@@ -34,9 +35,10 @@ func _ready() -> void:
 #### LOGIC ####
 
 func collect() -> void:
-	if is_disabled():
+	if is_disabled() or collected:
 		return
 	
+	collected = true
 	set_state("Collect")
 	
 	set_target(null)
