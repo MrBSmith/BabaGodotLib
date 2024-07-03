@@ -5,5 +5,5 @@
 [resource]
 resource_local_to_scene = true
 shader = ExtResource( 1 )
-shader_param/warp_amount = 0.0
-shader_param/blur_factor = 0.0
+shader_param/warp_amount = -0.3
+shader_param/blur_factor = 0.4
