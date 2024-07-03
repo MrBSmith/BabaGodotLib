@@ -251,7 +251,8 @@ func _on_visibility_changed() -> void:
 
 
 func _on_state_changed() -> void:
-	logger.debug("%s state changed to: %s" % [holder.name, STATE.keys()[state]])
+	if logger:
+		logger.debug("%s state changed to: %s" % [holder.name, STATE.keys()[state]])
 	
 	var previous_toggle = previous_state in TOGGLED_STATES
 	var current_toggle = state in TOGGLED_STATES
