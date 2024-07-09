@@ -26,6 +26,7 @@ export(int, 1, 9999) var max_hp : int = 1 setget set_max_hp
 export var hp : int = max_hp setget set_hp, get_hp
 
 export var free_when_destroyed := true
+export var undommagable : bool = false
 export var invincible : bool = false
 export var cooldown : float = INF setget set_cooldown
 
@@ -83,7 +84,7 @@ remotesync func damage() -> void:
 	if $Cooldown.is_running():
 		return
 	
-	if !invincible:
+	if !undommagable:
 		if damage_computer:
 			set_hp(Math.clampi(hp - damage_computer.compute_damage(), 0, max_hp))
 		else:
@@ -130,5 +131,5 @@ func _on_hp_changed(hp_value: int) -> void:
 	if animation_player && animation_player.has_animation("Damage"):
 		animation_player.play("Damage")
 	
-	if hp_value == 0:
+	if hp_value <= 0 and !invincible:
 		destroy()
