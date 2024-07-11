@@ -5,6 +5,7 @@ onready var state_machine = get_node("StateMachine")
 onready var raycast = get_node_or_null("Baba_RayCast2D")
 
 export var default_state : String = ""
+export var free_when_collected := true
 
 var collected := false
 var speed := 0.0
@@ -34,7 +35,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-func collect() -> void:
+func collect(body: PhysicsBody2D) -> void:
 	if is_disabled() or collected:
 		return
 	
@@ -49,7 +50,7 @@ func collect() -> void:
 		EVENTS.emit_signal("play_sound_effect", collect_sound)
 	
 	trigger_collect_animation()
-	.collect()
+	.collect(body)
 
 
 func follow_target(new_target: Node):
@@ -73,7 +74,8 @@ func compute_amount_collected() -> int:
 
 remotesync func _collect_success() -> void:
 	EVENTS.emit_signal("increment_collectable_amount", get_collectable_name(), compute_amount_collected())
-	owner.queue_free()
+	if free_when_collected:
+		owner.queue_free()
 
 
 #### INPUTS ####
@@ -107,7 +109,7 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 		return
 	
 	if body.is_class("Player") or body.is_class("Character"):
-		collect()
+		collect(body)
 
 
 func _on_collect_animation_finished() -> void:

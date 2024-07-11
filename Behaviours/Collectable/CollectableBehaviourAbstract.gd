@@ -23,6 +23,7 @@ var target_weakref : WeakRef = null
 #warning-ignore:unused_signal
 signal interactable_changed
 #warning-ignore:unused_signal
+signal collected(body)
 signal collect_animation_finished
 
 #### ACCESSORS ####
@@ -60,8 +61,8 @@ func _ready():
 
 #### LOGIC ####
 
-func collect() -> void:
-	pass
+func collect(body: PhysicsBody2D) -> void:
+	emit_signal("collected", body)
 
 
 func trigger_collect_animation() -> void:
