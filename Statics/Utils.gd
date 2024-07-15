@@ -39,6 +39,20 @@ static func dict_find_key(dict: Dictionary, wanted_key: String, case_sensitive: 
 	return -1
 
 
+static func get_nearest_cardinal_direction(dir: Vector2, possible_directions := DIRECTIONS_4.values()) -> Vector2:
+	var smallest_dist = INF
+	var nearest_dir = Vector2.ZERO
+	
+	for direction in possible_directions:
+		var dist = abs(dir.angle() - direction.angle())
+		
+		if dist < smallest_dist:
+			smallest_dist = dist
+			nearest_dir = direction
+	
+	return nearest_dir
+
+
 # Finds the first key that matches the given value in the given Dictionary and returns it
 static func dict_find_key_by_value(dict: Dictionary, value) -> String:
 	var id = dict.values().find(value)
@@ -65,6 +79,7 @@ static func find_behaviour(node: Node, behaviour_name: String) -> Behaviour:
 		return node.get_meta(behaviour_name, null)
 	else:
 		return null
+
 
 static func has_behaviour(node: Node, behaviour_name: String) -> bool:
 	return node.has_meta(behaviour_name)
