@@ -266,12 +266,12 @@ func cancel():
 	match(cancel_action):
 		CANCEL_ACTION.RESUME_GAME:
 			if can_resume_game():
-				NETWORK.rpc_or_direct_call(self, "_resume_game", [], NETWORK.RPC_MODE.ONLINE)
+				_resume_game()
 			else:
-				NETWORK.rpc_or_direct_call(self, "_go_to_last_menu", [], NETWORK.RPC_MODE.ONLINE)
+				_go_to_last_menu()
 		
 		CANCEL_ACTION.GO_TO_LAST_MENU:
-			NETWORK.rpc_or_direct_call(self, "_go_to_last_menu", [], NETWORK.RPC_MODE.ONLINE)
+			_go_to_last_menu()
 
 
 remote func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
@@ -305,7 +305,7 @@ func _on_menu_option_focus_changed(option : Control, focus: bool) -> void:
 		choice_sound_node.play()
 	
 	var option_path = get_path_to(option)
-	NETWORK.rpc_or_direct_call(self, "remote_focus_option_changed", [option_path, focus], NETWORK.RPC_MODE.ONLINE)
+	remote_focus_option_changed(option_path, focus)
 
 
 # Virtual method to respond to the signal emited by an option beeing chosen

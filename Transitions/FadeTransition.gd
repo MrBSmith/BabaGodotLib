@@ -36,7 +36,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-remotesync func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay : float = 0.0, pause_time: float = 1.0) -> void:
+func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay : float = 0.0, pause_time: float = 1.0) -> void:
 	running = true
 	var duration = fade_time / 2 if fade_mode == FADE_MODE.FADE_IN_OUT else fade_time
 	
@@ -65,7 +65,7 @@ remotesync func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_
 	EVENTS.emit_signal("transition_finished")
 
 
-remotesync func interupt_transition() -> void:
+func interupt_transition() -> void:
 	tween.stop_all()
 	tween.remove_all()
 	running = false
@@ -87,12 +87,12 @@ func set_to_transparent() -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_EVENTS_fade_transition(duration: float, fade_mode: int) -> void:
-	NETWORK.rpc_or_direct_call(self, "fade", [duration, fade_mode])
+	fade(duration, fade_mode)
 
 
 func _on_EVENTS_fade_transition_with_pause(duration: float, fade_mode: int, delay : float, pause_time: float) -> void:
-	NETWORK.rpc_or_direct_call(self, "fade", [duration, fade_mode, delay, pause_time])
+	fade(duration, fade_mode, delay, pause_time)
 
 
 func _on_EVENTS_interupt_transition() -> void:
-	NETWORK.rpc_or_direct_call(self, "interupt_transition")
+	interupt_transition()
