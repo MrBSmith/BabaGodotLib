@@ -113,7 +113,7 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 
 
 func _on_collect_animation_finished() -> void:
-	NETWORK.rpc_or_direct_call(self, "_collect_success")
+	_collect_success()
 
 
 func _on_AnimationPlayer_animation_finished(anim_name: String) -> void:
