@@ -98,6 +98,9 @@ func _ready() -> void:
 
 
 func set_amount(amount: int, instant: bool = false) -> void:
+	if counter_label.target_amount == amount:
+		return
+	
 	if instant:
 		counter_label.reset(amount)
 	else:

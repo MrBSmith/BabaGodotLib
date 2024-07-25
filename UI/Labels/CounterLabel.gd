@@ -3,7 +3,8 @@ extends Label
 class_name CounterLabel
 
 onready var increment_sound = get_node_or_null("IncrementSound")
-export var amount : int = 0 setget set_amount 
+export var amount : int = 0 setget set_amount
+var target_amount := 0
 
 signal text_changed(text)
 signal amount_changed(previous_amount, amount)
@@ -47,6 +48,8 @@ func tween_amount(new_amount: int, duration: float = 0.3,
 	
 	if tween:
 		tween.kill()
+	
+	target_amount = new_amount
 	
 	tween = create_tween()
 	var __ = tween.connect("finished", self, "_on_tween_finished")
