@@ -217,7 +217,7 @@ func _on_hover_texture_flags_changed():
 	$HBoxContainer/HoverTexture2.set_visible(hover_texture_flags & TEXTURE_FLAGS.RIGHT)
 
 
-func _on_text_changed() -> void:
+func _on_text_changed(_text: String) -> void:
 	_update_text()
 
 
