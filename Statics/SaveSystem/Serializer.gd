@@ -30,8 +30,6 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 	if !is_instance_valid(scene_root):
 		push_error("Invalid scene root: abort serializing")
 	
-	print(scene_root.name)
-	
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
 	for node in nodes:
