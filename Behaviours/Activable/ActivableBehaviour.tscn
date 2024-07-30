@@ -13,5 +13,5 @@ one_shot = true
 script = ExtResource( 2 )
 
 [node name="SerializableBehaviour" parent="." instance=ExtResource( 3 )]
-fetch_case_flag = 7
+fetch_case_flag = 4
 serialized_properties = PoolStringArray( "active" )
