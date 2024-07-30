@@ -39,6 +39,7 @@ func _init() -> void:
 
 func reset(default_value: int = 0) -> void:
 	if tween: tween.kill()
+	target_amount = 0
 	set_amount(default_value)
 
 
