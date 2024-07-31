@@ -7,9 +7,11 @@ onready var raycast = get_node_or_null("Baba_RayCast2D")
 export var default_state : String = ""
 export var free_when_collected := true
 
-var collected := false
+var collected := false setget set_collected
 var speed := 0.0
 export var acceleration := 10.0
+
+signal collected_changed(collected)
 
 #### ACCESSORS ####
 
@@ -19,6 +21,11 @@ func get_class() -> String: return "FollowCollectable"
 func set_state(state): state_machine.set_state(state)
 func get_state() -> Object: return state_machine.get_state()
 func get_state_name(): return state_machine.get_state_name()
+
+func set_collected(value: bool) -> void:
+	if collected != value:
+		collected = value
+		emit_signal("collected_changed", collected)
 
 #### BUILT-IN ####
 
@@ -39,7 +46,7 @@ func collect(body: PhysicsBody2D) -> void:
 	if is_disabled() or collected:
 		return
 	
-	collected = true
+	set_collected(true)
 	set_state("Collect")
 	
 	set_target(null)
