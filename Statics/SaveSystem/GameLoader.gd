@@ -7,14 +7,14 @@ class_name GameLoader
 # Load the content of the .cfg save file located in the save_dir_path folder. 
 # The method will fetch the right save based on its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
-static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null) -> void:
+static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null, input_handler : Node = null) -> void:
 	var save_path = find_corresponding_save_file(save_dir_path, slot_id)
 	
-	load_save(save_path, progression, players_data)
+	load_save(save_path, progression, players_data, input_handler)
 
 
 
-static func load_save(path: String, progression: Node, players_data: Node) -> void:
+static func load_save(path: String, progression: Node, players_data: Node, input_handler: Node) -> void:
 	var config_file = ConfigFile.new()
 	
 	if config_file.load(path) != OK:
@@ -22,7 +22,7 @@ static func load_save(path: String, progression: Node, players_data: Node) -> vo
 		return
 	
 	var input_mapper = InputMapper.new()
-	input_mapper.map_player_settings_inputs(path)
+	input_mapper.map_player_settings_inputs(path, input_handler)
 
 	for section in config_file.get_sections():
 		match(section):

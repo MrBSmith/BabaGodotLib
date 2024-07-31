@@ -177,10 +177,11 @@ func _fetch_input_profile_from_file(file_path: String, sections_to_read : Array 
 
 
 # Fetch the player's default_profile file content, then map the profile fetched
-func map_player_settings_inputs(file_path: String) -> void:
-	var inputs_dict = fetch_file_inputs(file_path)
+func map_player_settings_inputs(file_path: String, input_handler: Node) -> void:
+	var serialized_inputs = fetch_file_inputs(file_path)
+	var inputs_dict = input_handler.deserialize_inputs(serialized_inputs)
 	
-	PLAYERS_INPUT.update_inputs(inputs_dict)
+	input_handler.update_inputs(inputs_dict)
 
 
 # This function will remove the current keys in the given action from the settings and add a new key instead
