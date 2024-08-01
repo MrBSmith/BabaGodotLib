@@ -18,7 +18,7 @@ onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTe
 
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
-signal option_chose(menu_option)
+signal option_chose(path)
 signal hidden_changed
 signal text_changed(text)
 signal hover_texture_flags_changed()

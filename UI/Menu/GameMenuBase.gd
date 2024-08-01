@@ -54,6 +54,7 @@ func _ready() -> void:
 	var __ = connect("options_array_changed", self, "_on_options_array_changed")
 	
 	EVENTS.emit_signal("menu_entered", name)
+	
 	_setup()
 
 
@@ -239,7 +240,7 @@ func set_buttons_default_state():
 		options_array[i].set_disabled(default_button_state[i])
 
 
-remotesync func _go_to_last_menu() -> void:
+func _go_to_last_menu() -> void:
 	EVENTS.emit_signal("navigate_menu_back_query")
 
 
@@ -274,7 +275,7 @@ func cancel():
 			_go_to_last_menu()
 
 
-remote func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
+func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
 	var option = get_node_or_null(option_path)
 	
 	if !is_instance_valid(option) or not option is Control:
@@ -290,11 +291,12 @@ remote func remote_focus_option_changed(option_path: NodePath, focus: bool) -> v
 			option.release_focus()
 
 
+func _trigger_element(_elem_path: String) -> void:
+	pass
+
+
 #### INPUT ####
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and !get_tree().is_input_handled():
-		cancel()
 
 
 #### SIGNAL RESPONSES ####
@@ -310,8 +312,8 @@ func _on_menu_option_focus_changed(option : Control, focus: bool) -> void:
 
 # Virtual method to respond to the signal emited by an option beeing chosen
 # Here you can add the code that tells the game what to do based on what option was chose
-func _on_menu_option_chose(_option: MenuOptionsBase) -> void:
-	pass
+func _on_menu_option_chose(option: MenuOptionsBase) -> void:
+	NETWORK.call_and_remote_call_both_way(self, "_trigger_element", [str(option.get_path())])
 
 
 func _on_menu_option_disabled_changed(_disabled: bool) -> void:
