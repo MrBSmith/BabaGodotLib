@@ -8,7 +8,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int) -> Dictionary
 	
 	var dict = {
 		"root_path": scene_root.get_path(),
-		"brach_state" : {},
+		"branch_state" : {},
 	}
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
