@@ -291,7 +291,7 @@ func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
 			option.release_focus()
 
 
-func _trigger_element(node: Node) -> void:
+func _trigger_element(_node: Node) -> void:
 	pass
 
 
