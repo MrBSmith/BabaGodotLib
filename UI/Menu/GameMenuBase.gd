@@ -27,10 +27,6 @@ var is_ready : bool = false
 
 var submenu : bool = false setget set_submenu, is_submenu
 
-#warning-ignore:unused_signal
-signal menu_left
-#warning-ignore:unused_signal
-signal sub_menu_left
 signal options_array_changed
 
 #### ACCESSORS ####
