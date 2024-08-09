@@ -254,8 +254,8 @@ func can_resume_game() -> bool:
 
 
 func _resume_game():
-	EVENTS.emit_signal("game_resumed")
 	get_tree().set_pause(false)
+	EVENTS.emit_signal("game_resumed")
 	queue_free()
 
 
