@@ -318,7 +318,10 @@ func _on_menu_option_focus_changed(option : Control, focus: bool) -> void:
 # Virtual method to respond to the signal emited by an option beeing chosen
 # Here you can add the code that tells the game what to do based on what option was chose
 func _on_menu_option_chose(option: MenuOptionsBase) -> void:
-	NETWORK.call_and_remote_call_both_way(self, "_trigger_element_at_path", [str(option.get_path())])
+	if NETWORK.is_client():
+		NETWORK.remote_call(self, "_trigger_element_at_path", [str(option.get_path())])
+	else:
+		_trigger_element(option)
 
 
 func _on_menu_option_disabled_changed(_disabled: bool) -> void:
