@@ -19,13 +19,28 @@ export(int, FLAGS, "checkpoint", "save", "game state online", "character state o
 export var persistant := false
 export var serialized_properties := PoolStringArray()
 
+var _handled_by_client := false setget set_handled_by_client, is_handled_by_client
+
+signal handled_by_client_changed
 
 func is_class(value: String): return value == "SerializableBehaviour" or .is_class(value)
 func get_class() -> String: return "SerializableBehaviour"
 
+func set_handled_by_client(value: bool) -> void:
+	if _handled_by_client != value:
+		_handled_by_client = value
+		emit_signal("handled_by_client_changed")
+func is_handled_by_client() -> bool: return _handled_by_client
 
 func must_fetch(fetch_case: int) -> bool:
+	if fetch_case & FETCH_CASE_FLAG.GAME_STATE_ONLINE and NETWORK.is_online() and \
+		!_is_handler_peer():
+		return false
+	
 	return bool(fetch_case & fetch_case_flag)
+
+func _is_handler_peer() -> bool:
+	return NETWORK.is_client() == _handled_by_client
 
 
 func serialize() -> Dictionary:
@@ -41,6 +56,9 @@ func serialize() -> Dictionary:
 
 func deserialize(state: Dictionary) -> void:
 	if disabled: return
+	
+	if NETWORK.is_client() and _handled_by_client:
+		return
 	
 	for property in state.keys():
 		_set_value(property, state[property])
