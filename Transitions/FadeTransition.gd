@@ -54,6 +54,9 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 		yield(get_tree().create_timer(pause_time), "timeout")
 		EVENTS.emit_signal("transition_pause_finished")
 	
+	if pause:
+		yield(self, "unpaused")
+	
 	if fade_mode != FADE_MODE.FADE_OUT:
 		tween.interpolate_property($ColorRect, "color", fade_color, Color(0.0, 0.0, 0.0, 0.0),
 					 duration, Tween.TRANS_LINEAR, Tween.EASE_OUT, delay)
