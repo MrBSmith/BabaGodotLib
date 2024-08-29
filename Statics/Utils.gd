@@ -44,7 +44,10 @@ static func get_nearest_cardinal_direction(dir: Vector2, possible_directions := 
 	var nearest_dir = Vector2.ZERO
 	
 	for direction in possible_directions:
-		var dist = abs(dir.angle() - direction.angle())
+		if direction.is_equal_approx(dir):
+			return direction
+		
+		var dist = abs(dir.angle_to(direction))
 		
 		if dist < smallest_dist:
 			smallest_dist = dist
