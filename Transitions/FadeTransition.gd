@@ -10,6 +10,10 @@ onready var tween = $Tween
 export var start_color := Color.transparent
 export var fade_color := Color.black
 
+var pause := false setget set_pause
+
+signal paused
+signal unpaused
 
 #### ACCESSORS ####
 
@@ -19,6 +23,14 @@ func get_class() -> String: return "FadeTransition"
 func set_visible(value: bool):
 	$ColorRect.set_visible(value)
 
+func set_pause(value: bool) -> void:
+	if value != pause:
+		pause = value
+		
+		if pause:
+			emit_signal("paused")
+		else:
+			emit_signal("unpaused")
 
 #### BUILT-IN ####
 
