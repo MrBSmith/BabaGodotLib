@@ -173,6 +173,14 @@ static func capsule2poly(height: float, radius: float) -> PoolVector2Array:
 	return points_array
 
 
+static func shape2rect(shape: Shape2D, global_transform: Transform2D) -> Rect2:
+	if shape is RectangleShape2D:
+		var rect = Rect2(-shape.get_extents(), shape.get_extents() * 2)
+		return global_transform.xform(rect)
+	else:
+		return Rect2()
+
+
 static func shape2poly(shape: Shape2D, global_transform: Transform) -> PoolVector2Array:
 	if shape is RectangleShape2D:
 		var rect = Rect2(Vector2.ZERO, shape.get_extents() * 2)
