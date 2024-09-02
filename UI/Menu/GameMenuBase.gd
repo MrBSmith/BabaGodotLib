@@ -14,10 +14,12 @@ export var opt_container_path : NodePath = "VBoxContainer"
 
 onready var opt_container = get_node_or_null(opt_container_path)
 onready var choice_sound_node = get_node_or_null("OptionChoiceSound")
+onready var resume_option = get_node_or_null(resume_option_path)
 
 onready var options_array = _fetch_menu_option_array() setget set_options_array
 
 export var resume_scenes = ["ViewManager", "WorldMap"]
+export var resume_option_path : NodePath
 
 export(CANCEL_ACTION) var cancel_action = CANCEL_ACTION.GO_TO_LAST_MENU 
 export var focus_first_option_on_ready : bool = true
@@ -107,7 +109,7 @@ func _setup_menu_options_wrapping(wrapping: bool = true) -> void:
 		if options_array[i].is_accessible() && first_option_unabled == null:
 			first_option_unabled = options_array[i]
 		
-		if options_array[-i - 1].is_accessible() && last_option_unabled == null:
+		elif options_array[-i - 1].is_accessible() && last_option_unabled == null:
 			last_option_unabled = options_array[-i - 1]
 	
 	# Setup the wrapping
@@ -182,6 +184,9 @@ func _fetch_menu_option_array() -> Array:
 			var options = Utils.fetch_recursive(child, "MenuOptionsBase")
 			if !options.empty():
 				menu_option_array.append(options[0])
+	
+	if resume_option:
+		menu_option_array.append(resume_option)
 	
 	return menu_option_array
 
@@ -298,6 +303,11 @@ func _trigger_element_at_path(node_path: String) -> void:
 		_trigger_element(node)
 	else:
 		push_error("Couldn't find node at path %s to trigger" % node_path)
+
+
+func _disable_all_buttons() -> void:
+	for option in opt_container.get_children():
+		option.set_disabled(true)
 
 
 #### INPUT ####
