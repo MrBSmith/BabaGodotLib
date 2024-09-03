@@ -18,7 +18,7 @@ onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTe
 
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
-signal option_chose(path)
+signal option_chose(option)
 signal hidden_changed
 signal text_changed(text)
 signal hover_texture_flags_changed()
@@ -162,9 +162,11 @@ func _on_mouse_exited():
 
 
 func _on_focus_entered():
-	if !hidden:
-		set_focused(true)
-		$AnimationPlayer.play("Focused")
+	if disabled or hidden:
+		return
+	
+	set_focused(true)
+	$AnimationPlayer.play("Focused")
 
 
 func _on_focus_exited():
@@ -178,7 +180,7 @@ func _on_focus_changed(entity: Control, focus: bool) -> void:
 		
 		set_hover_icons_modulate(dest_color)
 	
-	if focused:
+	if !disabled and focused:
 		_button.grab_focus()
 	else:
 		_button.release_focus()
@@ -206,6 +208,9 @@ func _on_button_up() -> void:
 
 func _on_disabled_changed(value: bool) -> void:
 	_button.set_disabled(value)
+	
+	var mode = Control.FOCUS_NONE if disabled else Control.FOCUS_ALL
+	_button.set_focus_mode(mode)
 	
 	for sprite in hover_sprites:
 		var alpha = int(!disabled)
