@@ -139,18 +139,20 @@ func _setup_menu_options_wrapping(wrapping: bool = true) -> void:
 		var next_button = next_option.get_button()
 		
 		if button == first_option_unabled:
-			if wrapping:
+			if wrapping and button.get_focus_neighbour(MARGIN_TOP).is_empty():
 				button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
 		else:
-			button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
-			button.set_focus_previous(previous_button.get_path())
+			if button.get_focus_neighbour(MARGIN_TOP).is_empty():
+				button.set_focus_neighbour(MARGIN_TOP, previous_button.get_path())
+				button.set_focus_previous(previous_button.get_path())
 		
 		if button == last_option_unabled:
-			if wrapping:
+			if wrapping and button.get_focus_neighbour(MARGIN_BOTTOM).is_empty():
 				button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
 		else:
-			button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
-			button.set_focus_next(next_button.get_path())
+			if button.get_focus_neighbour(MARGIN_BOTTOM).is_empty():
+				button.set_focus_neighbour(MARGIN_BOTTOM, next_button.get_path())
+				button.set_focus_next(next_button.get_path())
 
 
 func _connect_options_signals() -> void:

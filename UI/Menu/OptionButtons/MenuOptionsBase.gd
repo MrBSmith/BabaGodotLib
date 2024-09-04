@@ -140,6 +140,12 @@ func _update_text() -> void:
 	else:
 		_button.set_text(text)
 
+
+func _update_focus_mode() -> void:
+	var button_focus_mode = FOCUS_ALL if is_visible_in_tree() and !disabled else FOCUS_NONE
+	_button.set_focus_mode(button_focus_mode)
+
+
 #### SIGNAL RESPONSES ####
 
 func _on_gui_input(event : InputEvent): 
@@ -162,7 +168,7 @@ func _on_mouse_exited():
 
 
 func _on_focus_entered():
-	if disabled or hidden:
+	if !is_visible_in_tree() or disabled or hidden:
 		return
 	
 	set_focused(true)
@@ -180,9 +186,10 @@ func _on_focus_changed(entity: Control, focus: bool) -> void:
 		
 		set_hover_icons_modulate(dest_color)
 	
-	if !disabled and focused:
+	if is_visible() and !disabled and focused:
 		_button.grab_focus()
 	else:
+		set_focused(false)
 		_button.release_focus()
 
 
@@ -215,6 +222,8 @@ func _on_disabled_changed(value: bool) -> void:
 	for sprite in hover_sprites:
 		var alpha = int(!disabled)
 		sprite.self_modulate.a = alpha
+	
+	_update_focus_mode()
 
 
 func _on_hover_texture_flags_changed():
@@ -229,3 +238,7 @@ func _on_text_changed(_text: String) -> void:
 func _on_hover_texture_changed() -> void:
 	for sprite in hover_sprites:
 		sprite.set_texture(hover_texture)
+
+
+func _on_MenuOptionBase_visibility_changed() -> void:
+	_update_focus_mode()

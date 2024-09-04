@@ -82,3 +82,5 @@ __meta__ = {
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 playback_speed = 4.0
 anims/Focused = SubResource( 2 )
+
+[connection signal="visibility_changed" from="." to="." method="_on_MenuOptionBase_visibility_changed"]
