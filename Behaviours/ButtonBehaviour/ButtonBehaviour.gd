@@ -132,6 +132,7 @@ func _ready() -> void:
 	
 	_update_theme()
 	_on_state_changed()
+	_update_focus_mode()
 
 
 #### VIRTUALS ####
@@ -163,6 +164,14 @@ func _update_state() -> void:
 		
 		else:
 			set_state(STATE.NORMAL) 
+
+
+func _update_focus_mode() -> void:
+	if not holder is Control:
+		return
+	
+	var focus_mode = Control.FOCUS_ALL if !disabled and holder.is_visible_in_tree() else Control.FOCUS_NONE
+	holder.set_focus_mode(focus_mode)
 
 
 func toggle() -> void:
@@ -248,6 +257,7 @@ func _on_focus_exited() -> void:
 
 func _on_visibility_changed() -> void:
 	_update_state()
+	_update_focus_mode()
 
 
 func _on_state_changed() -> void:
