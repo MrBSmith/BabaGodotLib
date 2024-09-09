@@ -1,0 +1,25 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://Scenes/GUI/AvatarsHUD/PlayerAvatar/Mask_AvatarHUD.png" type="Texture" id=1]
+
+[sub_resource type="Shader" id=2]
+code = "shader_type canvas_item;
+
+uniform sampler2D mask;
+uniform vec4 transparent_color : hint_color = vec4(0.0, 0.0, 0.0, 1.0);
+
+void fragment(){
+	vec4 mask_color = texture(mask, UV, 0.0);
+	vec4 color = texture(TEXTURE, UV, 0.0);
+	
+	if (mask_color.a == transparent_color.a){
+		COLOR = vec4(0.0);
+	} else {
+		COLOR = color;
+	}
+}"
+
+[resource]
+shader = SubResource( 2 )
+shader_param/transparent_color = Color( 1, 1, 1, 0 )
+shader_param/mask = ExtResource( 1 )
