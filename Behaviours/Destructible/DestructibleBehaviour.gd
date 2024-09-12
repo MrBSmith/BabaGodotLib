@@ -16,6 +16,13 @@ class_name DestructibleBehaviour
 # then the destroyed signal is called when the animation is over
 
 
+enum FREE_AFTER {
+	NONE,
+	ANIMATION,
+	PARTICLES,
+}
+
+
 onready var animation_player = get_node_or_null("AnimationPlayer")
 onready var damage_computer = get_node_or_null("DamageComputer")
 onready var destroy_sound = get_node_or_null("DestroySound")
@@ -29,6 +36,8 @@ export var free_when_destroyed := true
 export var undommagable : bool = false
 export var invincible : bool = false
 export var cooldown : float = INF setget set_cooldown
+
+export(FREE_AFTER) var free_after_mode = FREE_AFTER.ANIMATION
 
 var is_destroyed := false
 
@@ -80,7 +89,7 @@ func _ready() -> void:
 
 #### LOGIC ####
 
-remotesync func damage() -> void:
+func damage() -> void:
 	if $Cooldown.is_running():
 		return
 	
@@ -96,7 +105,7 @@ remotesync func damage() -> void:
 		$Cooldown.start()
 
 
-remotesync func destroy() -> void:
+func destroy() -> void:
 	if invincible or is_destroyed:
 		return
 	
@@ -106,18 +115,21 @@ remotesync func destroy() -> void:
 		EVENTS.emit_signal("play_sound_effect", destroy_sound)
 	
 	if particules:
-		EVENTS.emit_signal("play_particule_FX", particules, particules.get_global_position())
+		particules.set_emitting(true)
 	
 	emit_signal("destroy_animation_started")
 	
 	if animation_player && animation_player.has_animation("Destroy"):
 		animation_player.play("Destroy")
-		yield(animation_player, "animation_finished")
+	
+	match(free_after_mode):
+		FREE_AFTER.PARTICLES: yield(get_tree().create_timer(particules.lifetime), "timeout")
+		FREE_AFTER.ANIMATION: yield(animation_player, "animation_finished")
 	
 	emit_signal("destroyed")
 	
 	if free_when_destroyed:
-		owner.queue_free()
+		owner.call_deferred("queue_free")
 
 
 

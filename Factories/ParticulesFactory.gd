@@ -22,9 +22,10 @@ func _ready() -> void:
 func play_particules(particule: Particles2D, pos: Vector2) -> void:
 	var new_particule = particule.duplicate()
 	target.call_deferred("add_child", new_particule)
+
 	new_particule.set_position(pos)
-	new_particule.set_emitting(true)
-	
+	new_particule.call_deferred("set_emitting", true)
+
 	yield(get_tree().create_timer(new_particule.lifetime), "timeout")
 	new_particule.queue_free()
 
