@@ -123,8 +123,12 @@ func destroy() -> void:
 		animation_player.play("Destroy")
 	
 	match(free_after_mode):
-		FREE_AFTER.PARTICLES: yield(get_tree().create_timer(particules.lifetime), "timeout")
-		FREE_AFTER.ANIMATION: yield(animation_player, "animation_finished")
+		FREE_AFTER.PARTICLES: 
+			if particules:
+				yield(get_tree().create_timer(particules.lifetime), "timeout")
+		FREE_AFTER.ANIMATION: 
+			if animation_player:
+				yield(animation_player, "animation_finished")
 	
 	emit_signal("destroyed")
 	
