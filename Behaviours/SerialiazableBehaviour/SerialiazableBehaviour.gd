@@ -71,8 +71,7 @@ func _get_value(property: String):
 			var getter = "get_" + property
 		
 			if !holder.has_method(getter):
-				push_error("Cannot fetch property %s: no getter found" % property)
-				continue
+				return holder.get(property)
 			
 			return holder.call(getter)
 
@@ -84,7 +83,7 @@ func _set_value(property: String, value) -> void:
 			var setter = "set_" + property
 		
 			if !holder.has_method(setter):
-				push_error("Cannot apply serialized state property %s: no setter found" % property)
-				continue
+				holder.set(property, value)
+				return
 			
 			holder.call(setter, value)
