@@ -15,8 +15,7 @@ enum FETCH_CASE_FLAG {
 
 export(SETGET_MODE) var setget_mode : int = SETGET_MODE.PROPERTY
 export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var fetch_case_flag : int = 0x00
-
-export var persistant := false
+export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var persitant_flag : int = 0x00
 export var serialized_properties := PoolStringArray()
 
 var _handled_by_client := false setget set_handled_by_client, is_handled_by_client
@@ -39,8 +38,10 @@ func must_fetch(fetch_case: int) -> bool:
 	
 	return bool(fetch_case & fetch_case_flag)
 
+
 func must_apply(fetch_case: int) -> bool:
 	return bool(fetch_case & fetch_case_flag)
+
 
 func _is_handler_peer() -> bool:
 	return NETWORK.is_client() == _handled_by_client
