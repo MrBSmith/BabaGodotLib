@@ -15,7 +15,7 @@ enum FETCH_CASE_FLAG {
 
 export(SETGET_MODE) var setget_mode : int = SETGET_MODE.PROPERTY
 export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var fetch_case_flag : int = 0x00
-export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var persitant_flag : int = 0x00
+export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var persistant_flag : int = 0x00
 export var serialized_properties := PoolStringArray()
 
 var _handled_by_client := false setget set_handled_by_client, is_handled_by_client
