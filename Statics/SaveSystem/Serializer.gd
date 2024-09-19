@@ -52,7 +52,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
 			continue
 		
-		if !serializable_behav.must_fetch(fetch_type_flag):
+		if !serializable_behav.must_apply(fetch_type_flag):
 			continue
 		
 		if not node_path in dict["branch_state"].keys():

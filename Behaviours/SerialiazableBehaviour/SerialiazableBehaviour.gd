@@ -39,6 +39,9 @@ func must_fetch(fetch_case: int) -> bool:
 	
 	return bool(fetch_case & fetch_case_flag)
 
+func must_apply(fetch_case: int) -> bool:
+	return bool(fetch_case & fetch_case_flag)
+
 func _is_handler_peer() -> bool:
 	return NETWORK.is_client() == _handled_by_client
 
