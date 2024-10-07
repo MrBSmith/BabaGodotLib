@@ -7,46 +7,25 @@ class_name GameLoader
 # Load the content of the .cfg save file located in the save_dir_path folder. 
 # The method will fetch the right save based on its slot_id
 # It will then apply audio & controls settings; and feed the given progression node with the progression data
-static func load_save_slot(save_dir_path: String, slot_id : int, progression: Node = null, players_data: Node = null, input_handler : Node = null) -> void:
-	var save_path = find_corresponding_save_file(save_dir_path, slot_id)
-	
-	load_save(save_path, progression, players_data, input_handler)
 
 
-
-static func load_save(path: String, progression: Node, players_data: Node, input_handler: Node) -> void:
+static func load_save_as_dict(path: String) -> Dictionary:
 	var config_file = ConfigFile.new()
 	
 	if config_file.load(path) != OK:
 		push_error("Couldn't load save at path %s" % path)
-		return
+		return {}
 	
-	var input_mapper = InputMapper.new()
-	input_mapper.map_player_settings_inputs(path, input_handler)
-
+	var dict = {}
+	
 	for section in config_file.get_sections():
-		match(section):
-			"progression":
-				if progression == null:
-					print_debug("No progression node passed; progression could not be loaded")
-					continue
-				
-				for key in config_file.get_section_keys(section):
-					var value = config_file.get_value(section, key)
-					progression.set(key, value)
-			
-			"players_data":
-				if players_data == null:
-					push_error("No players_data node passed; players_data could not be loaded")
-					continue
-				
-				var player_data_dict = {}
-				
-				# All the players data are stored in one big dictionnary, so it should always be only one key there
-				for key in config_file.get_section_keys(section):
-					player_data_dict[key] = config_file.get_value(section, key)
-				
-				players_data.players_data_dict = player_data_dict
+		dict[section] = {}
+		
+		for key in config_file.get_section_keys(section):
+			dict[section][key] = config_file.get_value(section, key)
+	
+	return dict
+
 
 
 # Create a ConfigFile object out of the save.cfg found in the save folder corresponding to the given slot_id.
