@@ -10,12 +10,12 @@ enum FETCH_CASE_FLAG {
 	CHECKPOINT = 0x01,
 	SAVE = 0x02,
 	GAME_STATE_ONLINE = 0x04,
-	CHARACTER_STATE_ONLINE = 0x08,
+	EACH_TICK_ONLINE = 0x08,
 }
 
 export(SETGET_MODE) var setget_mode : int = SETGET_MODE.PROPERTY
-export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var fetch_case_flag : int = 0x00
-export(int, FLAGS, "checkpoint", "save", "game state online", "character state online") var persistant_flag : int = 0x00
+export(int, FLAGS, "checkpoint", "save", "game state online", "each tick online") var fetch_case_flag : int = 0x00
+export(int, FLAGS, "checkpoint", "save", "game state online", "each tick online") var persistant_flag : int = 0x00
 export var serialized_properties := PoolStringArray()
 
 var _handled_by_client := false setget set_handled_by_client, is_handled_by_client
@@ -45,6 +45,19 @@ func must_apply(fetch_case: int) -> bool:
 
 func _is_handler_peer() -> bool:
 	return NETWORK.is_client() == _handled_by_client
+
+
+func _ready() -> void:
+	if fetch_case_flag & FETCH_CASE_FLAG.EACH_TICK_ONLINE:
+		set_physics_process(true)
+		var _err = EVENTS.connect("remote_peer_handled_state_received", self, "_on_EVENTS_remote_peer_handled_state_received")
+	else:
+		set_physics_process(false)
+
+
+func _physics_process(delta: float) -> void:
+	if NETWORK.is_client() == is_handled_by_client():
+		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
 
 
 func serialize() -> Dictionary:
@@ -91,3 +104,9 @@ func _set_value(property: String, value) -> void:
 				return
 			
 			holder.call(setter, value)
+
+
+func _on_EVENTS_remote_peer_handled_state_received(node_path: String, remote_state: Dictionary) -> void:
+	if node_path == str(get_path()):
+		deserialize(remote_state)
+
