@@ -397,11 +397,10 @@ static func are_event_same_input(event_a: InputEvent, event_b: InputEvent) -> bo
 		or (event_a.physical_scancode == event_b.physical_scancode && event_a.physical_scancode != 0)
 	
 	elif event_a is InputEventJoypadButton:
-		return event_a.button_index == event_b.button_index && event_a.device == event_b.device
+		return event_a.button_index == event_b.button_index
 	
 	elif event_a is InputEventJoypadMotion:
-		return event_a.axis == event_b.axis && sign(event_a.axis_value) == sign(event_b.axis_value) \
-			 && event_a.device == event_b.device
+		return event_a.axis == event_b.axis && sign(event_a.axis_value) == sign(event_b.axis_value)
 	
 	return false
 
