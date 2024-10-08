@@ -278,22 +278,6 @@ func cancel():
 			_go_to_last_menu()
 
 
-func remote_focus_option_changed(option_path: NodePath, focus: bool) -> void:
-	var option = get_node_or_null(option_path)
-	
-	if !is_instance_valid(option) or not option is Control:
-		push_error("No focusable option found at path %s" % str(option_path))
-		return
-	
-	if option is MenuOptionsBase:
-		option.set_focused(focus)
-	else:
-		if focus:
-			option.grab_focus()
-		else:
-			option.release_focus()
-
-
 func _trigger_element(_node: Node) -> void:
 	pass
 
@@ -322,9 +306,6 @@ func _disable_all_buttons() -> void:
 func _on_menu_option_focus_changed(option : Control, focus: bool) -> void:
 	if focus && choice_sound_node != null:
 		choice_sound_node.play()
-	
-	var option_path = get_path_to(option)
-	remote_focus_option_changed(option_path, focus)
 
 
 # Virtual method to respond to the signal emited by an option beeing chosen
