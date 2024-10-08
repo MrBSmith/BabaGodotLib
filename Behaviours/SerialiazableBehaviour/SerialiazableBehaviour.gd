@@ -55,7 +55,7 @@ func _ready() -> void:
 		set_physics_process(false)
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if NETWORK.is_client() == is_handled_by_client():
 		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
 
