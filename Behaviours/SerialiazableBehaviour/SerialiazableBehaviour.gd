@@ -48,7 +48,7 @@ func _is_handler_peer() -> bool:
 
 
 func _ready() -> void:
-	if fetch_case_flag & FETCH_CASE_FLAG.EACH_TICK_ONLINE:
+	if NETWORK.is_online() and (fetch_case_flag & FETCH_CASE_FLAG.EACH_TICK_ONLINE):
 		set_physics_process(true)
 		var _err = EVENTS.connect("remote_peer_handled_state_received", self, "_on_EVENTS_remote_peer_handled_state_received")
 	else:
