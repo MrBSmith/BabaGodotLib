@@ -107,6 +107,9 @@ func _set_value(property: String, value) -> void:
 
 
 func _on_EVENTS_remote_peer_handled_state_received(node_path: String, remote_state: Dictionary) -> void:
+	if is_handled_by_client() != NETWORK.is_client():
+		return
+	
 	if node_path == str(get_path()):
 		deserialize(remote_state)
 
