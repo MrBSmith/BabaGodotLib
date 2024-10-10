@@ -58,7 +58,6 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	if NETWORK.is_online() and NETWORK.is_client() == is_handled_by_client():
 		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
-		print("emit %s state" % owner.name)
 
 
 func serialize() -> Dictionary:
@@ -113,5 +112,4 @@ func _on_EVENTS_remote_peer_handled_state_received(node_path: String, remote_sta
 	
 	if node_path == str(get_path()):
 		deserialize(remote_state)
-		print("Receive %s state" % owner.name)
 
