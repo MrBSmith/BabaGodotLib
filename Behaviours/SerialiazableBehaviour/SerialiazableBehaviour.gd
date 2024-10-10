@@ -48,7 +48,7 @@ func _is_handler_peer() -> bool:
 
 
 func _ready() -> void:
-	if NETWORK.is_online() and (fetch_case_flag & FETCH_CASE_FLAG.EACH_TICK_ONLINE):
+	if fetch_case_flag & FETCH_CASE_FLAG.EACH_TICK_ONLINE:
 		set_physics_process(true)
 		var _err = EVENTS.connect("remote_peer_handled_state_received", self, "_on_EVENTS_remote_peer_handled_state_received")
 	else:
@@ -56,8 +56,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	if NETWORK.is_client() == is_handled_by_client():
+	if NETWORK.is_online() and NETWORK.is_client() == is_handled_by_client():
 		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
+		print("emit %s state" % owner.name)
 
 
 func serialize() -> Dictionary:
@@ -112,4 +113,5 @@ func _on_EVENTS_remote_peer_handled_state_received(node_path: String, remote_sta
 	
 	if node_path == str(get_path()):
 		deserialize(remote_state)
+		print("Receive %s state" % owner.name)
 
