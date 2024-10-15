@@ -34,7 +34,7 @@ static func test_collision(caller : PhysicsBody2D, movement: Vector2,
 
 
 # Check for a wall collision behind the character
-static func test_wall_collision(body: PhysicsBody2D, level: Level, movement: Vector2) -> bool:
+static func test_wall_collision(body: PhysicsBody2D, level: Node, movement: Vector2) -> bool:
 	if movement.x == 0.0 or !body:
 		return false
 	
