@@ -27,10 +27,11 @@ func _trigger(level_type: String) -> void:
 	fade()
 	
 	yield(EVENTS, "transition_finished")
+	yield(tween, "finished")
 	hide()
 
 
-func fade(fade_time := 3.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.0, pause_time := 1.0) -> void:
+func fade(fade_time := 2.3, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.0, pause_time := 1.0) -> void:
 	if tween:
 		tween.kill()
 	
@@ -41,7 +42,7 @@ func fade(fade_time := 3.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.
 	
 	if fade_mode != FADE_MODE.FADE_IN:
 		pivot.set_scale(dezoomed_scale)
-		var __ = tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		var __ = tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		__ = tween.tween_property(pivot, "scale", zoomed_scale, duration).set_delay(delay)
 		
 		yield(tween, "finished")
@@ -64,7 +65,7 @@ func fade(fade_time := 3.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.
 		tween = create_tween()
 		mask.show()
 		pivot.set_scale(zoomed_scale)
-		var __ = tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		var __ = tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 		__ = tween.tween_property(pivot, "scale", dezoomed_scale, duration).set_delay(delay)
 		
 		yield(get_tree().create_timer(delay + duration * 0.5), "timeout")
