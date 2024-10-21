@@ -25,13 +25,13 @@ func update_state(delta: float):
 	if target != null:
 		owner.speed += owner.acceleration
 		
-		var obj_pos = obj.get_position()
-		var target_pos = target.get_position()
+		var obj_pos = obj.get_global_position()
+		var target_pos = target.get_global_position()
 		
 		if obj_pos.distance_to(target_pos) < owner.speed * delta:
-			obj.set_position(target_pos)
+			obj.set_global_position(target_pos)
 		else:
-			obj.set_position(obj_pos.move_toward(target_pos, owner.speed * delta))
+			obj.set_global_position(obj_pos.move_toward(target_pos, owner.speed * delta))
 
 
 #### LOGIC ####
