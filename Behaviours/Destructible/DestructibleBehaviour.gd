@@ -89,6 +89,11 @@ func _ready() -> void:
 
 #### LOGIC ####
 
+func restore() -> void:
+	is_destroyed = false
+	set_hp(max_hp)
+
+
 func damage() -> void:
 	if $Cooldown.is_running():
 		return
