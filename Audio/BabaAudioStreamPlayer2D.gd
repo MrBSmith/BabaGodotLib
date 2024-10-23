@@ -16,6 +16,7 @@ export var delay := 0.0
 export var loop := false
 export var loop_delay := 0.0
 export var print_logs: bool = false 
+export var mute := false
 
 onready var sound_pool = sound_variations_array.duplicate()
 onready var start_pitch := pitch_scale
@@ -45,6 +46,10 @@ func _ready() -> void:
 #### LOGIC ####
 
 func play(from_position: float = 0.0) -> void:
+	if mute:
+		stop()
+		return
+	
 	if delay > 0.0:
 		yield(get_tree().create_timer(delay), "timeout")
 	
