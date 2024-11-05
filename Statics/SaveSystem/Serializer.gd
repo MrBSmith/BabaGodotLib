@@ -71,6 +71,6 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			if serializable_behav.persistant_flag & fetch_type_flag:
 				node.queue_free()
 			else:
-				push_error("Node at path %s is not peristant but doesn't appear in the serialized state" % node_path)
+				push_error("Node at path %s is not persistant but doesn't appear in the serialized state" % node_path)
 		else:
 			serializable_behav.deserialize(dict["branch_state"][node_path])
