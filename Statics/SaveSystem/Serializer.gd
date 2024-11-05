@@ -73,4 +73,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			else:
 				push_error("Node at path %s is not persistant but doesn't appear in the serialized state" % node_path)
 		else:
-			serializable_behav.deserialize(dict["branch_state"][node_path])
+			if dict["branch_state"].has(node_path):
+				serializable_behav.deserialize(dict["branch_state"][node_path])
+			else:
+				push_error("Node at path %s couldn't be found in the serialized dict" % node_path)
