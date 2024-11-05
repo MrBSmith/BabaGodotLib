@@ -1,66 +1,11 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Scenes/GUI/LevelContextUI/Sprites/Puzzle_BigIcon_LevelIntro.png" type="Texture" id=1]
 [ext_resource path="res://BabaGodotLib/Transitions/IconMaskTransition.gd" type="Script" id=3]
-
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-
-uniform vec4 background_color : hint_color = vec4(1.0);
-
-void fragment() {
-	vec4 texture_color = texture(TEXTURE, UV);
-	
-	if (texture_color.a == 0.0) {
-		COLOR = texture_color;
-	} else {
-		vec4 screen_texture = texture(SCREEN_TEXTURE, SCREEN_UV);
-		if (screen_texture.a != 0.0 && background_color.a != 0.0) {
-			COLOR = background_color;
-		} else {
-			COLOR = screen_texture;
-		}
-	}
-}"
-
-[sub_resource type="ShaderMaterial" id=2]
-shader = SubResource( 1 )
-shader_param/background_color = Color( 1, 1, 1, 0 )
 
 [node name="IconMaskTransition" type="CanvasLayer"]
 layer = 128
 script = ExtResource( 3 )
 
-[node name="BackBufferCopy" type="BackBufferCopy" parent="."]
-copy_mode = 2
-rect = Rect2( 0, 0, 960, 540 )
-
-[node name="Pivot" type="Node2D" parent="BackBufferCopy"]
+[node name="Pivot" type="Node2D" parent="."]
 unique_name_in_owner = true
 position = Vector2( 480, 270 )
-scale = Vector2( 15, 15 )
-
-[node name="Background" type="ColorRect" parent="BackBufferCopy/Pivot"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -48000.0
-margin_top = -27000.0
-margin_right = 48000.0
-margin_bottom = 27000.0
-color = Color( 0.137255, 0.0980392, 0.152941, 1 )
-
-[node name="Mask" type="TextureRect" parent="BackBufferCopy/Pivot"]
-unique_name_in_owner = true
-material = SubResource( 2 )
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -479.5
-margin_top = -270.0
-margin_right = 479.5
-margin_bottom = 270.0
-texture = ExtResource( 1 )
-stretch_mode = 4
