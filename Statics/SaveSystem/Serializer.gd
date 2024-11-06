@@ -12,6 +12,9 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 		"removed_elements": {},
 	}
 	
+	if fetch_type_flag & SerializableBehaviour.FETCH_CASE_FLAG.GAME_STATE_ONLINE:
+		dict["instance_id"] = scene_root.get_instance_id()
+	
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
 	# Fetch curent branch state
@@ -50,6 +53,13 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 	if !is_instance_valid(scene_root) or scene_root.get_path() != dict["root_path"]:
 		push_error("Invalid scene root: abort deserializing")
 		return
+	
+	if fetch_type_flag & SerializableBehaviour.FETCH_CASE_FLAG.GAME_STATE_ONLINE:
+		var remote_id_behav = Utils.find_behaviour(scene_root, "RemoteInstanceId")
+		
+		if remote_id_behav and remote_id_behav.remote_instance_id != dict["instance_id"]:
+			push_error("Cannot apply the branch state: invalid instance id")
+			return
 	
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
