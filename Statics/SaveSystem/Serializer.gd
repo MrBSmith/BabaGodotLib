@@ -87,3 +87,34 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 				serializable_behav.deserialize(dict["branch_state"][node_path])
 			else:
 				push_error("Node at path %s couldn't be found in the serialized dict" % node_path)
+
+
+# Compare two state dicts: if both have the same key but with different values, a will preveil over b
+static func state_diff(a: Dictionary, b: Dictionary) -> Dictionary:
+	if a["root_path"] != b["root_path"] or a["instance_id"] != b["instance_id"]:
+		return a
+	
+	var diff = {
+		"root_path": a["root_path"],
+		"instance_id": a["instance_id"],
+		"branch_state": {},
+		"removed_elements": {},
+	}
+	
+	var states = [a, b] 
+	
+	for dict_key in ["branch_state", "removed_elements"]:
+		for i in states.size():
+			var current = states[i]
+			var other = states[i - 1]
+			var treated_keys = []
+			
+			for key in current[dict_key]:
+				if key in treated_keys:
+					continue
+				
+				if !other[dict_key].has(key) or current[dict_key][key].hash() != other[dict_key][key].hash():
+					diff[dict_key][key] = current[dict_key][key]
+					treated_keys.append(key)
+	
+	return diff
