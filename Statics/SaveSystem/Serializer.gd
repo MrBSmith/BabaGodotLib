@@ -54,7 +54,9 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 		push_error("Invalid scene root: abort deserializing")
 		return
 	
-	if fetch_type_flag & SerializableBehaviour.FETCH_CASE_FLAG.GAME_STATE_ONLINE:
+	var fetch_online = fetch_type_flag & SerializableBehaviour.FETCH_CASE_FLAG.GAME_STATE_ONLINE
+	
+	if fetch_online:
 		var remote_id_behav = Utils.find_behaviour(scene_root, "RemoteInstanceId")
 		
 		if remote_id_behav and remote_id_behav.remote_instance_id != dict["instance_id"]:
@@ -74,7 +76,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
 			continue
 		
-		if !serializable_behav.must_apply(fetch_type_flag):
+		if fetch_online and NETWORK.is_online() and !serializable_behav.must_apply(fetch_type_flag):
 			continue
 		
 		if node_path in dict["removed_elements"].keys():

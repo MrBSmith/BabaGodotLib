@@ -50,6 +50,10 @@ func must_fetch(fetch_case: int) -> bool:
 
 
 func must_apply(fetch_case: int) -> bool:
+	if fetch_case & FETCH_CASE_FLAG.GAME_STATE_ONLINE and NETWORK.is_online() and \
+		_is_handler_peer():
+		return false
+	
 	return bool(fetch_case & fetch_case_flag)
 
 
