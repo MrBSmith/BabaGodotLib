@@ -104,17 +104,37 @@ static func state_diff(a: Dictionary, b: Dictionary) -> Dictionary:
 	var states = [a, b] 
 	
 	for dict_key in ["branch_state", "removed_elements"]:
-		for i in states.size():
-			var current = states[i]
-			var other = states[i - 1]
-			var treated_keys = []
-			
-			for key in current[dict_key]:
-				if key in treated_keys:
-					continue
-				
-				if !other[dict_key].has(key) or current[dict_key][key].hash() != other[dict_key][key].hash():
-					diff[dict_key][key] = current[dict_key][key]
-					treated_keys.append(key)
+		diff[dict_key] = dict_diff(a[dict_key], b[dict_key])
 	
 	return diff
+
+
+static func dict_diff(a: Dictionary, b: Dictionary) -> Dictionary:
+	var diff = {}
+	var states = [a, b]
+	var treated_keys = []
+	
+	for i in states.size():
+		var current = states[i]
+		var other = states[i - 1]
+		
+		for key in current:
+			if key in treated_keys:
+				continue
+			
+			if !other.has(key) or !are_property_dict_equal(current[key], other[key]):
+				diff[key] = current[key]
+				treated_keys.append(key)
+	
+	return diff
+
+
+static func are_property_dict_equal(a: Dictionary, b: Dictionary) -> bool:
+	for key in a.keys():
+		if !b.has(key):
+			return false
+		
+		if str(a[key]) != str(b[key]):
+			return false
+	return true
+
