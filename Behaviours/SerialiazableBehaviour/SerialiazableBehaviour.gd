@@ -80,7 +80,8 @@ func serialize() -> Dictionary:
 	var dict = {}
 	
 	for property in serialized_properties:
-		dict[property] = _get_value(property)
+		var property_path = NodePath(property)
+		dict[property] = _get_value(property_path)
 	
 	return dict
 
@@ -92,29 +93,49 @@ func deserialize(state: Dictionary) -> void:
 		_set_value(property, state[property])
 
 
-func _get_value(property: String):
+func _get_value(property_path: NodePath):
+	var path = Utils.node_path_trim_property(property_path)
+	var node = get_node_or_null(path)
+	
+	if !node:
+		push_error("Couldn't find node at path %s" % path)
+		return
+	
+	var property = Utils.node_path_trim_path(property_path)
+	
 	match(setget_mode):
-		SETGET_MODE.PROPERTY: return holder.get(property)
+		SETGET_MODE.PROPERTY: return node.get(property)
 		SETGET_MODE.ACCESSOR:
 			var getter = "get_" + property
 		
-			if !holder.has_method(getter):
-				return holder.get(property)
+			if !node.has_method(getter):
+				return node.get(property)
 			
-			return holder.call(getter)
+			return node.call(getter)
 
 
-func _set_value(property: String, value) -> void:
+func _set_value(property_path: NodePath, value) -> void:
+	var path = Utils.node_path_trim_property(property_path)
+	var node = get_node_or_null(path)
+	
+	if !node:
+		push_error("Couldn't find node at path %s" % path)
+		return
+	
+	var property = Utils.node_path_trim_path(property_path)
+	
 	match(setget_mode):
-		SETGET_MODE.PROPERTY: holder.set(property, value)
+		SETGET_MODE.PROPERTY: node.set(property, value)
 		SETGET_MODE.ACCESSOR: 
 			var setter = "set_" + property
 		
-			if !holder.has_method(setter):
-				holder.set(property, value)
+			if !node.has_method(setter):
+				node.set(property, value)
 				return
 			
-			holder.call(setter, value)
+			node.call(setter, value)
+
+
 
 
 func _update_average_state_delta() -> void:

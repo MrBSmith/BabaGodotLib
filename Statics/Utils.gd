@@ -152,6 +152,27 @@ static func trim_image(image: Image) -> Image:
 	return output_img
 
 
+static func node_path_trim_property(node_path: NodePath) -> String:
+	var path : String = str(node_path)
+	var column_id = path.find(":")
+	
+	if column_id == -1:
+		return path
+	else:
+		return path.left(column_id)
+
+
+static func node_path_trim_path(node_path: NodePath) -> String:
+	var path : String = str(node_path)
+	var column_id = path.find(":")
+	
+	if column_id == -1:
+		return path
+	else:
+		return path.right(column_id)
+
+
+
 static func fetch_first(node: Node, wanted_class: String) -> Node:
 	for child in node.get_children():
 		if child.is_class(wanted_class):
