@@ -80,7 +80,8 @@ func serialize() -> Dictionary:
 	var dict = {}
 	
 	for property in serialized_properties:
-		var property_path = NodePath(property)
+		var holder_path = owner.get_path_to(holder)
+		var property_path = NodePath(property) if ":" in property else NodePath("%s:%s" % [holder_path, property])
 		dict[property] = _get_value(property_path)
 	
 	return dict
