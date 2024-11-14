@@ -101,8 +101,6 @@ static func state_diff(a: Dictionary, b: Dictionary) -> Dictionary:
 		"removed_elements": {},
 	}
 	
-	var states = [a, b] 
-	
 	for dict_key in ["branch_state", "removed_elements"]:
 		diff[dict_key] = dict_diff(a[dict_key], b[dict_key])
 	
