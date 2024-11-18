@@ -70,8 +70,6 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	print(serialize())
-	
 	if NETWORK.is_online() and NETWORK.is_client() == is_handled_by_client():
 		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
 
@@ -137,8 +135,6 @@ func _set_value(property_path: NodePath, value) -> void:
 				return
 			
 			node.call(setter, value)
-
-
 
 
 func _update_average_state_delta() -> void:
