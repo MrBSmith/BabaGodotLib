@@ -172,7 +172,6 @@ static func node_path_trim_path(node_path: NodePath) -> String:
 		return path.right(column_id + 1)
 
 
-
 static func fetch_first(node: Node, wanted_class: String) -> Node:
 	for child in node.get_children():
 		if child.is_class(wanted_class):
@@ -348,6 +347,17 @@ static func cfg_game_verion_is_prior(file_path: String, target_version : String,
 	
 	if debug: print("The file version is NOT prior the target_version")
 	return false
+
+
+static func find_unique_name(prefix: String, container: Node) -> String:
+	var id = 0
+	var unique_name = prefix 
+	
+	while(container.get_node_or_null(unique_name)):
+		id += 1
+		unique_name = prefix + str(id)
+	
+	return unique_name
 
 
 #### STRINGS ####
