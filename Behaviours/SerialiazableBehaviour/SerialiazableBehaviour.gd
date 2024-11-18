@@ -70,6 +70,8 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	print(serialize())
+	
 	if NETWORK.is_online() and NETWORK.is_client() == is_handled_by_client():
 		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
 
@@ -96,7 +98,7 @@ func deserialize(state: Dictionary) -> void:
 
 func _get_value(property_path: NodePath):
 	var path = Utils.node_path_trim_property(property_path)
-	var node = get_node_or_null(path)
+	var node = owner.get_node_or_null(path)
 	
 	if !node:
 		push_error("Couldn't find node at path %s" % path)
@@ -117,7 +119,7 @@ func _get_value(property_path: NodePath):
 
 func _set_value(property_path: NodePath, value) -> void:
 	var path = Utils.node_path_trim_property(property_path)
-	var node = get_node_or_null(path)
+	var node = owner.get_node_or_null(path)
 	
 	if !node:
 		push_error("Couldn't find node at path %s" % path)

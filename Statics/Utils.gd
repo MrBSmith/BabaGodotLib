@@ -169,7 +169,7 @@ static func node_path_trim_path(node_path: NodePath) -> String:
 	if column_id == -1:
 		return path
 	else:
-		return path.right(column_id)
+		return path.right(column_id + 1)
 
 
 
