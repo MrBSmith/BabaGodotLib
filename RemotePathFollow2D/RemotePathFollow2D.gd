@@ -9,6 +9,7 @@ var moved_node_wr : WeakRef
 var moving : bool = false
 var duration : float = 1.0
 var is_ready = false
+var tween : SceneTreeTween = null
 
 var unreached_points = []
 
@@ -61,12 +62,12 @@ func move_node_along_path(node: Node2D, backwards: bool = false, dur: float = 1.
 	
 	unreached_points = _get_path_points()
 	
-	var tween = create_tween()
+	tween = create_tween()
 	var __ = tween.connect("finished", self, "_on_tween_finished")
 	var from = 0.0 if !backwards else 1.0
 	var to = 1.0 if !backwards else 0.0
 	
-	tween.tween_method(self, "set_unit_offset", from, to, duration)
+	__ = tween.tween_method(self, "set_unit_offset", from, to, duration)
 	
 	yield(tween, "finished")
 	moving = false
@@ -105,3 +106,8 @@ func _on_unit_offset_changed(_unit_offset: float) -> void:
 		return
 	
 	moved_node.set_global_position(global_position)
+
+
+func _on_body_destroyed() -> void:
+	if tween: tween.kill()
+	queue_free()
