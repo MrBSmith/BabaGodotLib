@@ -122,7 +122,7 @@ func destroy() -> void:
 	is_destroyed = true
 	
 	if destroy_sound:
-		NETWORK.call_and_remote_call_both_way(EVENTS, "emit_signal", ["play_sound_effect", destroy_sound])
+		NETWORK.call_and_remote_call_both_way(EVENTS, "emit_signal", ["play_sound_effect_by_path", destroy_sound.get_path()])
 	
 	if particules:
 		NETWORK.call_and_remote_call_both_way(particules, "set_emitting", [true])

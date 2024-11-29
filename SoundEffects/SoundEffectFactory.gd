@@ -14,6 +14,7 @@ func get_class() -> String: return "SoundEffectFactory"
 
 func _ready() -> void:
 	var __ = EVENTS.connect("play_sound_effect", self, "_on_EVENTS_play_sound_effect")
+	__ = EVENTS.connect("play_sound_effect_by_path", self, "_on_EVENTS_play_sound_effect_by_path")
 
 
 #### VIRTUALS ####
@@ -55,7 +56,22 @@ func play(stream_player : Node) -> void:
 #### SIGNAL RESPONSES ####
 
 func _on_EVENTS_play_sound_effect(stream_player: Node):
+	if !stream_player:
+		return
+	
 	if stream_player is AudioStreamPlayer or stream_player is AudioStreamPlayer2D:
 		play(stream_player)
 	else:
 		push_warning("The given value is of type %s where it shouild be a AudioStreamPlayer or a AudioStreamPlayer2D" % stream_player.get_class())
+
+
+func _on_EVENTS_play_sound_effect_by_path(path: String) -> void:
+	var stream_player = get_node_or_null(path)
+	
+	if !stream_player:
+		push_warning("Cannot play sound: no AudioStreamPlayer found at path %s" % path)
+		return
+	
+	play(stream_player)
+
+

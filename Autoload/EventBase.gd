@@ -71,7 +71,7 @@ signal play_particule_FX(particules, pos)
 #### SOUND ####
 
 signal play_sound_effect(stream_player)
-
+signal play_sound_effect_by_path(stream_player_path)
 
 #### DIALOGUES ####
 
