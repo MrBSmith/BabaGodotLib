@@ -28,10 +28,12 @@ onready var damage_computer = get_node_or_null("DamageComputer")
 onready var destroy_sound = get_node_or_null("DestroySound")
 onready var approch_area = get_node_or_null("ApprochArea")
 onready var particules = get_node_or_null("Particles2D")
+onready var serializable_behaviour = get_node_or_null(serializable_behaviour_path)
 
 export(int, 1, 9999) var max_hp : int = 1 setget set_max_hp
 export var hp : int = max_hp setget set_hp, get_hp
 
+export var serializable_behaviour_path := NodePath()
 export var free_when_destroyed := true
 export var undommagable : bool = false
 export var invincible : bool = false
@@ -112,6 +114,9 @@ func damage() -> void:
 
 func destroy() -> void:
 	if invincible or is_destroyed:
+		return
+	
+	if serializable_behaviour and !serializable_behaviour._is_handler_peer():
 		return
 	
 	is_destroyed = true
