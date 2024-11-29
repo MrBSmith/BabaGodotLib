@@ -122,15 +122,15 @@ func destroy() -> void:
 	is_destroyed = true
 	
 	if destroy_sound:
-		EVENTS.emit_signal("play_sound_effect", destroy_sound)
+		NETWORK.call_and_remote_call_both_way(EVENTS, "emit_signal", ["play_sound_effect", destroy_sound])
 	
 	if particules:
-		particules.set_emitting(true)
+		NETWORK.call_and_remote_call_both_way(particules, "set_emitting", [true])
 	
-	emit_signal("destroy_animation_started")
+	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroy_animation_started"])
 	
 	if animation_player && animation_player.has_animation("Destroy"):
-		animation_player.play("Destroy")
+		NETWORK.call_and_remote_call_both_way(animation_player, "play", ["Destroy"])
 	
 	match(free_after_mode):
 		FREE_AFTER.PARTICLES: 
@@ -140,10 +140,10 @@ func destroy() -> void:
 			if animation_player:
 				yield(animation_player, "animation_finished")
 	
-	emit_signal("destroyed")
+	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroyed"])
 	
 	if free_when_destroyed:
-		owner.call_deferred("queue_free")
+		NETWORK.call_and_remote_call_both_way(owner, "call_deferred", ["queue_free"])
 
 
 
