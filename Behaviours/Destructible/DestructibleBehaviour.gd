@@ -45,8 +45,10 @@ var is_destroyed := false
 
 signal max_hp_changed(max_hp_value)
 signal hp_changed(hp_value)
+#warning-ignore:unused_signal
 signal destroy_animation_started()
 signal damaged()
+#warning-ignore:unused_signal
 signal destroyed()
 
 #### ACCESSORS ####
