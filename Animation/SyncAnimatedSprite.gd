@@ -39,6 +39,8 @@ func _ready() -> void:
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
 			__ = master_anim_sprite.connect("animation_changed", self, "_on_master_animation_changed")
 	
+	set_process(NETWORK.is_online())
+	
 	var __ = connect("frame_changed", self, "_on_frame_changed")
 	
 	is_ready = true
@@ -46,6 +48,10 @@ func _ready() -> void:
 	if auto_start and !Engine.editor_hint:
 		play(animation)
 
+
+func _process(delta: float) -> void:
+	set_animation(master_anim_sprite.animation)
+	set_frame(master_anim_sprite.frame)
 
 #### VIRTUALS ####
 
@@ -88,7 +94,7 @@ func set_flip_h(value: bool) -> void:
 
 func _on_master_frame_changed() -> void:
 	if sync_frame_rate && frames != null:
-		set_frame(get_parent().get_frame())
+		set_frame(master_anim_sprite.get_frame())
 
 
 func _on_master_animation_changed(anim: String = "", _backwards: bool = false) -> void:
