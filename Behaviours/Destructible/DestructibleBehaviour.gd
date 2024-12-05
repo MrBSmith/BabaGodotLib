@@ -142,7 +142,7 @@ func destroy() -> void:
 			if animation_player:
 				yield(animation_player, "animation_finished")
 	
-	if !is_destroyed or !serializable_behaviour._is_handler_peer():
+	if !is_destroyed or (serializable_behaviour and !serializable_behaviour._is_handler_peer()):
 		return
 	
 	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroyed"])
