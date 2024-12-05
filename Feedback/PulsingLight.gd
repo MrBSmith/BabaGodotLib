@@ -14,7 +14,6 @@ export var pulsing : bool = false setget set_pulsing, is_pulsing
 
 onready var initial_scale = get_scale()
 onready var current_color : Color = get_light_color() setget set_current_color, get_current_color
-onready var initial_mask_text_scale : float = $LightMask.get_texture_scale()
 
 signal pulsing_changed
 
@@ -31,8 +30,7 @@ func get_light_color() -> Color: return light_color
 
 func set_current_color(value: Color):
 	current_color = value
-	$Light2D.set_color(current_color)
-	$LightMask.set_color(current_color)
+	$Light.set_modulate(current_color)
 
 func get_current_color() -> Color: return current_color
 
