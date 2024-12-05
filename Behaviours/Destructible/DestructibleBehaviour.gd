@@ -142,6 +142,9 @@ func destroy() -> void:
 			if animation_player:
 				yield(animation_player, "animation_finished")
 	
+	if !is_destroyed:
+		return
+	
 	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroyed"])
 	
 	if free_when_destroyed:
