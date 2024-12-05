@@ -42,12 +42,10 @@ func _ready() -> void:
 	var __ = connect("frame_changed", self, "_on_frame_changed")
 	
 	is_ready = true
+	set_process(!Engine.editor_hint and NETWORK.is_online() and master_anim_sprite)
 	
-	if !Engine.editor_hint:
-		set_process(NETWORK.is_online() and master_anim_sprite)
-		
-		if auto_start:
-			play(animation)
+	if !Engine.editor_hint and auto_start:
+		play(animation)
 
 
 func _process(delta: float) -> void:
