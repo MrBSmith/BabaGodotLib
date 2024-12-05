@@ -39,7 +39,7 @@ func _ready() -> void:
 		if master_anim_sprite.is_class("SyncAnimatedSprite"):
 			__ = master_anim_sprite.connect("animation_changed", self, "_on_master_animation_changed")
 	
-	set_process(NETWORK.is_online())
+	set_process(NETWORK.is_online() and master_anim_sprite)
 	
 	var __ = connect("frame_changed", self, "_on_frame_changed")
 	
@@ -52,6 +52,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	set_animation(master_anim_sprite.animation)
 	set_frame(master_anim_sprite.frame)
+
 
 #### VIRTUALS ####
 
