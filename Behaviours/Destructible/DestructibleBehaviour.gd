@@ -50,6 +50,7 @@ signal destroy_animation_started()
 signal damaged()
 #warning-ignore:unused_signal
 signal destroyed()
+signal distant_destruction_confirmed()
 
 #### ACCESSORS ####
 
@@ -84,6 +85,8 @@ func _ready() -> void:
 	if approch_area:
 		__ = approch_area.connect("body_entered", self, "_on_body_entered")
 	
+	__ = connect("distant_destruction_confirmed", self, "_on_distant_destruction_confirmed")
+	
 	owner.add_to_group("Destructible")
 
 
@@ -112,6 +115,11 @@ func damage() -> void:
 	
 	if $Cooldown.wait_time != INF:
 		$Cooldown.start()
+
+
+func _distant_destroy_attempt() -> void:
+	if !serializable_behaviour._is_handler_peer():
+		destroy()
 
 
 func destroy() -> void:
@@ -148,8 +156,16 @@ func destroy() -> void:
 	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroyed"])
 	
 	if free_when_destroyed:
-		NETWORK.call_and_remote_call_both_way(owner, "call_deferred", ["queue_free"])
+		if NETWORK.is_online():
+			owner.hide()
+			NETWORK.call_and_remote_call_both_way(self, "_confirm_distant_destruction")
+		else:
+			owner.call_deferred("queue_free")
 
+
+func _confirm_distant_destruction() -> void:
+	if is_destroyed:
+		NETWORK.remote_call_both_way(self, "emit_signal", ["distant_destruction_confirmed"])
 
 
 #### INPUTS ####
@@ -164,3 +180,7 @@ func _on_hp_changed(hp_value: int) -> void:
 	
 	if hp_value <= 0 and !invincible:
 		destroy()
+
+
+func _on_distant_destruction_confirmed() -> void:
+	NETWORK.call_and_remote_call_both_way(owner, "call_deferred", ["queue_free"])
