@@ -127,9 +127,6 @@ func destroy() -> void:
 	if invincible or is_destroyed:
 		return
 	
-	if serializable_behaviour and !serializable_behaviour._is_handler_peer():
-		return
-	
 	is_destroyed = true
 	
 	if destroy_sound:
@@ -150,9 +147,6 @@ func destroy() -> void:
 		FREE_AFTER.ANIMATION: 
 			if animation_player:
 				yield(animation_player, "animation_finished")
-	
-	if !is_destroyed or (serializable_behaviour and !serializable_behaviour._is_handler_peer()):
-		return
 	
 	NETWORK.call_and_remote_call_both_way(self, "emit_signal", ["destroyed"])
 	
