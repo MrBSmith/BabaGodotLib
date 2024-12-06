@@ -38,6 +38,7 @@ export var free_when_destroyed := true
 export var undommagable : bool = false
 export var invincible : bool = false
 export var cooldown : float = INF setget set_cooldown
+export var distant_confirmation := false
 
 export(FREE_AFTER) var free_after_mode = FREE_AFTER.ANIMATION
 
@@ -152,8 +153,11 @@ func destroy() -> void:
 	
 	if free_when_destroyed:
 		if NETWORK.is_online():
-			owner.hide()
-			NETWORK.call_and_remote_call_both_way(self, "_confirm_distant_destruction")
+			if distant_confirmation:
+				owner.hide()
+				NETWORK.call_and_remote_call_both_way(self, "_confirm_distant_destruction")
+			else:
+				NETWORK.call_and_remote_call(self, "queue_free")
 		else:
 			owner.call_deferred("queue_free")
 
