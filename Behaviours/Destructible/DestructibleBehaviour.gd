@@ -159,8 +159,10 @@ func destroy() -> void:
 
 
 func _confirm_distant_destruction() -> void:
-	if is_destroyed:
-		NETWORK.remote_call_both_way(self, "emit_signal", ["distant_destruction_confirmed"])
+	if !is_destroyed:
+		yield(self, "destroyed")
+	
+	NETWORK.remote_call_both_way(self, "emit_signal", ["distant_destruction_confirmed"])
 
 
 #### INPUTS ####
