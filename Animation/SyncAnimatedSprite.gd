@@ -69,7 +69,7 @@ func play(anim: String = "", backwards: bool = false) -> void:
 
 
 func set_animation(anim: String) -> void:
-	if (anim == "" and get_animation() != "default") or anim != get_animation():
+	if (anim == "" and get_animation() != "default") or (anim != get_animation() and frames.has_animation(anim)):
 		.set_animation(anim)
 		emit_signal("animation_changed", anim, false)
 
