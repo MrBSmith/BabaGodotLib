@@ -134,7 +134,7 @@ func destroy() -> void:
 		EVENTS.emit_signal("play_sound_effect_by_path", destroy_sound.get_path())
 	
 	if particules:
-		particules.set_emitting([true])
+		particules.set_emitting(true)
 	
 	emit_signal("destroy_animation_started")
 	
