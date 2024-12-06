@@ -50,6 +50,7 @@ signal destroy_animation_started()
 signal damaged()
 #warning-ignore:unused_signal
 signal destroyed()
+#warning-ignore:unused_signal
 signal distant_destruction_confirmed()
 
 #### ACCESSORS ####

@@ -48,7 +48,7 @@ func _ready() -> void:
 		play(animation)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	set_animation(master_anim_sprite.animation)
 	set_frame(master_anim_sprite.frame)
 
