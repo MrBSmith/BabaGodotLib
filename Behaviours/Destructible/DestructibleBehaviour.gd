@@ -157,7 +157,7 @@ func destroy() -> void:
 				owner.hide()
 				NETWORK.call_and_remote_call_both_way(self, "_confirm_distant_destruction")
 			else:
-				owner.call_deferred("queue_free")
+				NETWORK.call_and_remote_call_both_way(owner, "call_deferred", ["queue_free"])
 		else:
 			owner.call_deferred("queue_free")
 
