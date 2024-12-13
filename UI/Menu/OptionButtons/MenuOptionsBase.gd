@@ -13,6 +13,7 @@ export(int, FLAGS, "Left", "Right") var hover_texture_flags = TEXTURE_FLAGS.LEFT
 
 onready var _button = $HBoxContainer/Button setget , get_button
 onready var h_box_container = $HBoxContainer
+onready var shadow_label = get_node_or_null("%ShadowLabel")
 
 onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]
 
@@ -137,8 +138,10 @@ func set_hover_icons_modulate(color: Color) -> void:
 func _update_text() -> void:
 	if all_caps:
 		_button.set_text(text.to_upper())
+		if shadow_label: shadow_label.set_text(text.to_upper())
 	else:
 		_button.set_text(text)
+		if shadow_label: shadow_label.set_text(text)
 
 
 func _update_focus_mode() -> void:
