@@ -3,23 +3,59 @@ class_name IconMaskTransition
 
 const POLY_GEN_EPSILON = 1.5
 const NB_LAYERS = 3
-const LAYER_INTERVAL = 0.3
+const LAYER_INTERVAL = 0.6
+
+export var interval_curve : Curve
 
 export var dezoomed_scale := Vector2(10.0, 10.0)
 export var zoomed_scale := Vector2(0.5, 0.5)
 export var level_type_textures_dict : Dictionary = {}
+export var themes_dict : Dictionary
 
+onready var layers: Node2D = $Layers
 onready var pivot: Node2D = $"%Pivot"
 
+var theme : Theme
 var mask_poly_array : Array
+
+signal theme_changed
+
+func set_theme(value: Theme) -> void:
+	if value != theme:
+		theme = value
+		emit_signal("theme_changed")
+
 
 func _ready() -> void:
 	var __ = EVENTS.connect("level_transition", self, "_trigger")
+	__ = connect("theme_changed", self, "_update_colors")
 	hide()
+
+
+func _update_colors() -> void:
+	if !theme:
+		push_warning("No theme given to level transition, fallback to default colors")
+		return
+	
+	for layer_id in range(NB_LAYERS):
+		var color_name = ""
+		match(layer_id):
+			0: color_name = "outer_transition_color"
+			1: color_name = "middle_transition_color"
+			2: color_name = "inner_transition_color"
+		
+		var color = theme.get_color(color_name, "")
+		var polygon_layer = layers.get_child(layer_id)
+		
+		for side in polygon_layer.get_children():
+			var result = side.get_node("Result")
+			for poly in result.get_children():
+				poly.set_color(color)
 
 
 func _trigger(level_type: String) -> void:
 	var texture = level_type_textures_dict.get(level_type)
+	set_theme(themes_dict.get(level_type))
 	
 	if texture == null:
 		push_error("Texture of type %s not found" % level_type)
@@ -62,7 +98,9 @@ func fade(fade_time := 2.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.
 	if fade_mode != FADE_MODE.FADE_IN:
 		for i in range(NB_LAYERS):
 			var __ = tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-			__ = tween.parallel().tween_method(self, "_set_mask_scale", dezoomed_scale, zoomed_scale, duration, [i]).set_delay(LAYER_INTERVAL * i + delay)
+			var ratio = smoothstep(0.0, float(NB_LAYERS), float(i))
+			var interval = interval_curve.interpolate(ratio) * LAYER_INTERVAL
+			__ = tween.parallel().tween_method(self, "_set_mask_scale", dezoomed_scale, zoomed_scale, duration, [i]).set_delay(interval + delay)
 		
 		yield(tween, "finished")
 		
@@ -83,8 +121,10 @@ func fade(fade_time := 2.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.
 		tween = create_tween()
 		for i in range(NB_LAYERS):
 			var id = NB_LAYERS - i - 1
+			var ratio = smoothstep(0.0, float(NB_LAYERS), float(i))
+			var interval = interval_curve.interpolate(ratio) * LAYER_INTERVAL
 			var __ = tween.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-			__ = tween.parallel().tween_method(self, "_set_mask_scale", zoomed_scale, dezoomed_scale, duration, [id]).set_delay(LAYER_INTERVAL * i + delay)
+			__ = tween.parallel().tween_method(self, "_set_mask_scale", zoomed_scale, dezoomed_scale, duration, [id]).set_delay(interval + delay)
 		
 		yield(tween, "finished")
 	
@@ -100,7 +140,7 @@ func _set_mask_scale(mask_scale: Vector2, mask_id: int) -> void:
 	for i in range(mask_poly_array[mask_id].size()):
 		poly[i] = (mask_poly_array[mask_id][i] - center) * mask_scale + center
 	
-	var polygon_container: Node2D = $Layers.get_child(mask_id)
+	var polygon_container: Node2D = layers.get_child(mask_id)
 	
 	for half in polygon_container.get_children():
 		var screen_poly = half.get_node("Screen")
