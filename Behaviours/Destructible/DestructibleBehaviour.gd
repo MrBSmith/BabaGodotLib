@@ -119,9 +119,9 @@ func damage() -> void:
 		$Cooldown.start()
 
 
-func _distant_destroy_attempt() -> void:
+func distant_destroy_attempt() -> void:
 	if !serializable_behaviour._is_handler_peer():
-		destroy()
+		NETWORK.call_and_remote_call_both_way(self, "destroy")
 
 
 func destroy() -> void:
