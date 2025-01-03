@@ -151,7 +151,7 @@ func _update_average_state_delta() -> void:
 
 
 func _on_EVENTS_remote_peer_handled_state_received(node_path: String, remote_state: Dictionary) -> void:
-	if is_handled_by_client() == NETWORK.is_client():
+	if _is_handler_peer():
 		return
 	
 	if node_path == str(get_path()):
