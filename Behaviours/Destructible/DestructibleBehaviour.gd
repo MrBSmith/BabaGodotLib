@@ -149,6 +149,9 @@ func destroy() -> void:
 			if animation_player:
 				yield(animation_player, "animation_finished")
 	
+	if !is_destroyed:
+		return
+	
 	emit_signal("destroyed")
 	
 	if free_when_destroyed:
