@@ -53,6 +53,7 @@ signal damaged()
 signal destroyed()
 #warning-ignore:unused_signal
 signal distant_destruction_confirmed()
+signal destruction_aborted()
 
 #### ACCESSORS ####
 
@@ -119,8 +120,22 @@ func damage() -> void:
 		$Cooldown.start()
 
 
-func distant_destroy_attempt() -> void:
+func destroy_with_confirmation() -> void:
+	if !NETWORK.is_online():
+		destroy()
+		return
+	
 	if !serializable_behaviour._is_handler_peer():
+		return
+	
+	destroy()
+	NETWORK.remote_call_both_way(self, "distant_destroy_attempt")
+
+
+func distant_destroy_attempt() -> void:
+	if serializable_behaviour._is_handler_peer():
+		NETWORK.remote_call_both_way(self, "emit_signal", ["destruction_aborted"])
+	else:
 		NETWORK.call_and_remote_call_both_way(self, "destroy")
 
 
