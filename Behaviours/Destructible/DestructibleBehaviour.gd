@@ -49,7 +49,7 @@ signal hp_changed(hp_value)
 #warning-ignore:unused_signal
 signal destroy_animation_started()
 signal damaged()
-#warning-ignore:unused_signal
+signal pre_destroyed()
 signal destroyed()
 #warning-ignore:unused_signal
 signal distant_destruction_confirmed()
@@ -167,6 +167,7 @@ func destroy() -> void:
 	if !is_destroyed:
 		return
 	
+	emit_signal("pre_destroyed")
 	emit_signal("destroyed")
 	
 	if free_when_destroyed:
