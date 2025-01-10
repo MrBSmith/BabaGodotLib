@@ -27,6 +27,8 @@ func set_bars_width(value: float) -> void:
 
 func _ready() -> void:
 	var __ = connect("bars_width_changed", self, "_on_bars_width_changed")
+	
+	_on_bars_width_changed(bars_width)
 
 
 #### VIRTUALS ####
