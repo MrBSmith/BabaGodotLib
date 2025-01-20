@@ -9,11 +9,11 @@ modulate = Color( 0, 0, 0, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
-bars_width = 70.0
+bars_width = 55.0
 
 [node name="TopBar" type="ColorRect" parent="."]
 anchor_right = 1.0
-margin_top = -70.0
+margin_top = -55.0
 __meta__ = {
 "_edit_lock_": true
 }
@@ -22,7 +22,7 @@ __meta__ = {
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_bottom = 70.0
+margin_bottom = 55.0
 __meta__ = {
 "_edit_lock_": true
 }
