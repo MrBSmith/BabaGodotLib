@@ -51,7 +51,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 		return
 	
 	if !is_instance_valid(scene_root) or scene_root.get_path() != dict["root_path"]:
-		push_error("Invalid scene root: abort deserializing")
+		push_error("Invalid scene root: abort deserializing | Expected %s found %s" % [str(scene_root.get_path()), dict["root_path"]])
 		return
 	
 	var fetch_online = fetch_type_flag & SerializableBehaviour.FETCH_CASE_FLAG.GAME_STATE_ONLINE
