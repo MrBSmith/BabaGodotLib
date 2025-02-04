@@ -45,6 +45,7 @@ __meta__ = {
 }
 
 [node name="HoverTexture" type="TextureRect" parent="HBoxContainer"]
+unique_name_in_owner = true
 margin_top = 12.0
 margin_right = 14.0
 margin_bottom = 26.0
@@ -69,6 +70,7 @@ __meta__ = {
 }
 
 [node name="HoverTexture2" type="TextureRect" parent="HBoxContainer"]
+unique_name_in_owner = true
 margin_left = 26.0
 margin_top = 12.0
 margin_right = 40.0

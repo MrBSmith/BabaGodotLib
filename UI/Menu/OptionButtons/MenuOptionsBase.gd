@@ -15,7 +15,7 @@ onready var _button = $HBoxContainer/Button setget , get_button
 onready var h_box_container = $HBoxContainer
 onready var shadow_label = get_node_or_null("%ShadowLabel")
 
-onready var hover_sprites = [$HBoxContainer/HoverTexture, $HBoxContainer/HoverTexture2]
+onready var hover_sprites = [$"%HoverTexture", $"%HoverTexture2"]
 
 signal disabled_changed(disabled)
 signal focus_changed(entity, focus)
@@ -130,9 +130,8 @@ func _ready() -> void:
 #### LOGIC ####
 
 func set_hover_icons_modulate(color: Color) -> void:
-	for child in h_box_container.get_children():
-		if child is TextureRect:
-			child.set_modulate(color)
+	for sprite in hover_sprites:
+		sprite.set_modulate(color)
 
 
 func _update_text() -> void:
