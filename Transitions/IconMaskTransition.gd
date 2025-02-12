@@ -75,7 +75,7 @@ func _trigger(level_type: String) -> void:
 	
 	mask_poly_array = []
 	
-	for i in range(NB_LAYERS):
+	for __ in range(NB_LAYERS):
 		mask_poly_array.append(mask_poly)
 	
 	fade()
