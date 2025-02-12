@@ -9,6 +9,7 @@ onready var top_bar_hidden_pos = $TopBar.get_position()
 onready var bottom_bar_hidden_pos = $BottomBar.get_position()
 
 onready var bars_array = [$TopBar, $BottomBar]
+var bars_visible = false
 
 signal bars_width_changed
 
@@ -21,6 +22,10 @@ func set_bars_width(value: float) -> void:
 	if bars_width != value:
 		bars_width = value
 		emit_signal("bars_width_changed", bars_width)
+
+
+func are_bars_visible() -> bool:
+	return bars_visible
 
 
 #### BUILT-IN ####
@@ -38,7 +43,11 @@ func _ready() -> void:
 #### LOGIC ####
 
 func appear(disappear: bool = false, duration: float = 1.5) -> void:
+	if bars_visible != disappear:
+		return
+	
 	set_visible(true)
+	bars_visible = true
 	
 	var debug_string = "appear" if !disappear else "disappear"
 	logger.debug("Black bars %s transition started" % debug_string)
@@ -55,6 +64,8 @@ func appear(disappear: bool = false, duration: float = 1.5) -> void:
 	
 	yield(tween, "finished")
 	set_visible(!disappear)
+	if disappear:
+		bars_visible = false
 
 
 func disappear(duration: float = 1.5) -> void:
