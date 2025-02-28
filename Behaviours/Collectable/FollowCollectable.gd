@@ -6,6 +6,7 @@ onready var raycast = get_node_or_null("Baba_RayCast2D")
 
 export var default_state : String = ""
 export var free_when_collected := true
+export var collectable_multiple_times := false
 
 var collected := false setget set_collected
 var speed := 0.0
@@ -43,7 +44,7 @@ func _ready() -> void:
 #### LOGIC ####
 
 func collect(body: PhysicsBody2D) -> void:
-	if is_disabled() or collected:
+	if is_disabled() or (collected and !collectable_multiple_times):
 		return
 	
 	set_collected(true)
