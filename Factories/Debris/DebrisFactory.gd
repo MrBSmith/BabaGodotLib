@@ -1,16 +1,49 @@
 extends Factory
 class_name DebrisFactory
 
+const POOL_CAPACITY = 400
 
 export var max_debris_per_frame : int = 20
 
-onready var debris = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
+onready var debris_scene = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
+var pool = []
 
 
 #### BUILT-IN ####
 
 func _ready() -> void:
 	var _err = EVENTS.connect("scatter_object", self, "_on_scatter_object")
+	
+	_fill_pool()
+
+
+func _fill_pool() -> void:
+	pool = []
+	
+	for i in POOL_CAPACITY:
+		var debris = _generate_debris()
+		debris.disabled = true
+		pool.append(debris)
+
+
+func _is_pool_full() -> bool:
+	return pool.size() >= POOL_CAPACITY
+
+
+func _generate_debris() -> Debris:
+	var debris = debris_scene.instance()
+	var __ = debris.connect("debris_disappeared", self, "_on_debris_disappeared", [debris])
+	
+	return debris
+
+
+func create_or_use_pooled_debris() -> Debris:
+	if pool.empty():
+		print("Pool empty: create new debris")
+		return _generate_debris()
+	else:
+		print("Used pooled debris")
+		return pool.pop_back()
 
 
 
@@ -42,27 +75,37 @@ func _on_scatter_object(sprite : Sprite, nb_debris : int, impulse_force: float =
 			if debris_counter >= max_debris_per_frame:
 				debris_counter = 0
 			
-			var debris_node = debris.instance()
+			var debris = create_or_use_pooled_debris()
 			
 			if !no_clip:
 				var collision_shape = RectangleShape2D.new()
 				collision_shape.set_extents((Vector2.ONE * square_size) / 2)
-				debris_node.shape = collision_shape
+				debris.shape = collision_shape
 			
 			var global_pos = Vector2(body_origin.x + i * square_size, body_origin.y + j * square_size)
-			debris_node.set_global_position(global_pos)
+			debris.set_global_position(global_pos)
 			
-			debris_node.texture = texture
-			debris_node.sprite_region_rect = Rect2(texture_origin + Vector2(i, j) * square_size, 
+			debris.texture = texture
+			debris.sprite_region_rect = Rect2(texture_origin + Vector2(i, j) * square_size, 
 												Vector2.ONE * square_size)
 			
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
-			debris_node.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
+			debris.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
-			debris_node.set_z_index(z)
-			debris_node.set_z_as_relative(z_as_relative)
-			target.call_deferred("add_child", debris_node)
+			debris.set_z_index(z)
+			debris.set_z_as_relative(z_as_relative)
+			debris.set_disabled(false)
+			
+			if !debris.is_inside_tree():
+				target.call_deferred("add_child", debris)
 			
 			debris_counter += 1
 
+
+
+func _on_debris_disappeared(debris: Debris) -> void:
+	if _is_pool_full():
+		debris.queue_free()
+	else:
+		pool.append(debris)
 
