@@ -39,10 +39,8 @@ func _generate_debris() -> Node:
 
 func create_or_use_pooled_debris() -> Node:
 	if pool.empty():
-		print("Pool empty: create new debris")
 		return _generate_debris()
 	else:
-		print("Used pooled debris")
 		return pool.pop_back()
 
 
@@ -69,6 +67,8 @@ func _on_scatter_object(sprite : Sprite, nb_debris : int, impulse_force: float =
 	var row_len = int(sprite_width / square_size)
 	var col_len = int(sprite_height / square_size)
 	var debris_counter : int = 0
+	var collision_shape = RectangleShape2D.new()
+	collision_shape.set_extents((Vector2.ONE * square_size) / 2)
 	
 	for i in range(row_len):
 		for j in range(col_len):
@@ -78,25 +78,25 @@ func _on_scatter_object(sprite : Sprite, nb_debris : int, impulse_force: float =
 			var debris = create_or_use_pooled_debris()
 			
 			if !no_clip:
-				var collision_shape = RectangleShape2D.new()
-				collision_shape.set_extents((Vector2.ONE * square_size) / 2)
 				debris.shape = collision_shape
 			
 			var global_pos = Vector2(body_origin.x + i * square_size, body_origin.y + j * square_size)
-			debris.set_global_position(global_pos)
+			var target_pos = target.to_local(global_pos)
 			
 			debris.texture = texture
 			debris.sprite_region_rect = Rect2(texture_origin + Vector2(i, j) * square_size, 
 												Vector2.ONE * square_size)
 			
 			var epicenter_dir = global_pos.direction_to(body_global_pos)
-			debris.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
 			
 			debris.set_z_index(z)
 			debris.set_z_as_relative(z_as_relative)
-			debris.set_disabled(false)
+			debris.apply_central_impulse(-(epicenter_dir * impulse_force * rand_range(0.7, 1.3)))
+			debris.buffered_position = target_pos
 			
 			if !debris.is_inside_tree():
+				debris.set_position(target_pos)
+				debris.set_disabled(false)
 				target.call_deferred("add_child", debris)
 			
 			debris_counter += 1
