@@ -30,14 +30,14 @@ func _is_pool_full() -> bool:
 	return pool.size() >= POOL_CAPACITY
 
 
-func _generate_debris() -> Debris:
+func _generate_debris() -> Node:
 	var debris = debris_scene.instance()
 	var __ = debris.connect("debris_disappeared", self, "_on_debris_disappeared", [debris])
 	
 	return debris
 
 
-func create_or_use_pooled_debris() -> Debris:
+func create_or_use_pooled_debris() -> Node:
 	if pool.empty():
 		print("Pool empty: create new debris")
 		return _generate_debris()
