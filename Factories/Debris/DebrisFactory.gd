@@ -103,7 +103,7 @@ func _on_scatter_object(sprite : Sprite, nb_debris : int, impulse_force: float =
 
 
 
-func _on_debris_disappeared(debris: Debris) -> void:
+func _on_debris_disappeared(debris: Node) -> void:
 	if _is_pool_full():
 		debris.queue_free()
 	else:
