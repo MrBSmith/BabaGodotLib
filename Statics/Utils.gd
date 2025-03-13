@@ -288,7 +288,7 @@ static func get_adjacents_cells(cell: Vector2) -> PoolVector2Array:
 
 # Convert a number of milliseconds into a String formated this way:
 # mm:ss.msms
-static func secs_to_formated_time(seconds: float, nb_digit_after_sec : int = 2) -> String:
+static func secs_to_formated_time(seconds: float, nb_digit_after_sec : int = 1) -> String:
 	var milliseconds = (seconds - int(seconds))
 	var minutes := int(clamp(seconds / 60.0, 0.0, 60.0))
 	
