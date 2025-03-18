@@ -27,7 +27,7 @@ signal win()
 signal game_resumed()
 signal quit_current_game()
 
-signal save_game(save_id)
+signal save_game(with_confirmation, save_id)
 signal load_game(save_id)
 signal save_level(level, data_dict)
 signal save_level_state(level)
