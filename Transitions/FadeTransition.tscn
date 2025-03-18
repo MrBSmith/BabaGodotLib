@@ -4,7 +4,7 @@
 
 [node name="FadeTransition" type="CanvasLayer"]
 pause_mode = 2
-layer = 128
+layer = 126
 script = ExtResource( 1 )
 
 [node name="ColorRect" type="ColorRect" parent="."]

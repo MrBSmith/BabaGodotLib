@@ -3,7 +3,7 @@
 [ext_resource path="res://BabaGodotLib/Transitions/IconMaskTransition.gd" type="Script" id=3]
 
 [node name="IconMaskTransition" type="CanvasLayer"]
-layer = 128
+layer = 126
 script = ExtResource( 3 )
 
 [node name="Pivot" type="Node2D" parent="."]

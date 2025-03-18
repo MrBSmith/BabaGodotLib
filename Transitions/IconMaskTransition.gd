@@ -91,6 +91,7 @@ func fade(fade_time := 2.0, fade_mode : int = FADE_MODE.FADE_IN_OUT, delay := 0.
 		tween.kill()
 	
 	tween = create_tween()
+	layers.show()
 	
 	running = true
 	var duration = fade_time / 2.0 if fade_mode == FADE_MODE.FADE_IN_OUT else fade_time
@@ -154,3 +155,13 @@ func _set_mask_scale(mask_scale: Vector2, mask_id: int) -> void:
 				result.set_polygon(result_polygons[id])
 			else:
 				result.set_polygon(PoolVector2Array())
+
+
+func interupt_transition() -> void:
+	.interupt_transition()
+	layers.hide()
+	
+
+
+
+

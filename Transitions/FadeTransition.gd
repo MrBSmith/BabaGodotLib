@@ -74,9 +74,7 @@ func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay 
 
 
 func interupt_transition() -> void:
-	if tween:
-		tween.kill()
-	running = false
+	.interupt_transition()
 	set_to_transparent()
 
 
