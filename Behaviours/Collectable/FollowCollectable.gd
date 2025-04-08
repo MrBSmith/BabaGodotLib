@@ -80,7 +80,7 @@ func compute_amount_collected() -> int:
 	return int(average_amount * (1 + rand_range(-amount_variance, amount_variance)))
 
 
-remotesync func _collect_success() -> void:
+func _collect_success() -> void:
 	EVENTS.emit_signal("increment_collectable_amount", get_collectable_name(), compute_amount_collected())
 	if free_when_collected:
 		owner.queue_free()
@@ -121,7 +121,8 @@ func _on_collect_area_body_entered(body: PhysicsBody2D):
 
 
 func _on_collect_animation_finished() -> void:
-	_collect_success()
+	if !NETWORK.is_client():
+		NETWORK.call_and_remote_call(self, "_collect_success")
 
 
 func _on_AnimationPlayer_animation_finished(anim_name: String) -> void:
