@@ -170,7 +170,7 @@ func _update_focus_mode() -> void:
 	if not holder is Control:
 		return
 	
-	var focus_mode = Control.FOCUS_ALL if !disabled and holder.is_visible_in_tree() else Control.FOCUS_NONE
+	var focus_mode = Control.FOCUS_ALL if !disabled and state != STATE.DISABLED and holder.is_visible_in_tree() else Control.FOCUS_NONE
 	holder.set_focus_mode(focus_mode)
 
 
