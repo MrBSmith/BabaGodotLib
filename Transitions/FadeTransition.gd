@@ -32,6 +32,8 @@ func _ready() -> void:
 #### LOGIC ####
 
 func fade(fade_time: float = 1.0, fade_mode: int = FADE_MODE.FADE_IN_OUT, delay : float = 0.0, pause_time: float = 1.0) -> void:
+	emit_signal("started")
+	
 	if tween:
 		tween.kill()
 	

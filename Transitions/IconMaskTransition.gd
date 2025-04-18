@@ -54,6 +54,7 @@ func _update_colors() -> void:
 
 
 func _trigger(level_type: String) -> void:
+	emit_signal("started")
 	var texture = level_type_textures_dict.get(level_type)
 	set_theme(themes_dict.get(level_type))
 	
