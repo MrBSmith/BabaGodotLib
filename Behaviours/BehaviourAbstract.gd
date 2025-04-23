@@ -41,8 +41,9 @@ func _ready() -> void:
 	if holder == null:
 		holder = owner
 	
-	holder.add_to_group(behaviour_type)
-	holder.set_meta(behaviour_type, self)
+	if !behaviour_type.empty():
+		holder.add_to_group(behaviour_type)
+		holder.set_meta(behaviour_type, self)
 
 
 #### VIRTUALS ####

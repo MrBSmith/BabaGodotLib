@@ -157,12 +157,18 @@ func destroy() -> void:
 	
 	match(free_after_mode):
 		FREE_AFTER.PARTICLES: 
-			if particules:
-				yield(get_tree().create_timer(particules.lifetime), "timeout")
+			if particules: 
+				var __ = get_tree().create_timer(particules.lifetime).connect("timeout", self, "fire_destroy_signals")
+				return
 		FREE_AFTER.ANIMATION: 
-			if animation_player:
-				yield(animation_player, "animation_finished")
+			if animation_player: 
+				var __ = animation_player.connect("animation_finished", self, "fire_destroy_signals")
+				return
 	
+	fire_destroy_signals()
+
+
+func fire_destroy_signals() -> void:
 	if !is_destroyed:
 		return
 	
