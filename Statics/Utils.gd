@@ -340,13 +340,16 @@ static func cfg_game_verion_is_prior(file_path: String, target_version : String,
 	var file_version_splitted = file_version.split(".")
 	var target_version_splited = target_version.split(".")
 	
-	for i in range(target_version_splited.size()):
-		if file_version_splitted[i].to_int() < target_version_splited[i].to_int():
-			if debug: print("The file version is prior the target_version")
-			return true
+	if file_version == target_version:
+		return false
 	
-	if debug: print("The file version is NOT prior the target_version")
-	return false
+	for i in range(target_version_splited.size()):
+		if file_version_splitted[i].to_int() > target_version_splited[i].to_int():
+			if debug: print("The file version is NOT prior the target_version")
+			return false
+	
+	if debug: print("The file version is prior the target_version")
+	return true
 
 
 static func find_unique_name(prefix: String, container: Node) -> String:
