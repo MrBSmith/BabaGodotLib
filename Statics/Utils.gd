@@ -334,9 +334,12 @@ static func cfg_game_verion_is_prior(file_path: String, target_version : String,
 		if debug: print("The file has no version mention of any kind: it is considered prior")
 		return true
 	
-	if debug: print("The file version is ", file_version)
-	if debug: print("The target_version is ", target_version)
-	
+	return game_verion_is_prior(file_version, target_version)
+
+
+# Return true if the game_version of the file is prior to the given version
+# Or if the file has no metion of game_version at all
+static func game_verion_is_prior(file_version: String, target_version: String) -> bool:
 	var file_version_splitted = file_version.split(".")
 	var target_version_splited = target_version.split(".")
 	
@@ -345,10 +348,8 @@ static func cfg_game_verion_is_prior(file_path: String, target_version : String,
 	
 	for i in range(target_version_splited.size()):
 		if file_version_splitted[i].to_int() > target_version_splited[i].to_int():
-			if debug: print("The file version is NOT prior the target_version")
 			return false
 	
-	if debug: print("The file version is prior the target_version")
 	return true
 
 
