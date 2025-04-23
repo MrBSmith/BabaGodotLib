@@ -3,6 +3,8 @@ class_name DebrisFactory
 
 const POOL_CAPACITY = 400
 
+
+export var disabled := false
 export var max_debris_per_frame : int = 20
 
 onready var debris_scene = preload("res://BabaGodotLib/Factories/Debris/Debris.tscn")
@@ -12,6 +14,9 @@ var pool = []
 #### BUILT-IN ####
 
 func _ready() -> void:
+	if disabled:
+		return
+	
 	var _err = EVENTS.connect("scatter_object", self, "_on_scatter_object")
 	
 	_fill_pool()
