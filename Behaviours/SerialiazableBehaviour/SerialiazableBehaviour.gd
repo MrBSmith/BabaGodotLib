@@ -20,6 +20,7 @@ export(SETGET_MODE) var setget_mode : int = SETGET_MODE.PROPERTY
 export(int, FLAGS, "checkpoint", "save", "game state online", "each tick online") var fetch_case_flag : int = 0x00
 export(int, FLAGS, "checkpoint", "save", "game state online", "each tick online") var persistant_flag : int = 0x00
 export var serialized_properties := PoolStringArray()
+export var immediate_packets := false
 
 onready var logger = get_node(logger_path) if !logger_path.is_empty() else NullLogger.new()
 
@@ -71,7 +72,7 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	if NETWORK.is_online() and NETWORK.is_client() == is_handled_by_client():
-		NETWORK.emit_peer_handled_state_packet(get_path(), serialize())
+		NETWORK.emit_peer_handled_state_packet(get_path(), serialize(), immediate_packets)
 
 
 func serialize() -> Dictionary:
