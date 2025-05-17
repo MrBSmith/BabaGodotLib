@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://bstbwefvfoogy"]
+
+[ext_resource type="Texture2D" uid="uid://koxky6suituh" path="res://icon.svg" id="2_v1xru"]
+[ext_resource type="Shader" uid="uid://b3mlfey5vpkr7" path="res://BabaGodotLib/Shaders/Shockwave/Shockwave.gdshader" id="2_xtmyv"]
+[ext_resource type="Texture2D" uid="uid://khlqul5qcct3" path="res://BabaGodotLib/Shaders/ColorSwap/Yeti_Illu.png" id="3_v1xru"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_v1xru"]
+shader = ExtResource("2_xtmyv")
+shader_parameter/strength = 0.0
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/radius = 0.0
+shader_parameter/aberration = 1.0
+shader_parameter/width = -0.045
+shader_parameter/feather = 0.495
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Icon2" type="Sprite2D" parent="."]
+position = Vector2(359, 103)
+texture = ExtResource("2_v1xru")
+
+[node name="Shader" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_v1xru")
+position = Vector2(359, 108)
+scale = Vector2(2.46875, 2.46875)
+texture = ExtResource("3_v1xru")
