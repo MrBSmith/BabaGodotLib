@@ -42,7 +42,7 @@ func _push(msg: String, msg_type: int) -> void:
 	if !active and msg_type == MESSAGE_TYPE.DEBUG:
 		return
 	
-	var console = get_tree().get_node_or_null("CONSOLE")
+	var console = get_tree().get_root().get_node_or_null("CONSOLE")
 	
 	if output_flag & OUTPUT.GAME_CONSOLE:
 		if console:
@@ -56,7 +56,7 @@ func _push(msg: String, msg_type: int) -> void:
 			MESSAGE_TYPE.WARNING: push_warning(msg) 
 
 
-func debug(msg: String) -> void:
+func log(msg: String) -> void:
 	_push(msg, MESSAGE_TYPE.DEBUG)
 
 
