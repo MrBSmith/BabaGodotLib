@@ -4,21 +4,21 @@ class_name NodeFinder
 static func find(node: Node, wanted_class: String) -> Array:
 	var array = []
 	for child in node.get_children():
-		if child.is_class(wanted_class):
+		if is_obj_of_class(child, wanted_class):
 			array.append(child)
 	return array
 
 
 static func find_first(node: Node, wanted_class: String) -> Node:
 	for child in node.get_children():
-		if child.is_class(wanted_class):
+		if is_obj_of_class(child, wanted_class):
 			return child
 	return null
 
 
 static func find_recursive(node: Node, wanted_class: String, array: Array = []) -> Array:
 	for child in node.get_children():
-		if child.is_class(wanted_class) and not child in array:
+		if is_obj_of_class(child, wanted_class) and not child in array:
 			array.append(child)
 		
 		if child.get_child_count() > 0:
