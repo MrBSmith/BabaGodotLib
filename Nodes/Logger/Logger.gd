@@ -26,6 +26,8 @@ enum MESSAGE_TYPE {
 var active : bool = false
 var _is_ready = false
 
+signal log_pushed(msg: String, type: MESSAGE_TYPE)
+
 func _ready() -> void:
 	if OS.has_feature("editor") and mode_flag & MODE.EDITOR: active = true
 	elif OS.has_feature("debug") and mode_flag & MODE.DEBUG: active = true
@@ -54,6 +56,8 @@ func _push(msg: String, msg_type: int) -> void:
 			MESSAGE_TYPE.DEBUG: print(msg)
 			MESSAGE_TYPE.ERROR: push_error(msg)
 			MESSAGE_TYPE.WARNING: push_warning(msg) 
+
+	log_pushed.emit(msg, msg_type)
 
 
 func log(msg: String) -> void:
