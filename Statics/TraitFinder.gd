@@ -3,7 +3,7 @@ class_name TraitFinder
 
 static func find_trait(node: Node, trait_name: String) -> Trait:
 	if node.has_meta(trait_name):
-		return node.get_meta(trait_name, null)
+		return node.get_meta(trait_name, null) as Trait
 	else:
 		return null
 
