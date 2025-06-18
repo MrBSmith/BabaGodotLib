@@ -23,7 +23,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav : SerializableTrait = TraitFinder.find_trait(node, "SerializableTrait")
+		var serializable_behav : SerializableTrait = TraitFinder.find_trait(node, SerializableTrait)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
@@ -55,14 +55,6 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 		return
 	
 	var fetch_online = fetch_type_flag & SerializableTrait.FETCH_CASE_FLAG.GAME_STATE_ONLINE
-	
-	if fetch_online:
-		var remote_id_behav = TraitFinder.find_trait(scene_root, "RemoteInstanceIdTrait")
-		
-		if remote_id_behav and remote_id_behav.remote_instance_id != dict["instance_id"]:
-			push_error("Cannot apply the branch state: invalid instance id")
-			return
-	
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
 	for node in nodes:
@@ -70,7 +62,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav = TraitFinder.find_trait(node, "SerializableTrait")
+		var serializable_behav = TraitFinder.find_trait(node, SerializableTrait)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
