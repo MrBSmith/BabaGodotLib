@@ -38,6 +38,9 @@ func play(stream_player : Node) -> void:
 	if !new_stream_player.is_inside_tree():
 		yield(new_stream_player, "ready")
 	
+	if !is_instance_valid(stream_player):
+		return
+	
 	if stream_player is AudioStreamPlayer2D:
 		var pos = stream_player.get_global_position()
 		new_stream_player.set_global_position(pos)
