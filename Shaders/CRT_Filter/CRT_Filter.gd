@@ -92,8 +92,8 @@ func _update_epileptic_mode() -> void:
 	if Engine.editor_hint:
 		return
 	
-	var epileptic_mode = SETTINGS.get_setting("epileptic_mode")
-	$CanvasLayer.set_visible(!epileptic_mode)
+	var glow_effects_active = SETTINGS.get_setting("glow_effects")
+	$CanvasLayer.set_visible(glow_effects_active)
 
 
 #### INPUTS ####
