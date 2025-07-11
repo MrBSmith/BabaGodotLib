@@ -37,3 +37,10 @@ static func find_recursive(node: Node, wanted_class: Variant, array: Array = [])
 	
 	return array
 
+
+static func get_center_position(control: Control) -> Vector2:
+	return control.position + control.size / 2.0
+
+
+static func get_center_global_position(control: Control) -> Vector2:
+	return control.global_position + control.size / 2.0
