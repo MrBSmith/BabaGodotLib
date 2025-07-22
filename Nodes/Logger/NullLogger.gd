@@ -1,3 +1,4 @@
+@tool
 extends Logger
 class_name NullLogger
 
