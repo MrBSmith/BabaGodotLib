@@ -1,5 +1,5 @@
-extends Trait
-class_name ActivableTrait
+extends Component
+class_name ActivableComponent
 
 @onready var cooldown : Timer = $Cooldown
 

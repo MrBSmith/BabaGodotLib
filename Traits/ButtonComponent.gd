@@ -1,5 +1,5 @@
-extends Trait
-class_name ButtonTrait
+extends Component
+class_name ButtonComponent
 
 enum STATE {
 	NORMAL,

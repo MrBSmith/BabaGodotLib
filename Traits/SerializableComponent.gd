@@ -1,5 +1,5 @@
-extends Trait
-class_name SerializableTrait
+extends Component
+class_name SerializableComponent
 
 const NB_SAMPLES_FOR_AVG_DELTA = 2
 

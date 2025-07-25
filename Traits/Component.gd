@@ -1,5 +1,5 @@
 extends Node
-class_name Trait
+class_name Component
 
 @export var holder_path := NodePath()
 @onready var holder = owner if holder_path.is_empty() else get_node_or_null(holder_path)

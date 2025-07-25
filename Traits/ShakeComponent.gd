@@ -1,5 +1,5 @@
-extends Trait
-class_name ShakeTrait
+extends Component
+class_name ShakeComponent
 
 enum {
 	ROTATION = 1,

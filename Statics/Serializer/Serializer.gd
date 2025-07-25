@@ -12,7 +12,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 		"removed_elements": {},
 	}
 	
-	if fetch_type_flag & SerializableTrait.FETCH_CASE_FLAG.GAME_STATE_ONLINE:
+	if fetch_type_flag & SerializableComponent.FETCH_CASE_FLAG.GAME_STATE_ONLINE:
 		dict["instance_id"] = scene_root.get_instance_id()
 	
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
@@ -23,7 +23,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav : SerializableTrait = TraitFinder.find_trait(node, SerializableTrait)
+		var serializable_behav : SerializableComponent = ComponentFinder.find_trait(node, SerializableComponent)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
@@ -45,7 +45,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 	return dict
 
 
-static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag: int = SerializableTrait.FETCH_CASE_FLAG.SAVE) -> void:
+static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag: int = SerializableComponent.FETCH_CASE_FLAG.SAVE) -> void:
 	if !dict.has("root_path") or !dict.has("branch_state"):
 		push_error("Invalid data format: abort deserializing")
 		return
@@ -54,7 +54,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 		push_error("Invalid scene root: abort deserializing | Expected %s found %s" % [str(scene_root.get_path()), dict["root_path"]])
 		return
 	
-	var fetch_online = fetch_type_flag & SerializableTrait.FETCH_CASE_FLAG.GAME_STATE_ONLINE
+	var fetch_online = fetch_type_flag & SerializableComponent.FETCH_CASE_FLAG.GAME_STATE_ONLINE
 	var nodes = scene_root.get_tree().get_nodes_in_group("Serializable")
 	
 	for node in nodes:
@@ -62,7 +62,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav = TraitFinder.find_trait(node, SerializableTrait)
+		var serializable_behav = ComponentFinder.find_trait(node, SerializableComponent)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
