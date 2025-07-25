@@ -1,5 +1,5 @@
 extends RefCounted
-class_name Interface
+class_name Trait
 
 var holder : Object
 
