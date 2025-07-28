@@ -23,7 +23,7 @@ static func serialize_tree(scene_root: Node, fetch_type_flag: int, default_state
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav : SerializableComponent = ComponentFinder.find_trait(node, SerializableComponent)
+		var serializable_behav : SerializableComponent = ComponentFinder.find_component(node, SerializableComponent)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
@@ -62,7 +62,7 @@ static func deserialize_tree(scene_root: Node, dict: Dictionary, fetch_type_flag
 			continue
 		
 		var node_path : String = str(scene_root.get_path_to(node))
-		var serializable_behav = ComponentFinder.find_trait(node, SerializableComponent)
+		var serializable_behav = ComponentFinder.find_component(node, SerializableComponent)
 		
 		if !serializable_behav:
 			push_error("Cannot serialize node at path: %s :Couldn't find serializable behaviour" % node_path)
