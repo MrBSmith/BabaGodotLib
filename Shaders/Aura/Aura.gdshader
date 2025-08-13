@@ -2,22 +2,58 @@ shader_type canvas_item;
 
 uniform sampler2D noise: repeat_enable;
 uniform float intensity = 0.0;
+uniform vec2 direction = vec2(1.0);
 uniform float speed = 0.0;
 uniform float threshold : hint_range(0.0, 1.0, 0.01);
 uniform vec4 color : source_color = vec4(1.0);
 uniform float opacity : hint_range(0.0, 1.0);
 
-void fragment(){
-	vec4 tex = texture(TEXTURE, UV);
-	vec4 noise_color = texture(noise, UV + TIME * speed);
+// Credits to DJBob Gaming YT :D
+uniform int blur_radius : hint_range(1, 32) = 8;
+uniform float blur_strength : hint_range(0.1, 10.0) = 1.0;
+
+float gaussian_weight(float i, float sigma) {
+    return exp(-0.5 * (i * i) / (sigma * sigma));
+}
+
+void calculate_kernel(out float kernel[32], int radius, float sigma) {
+    float sum = 0.0;
+    for (int i = 0; i <= radius; i++) {
+        kernel[i] = gaussian_weight(float(i), sigma);
+        sum += i == 0 ? kernel[i] : 2.0 * kernel[i];
+    }
+    for (int i = 0; i <= radius; i++) {
+        kernel[i] /= sum;
+    }
+}
+
+void fragment() {
+	vec2 resolution = vec2(1.0) / vec2(textureSize(TEXTURE, 0));
+	vec4 texture_color = texture(TEXTURE, UV);
 	
-	COLOR = color;
-	
+    float kernel[32];
+    calculate_kernel(kernel, blur_radius, blur_strength);
+
+    vec4 blured_texture_color = vec4(0.0);
+    float total_weight = 0.0;
+
+    for (int x = -blur_radius; x <= blur_radius; x++) {
+        for (int y = -blur_radius; y <= blur_radius; y++) {
+            float weight = kernel[abs(x)] * kernel[abs(y)];
+            vec2 offset = vec2(float(x), float(y)) * resolution;
+            blured_texture_color += texture(TEXTURE, UV + offset) * weight;
+            total_weight += weight;
+        }
+    }
+
+    blured_texture_color /= total_weight;
+
+	vec4 noise_color = texture(noise, UV + TIME * speed * direction);
 	float noise_value = noise_color.r;
-	if (noise_value < threshold) {
-		noise_value = 0.0;
+	vec4 result_color = color * noise_value;
+	float alpha = noise_value * blured_texture_color.a * opacity;
+	if (alpha < threshold) {
+		alpha = 0.0;
 	}
-	
-	float alpha = clamp(tex.a * intensity * noise_value * opacity, 0.0, 1.0);
-	COLOR.a = pow(alpha, 2.0) * color.a;
+	COLOR = vec4(result_color.rgb, alpha);
 }
