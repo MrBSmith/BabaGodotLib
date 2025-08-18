@@ -6,7 +6,7 @@ uniform vec2 direction = vec2(1.0);
 uniform float speed = 0.0;
 uniform float threshold : hint_range(0.0, 1.0, 0.01);
 uniform vec4 color : source_color = vec4(1.0);
-uniform float opacity : hint_range(0.0, 1.0);
+uniform float opacity : hint_range(0.0, 5.0);
 
 // Credits to DJBob Gaming YT :D
 uniform int blur_radius : hint_range(1, 32) = 8;
@@ -28,8 +28,13 @@ void calculate_kernel(out float kernel[32], int radius, float sigma) {
 }
 
 void fragment() {
-	vec2 resolution = vec2(1.0) / vec2(textureSize(TEXTURE, 0));
+	vec2 texture_size = vec2(textureSize(TEXTURE, 0));
+	vec2 noise_size = vec2(textureSize(noise, 0));
+	
+	vec2 aspect_ratio = vec2(1.0) - (texture_size / abs(noise_size - texture_size));
+	vec2 resolution = vec2(1.0) / texture_size;
 	vec4 texture_color = texture(TEXTURE, UV);
+	vec2 noise_uv = UV;
 	
     float kernel[32];
     calculate_kernel(kernel, blur_radius, blur_strength);
@@ -48,7 +53,7 @@ void fragment() {
 
     blured_texture_color /= total_weight;
 
-	vec4 noise_color = texture(noise, UV + TIME * speed * direction);
+	vec4 noise_color = texture(noise, noise_uv + TIME * speed * direction);
 	float noise_value = noise_color.r;
 	vec4 result_color = color * noise_value;
 	float alpha = noise_value * blured_texture_color.a * opacity;
