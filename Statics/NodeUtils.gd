@@ -12,6 +12,18 @@ static func clear(node: Node) -> void:
 		await last_child.tree_exited
 
 
+static func get_class_name(obj: Object) -> String:
+	var script = obj.get_script()
+	if script:
+		var global_name = script.get_global_name()
+		if !global_name.is_empty():
+			return global_name
+		else:
+			return obj.get_class()
+	else:
+		return obj.get_class()
+
+
 static func find(node: Node, wanted_class: Variant) -> Array:
 	var array = []
 	for child in node.get_children():
