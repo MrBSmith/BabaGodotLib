@@ -8,7 +8,7 @@ vec4 map_ramp_color(vec4 color) {
 	float ramp_size = float(textureSize(picker_ramp, 0).x);
 	float uv_offset = 1.0 / float(ramp_size);
 	float result_offset = 0.0;
-	
+
 	for (float i = 0.0; i < ramp_size; i++) {
 		result_offset = uv_offset * (i + 0.5);
 		vec4 picker_color = texture(picker_ramp, vec2(result_offset, 0.0));
@@ -16,7 +16,7 @@ vec4 map_ramp_color(vec4 color) {
 			break;
 		}
 	}
-	
+
 	return vec4(texture(color_ramp, vec2(result_offset, 0.0)).rgb, color.a);
 }
 

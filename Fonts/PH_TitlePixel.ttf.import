@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://d14hn22l24dmq"
-path="res://.godot/imported/SmallPixelBold.ttf-13767c89309d1ac46cc3039ff5c0a86b.fontdata"
+uid="uid://ceyqb0cxqd0m6"
+path="res://.godot/imported/PH_TitlePixel.ttf-4bef1dacbc0ea4e1d27ef5575477a6be.fontdata"
 
 [deps]
 
-source_file="res://BabaGodotLib/Fonts/SmallPixelBold.ttf"
-dest_files=["res://.godot/imported/SmallPixelBold.ttf-13767c89309d1ac46cc3039ff5c0a86b.fontdata"]
+source_file="res://BabaGodotLib/Fonts/PH_TitlePixel.ttf"
+dest_files=["res://.godot/imported/PH_TitlePixel.ttf-4bef1dacbc0ea4e1d27ef5575477a6be.fontdata"]
 
 [params]
 
