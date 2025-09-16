@@ -1,6 +1,6 @@
 @tool
 extends Node
-class_name Logger
+class_name CustomLogger
 
 enum OUTPUT {
 	GODOT_CONSOLE = 1,

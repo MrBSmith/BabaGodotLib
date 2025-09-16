@@ -1,5 +1,5 @@
 @tool
-extends Logger
+extends CustomLogger
 class_name NullLogger
 
 # A logger class that does nothing, meant to be used as a proxy when no factory if provided
