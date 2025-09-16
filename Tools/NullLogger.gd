@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream:Tools/NullLogger.gd
 extends Logger
+=======
+@tool
+extends CustomLogger
+>>>>>>> Stashed changes:Nodes/Logger/NullLogger.gd
 class_name NullLogger
 
 # A logger class that does nothing, meant to be used as a proxy when no factory if provided
