@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 uniform vec4 outline_color : source_color = vec4(1.0);
-uniform vec4 texture_tint : source_color = vec4(1.0);
+uniform vec4 texture_tint : source_color = vec4(vec3(1.0), 0.0);
 uniform float width : hint_range(0, 10) = 1.0;
 uniform int pattern : hint_range(0, 2) = 0; // diamond, circle, square
 uniform bool inside = false;
@@ -34,7 +34,10 @@ bool hasContraryNeighbour(vec2 uv, vec2 texture_pixel_size, sampler2D texture) {
 
 void fragment() {
 	vec2 uv = UV;
-	vec4 texture_color = texture(TEXTURE, uv) * texture_tint;
+	vec4 texture_color = texture(TEXTURE, uv);
+	if (texture_tint.a > 0.0) {
+		texture_color *= texture_tint;
+	}
 	
 	if ((texture_color.a > 0.0) == inside && hasContraryNeighbour(uv, TEXTURE_PIXEL_SIZE, TEXTURE)) {
 		COLOR = outline_color;
