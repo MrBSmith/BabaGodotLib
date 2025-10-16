@@ -5,7 +5,7 @@ uniform float intensity = 0.0;
 uniform vec2 direction = vec2(1.0);
 uniform float speed = 0.0;
 uniform float threshold : hint_range(0.0, 1.0, 0.01);
-uniform vec4 color : source_color = vec4(1.0);
+uniform sampler2D color_ramp: filter_nearest;
 uniform float opacity : hint_range(0.0, 5.0);
 
 // Credits to DJBob Gaming YT :D
@@ -55,7 +55,7 @@ void fragment() {
 
 	vec4 noise_color = texture(noise, noise_uv + TIME * speed * direction);
 	float noise_value = noise_color.r;
-	vec4 result_color = color * noise_value;
+	vec4 result_color = texture(color_ramp, vec2(noise_value));
 	float alpha = noise_value * blured_texture_color.a * opacity;
 	if (alpha < threshold) {
 		alpha = 0.0;
