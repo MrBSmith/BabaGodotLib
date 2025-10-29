@@ -50,9 +50,29 @@ static func find_recursive(node: Node, wanted_class: Variant, array: Array = [])
 	return array
 
 
-static func get_center_position(control: Control) -> Vector2:
-	return control.position + control.size / 2.0
+static func get_center_position(obj: CanvasItem) -> Vector2:
+	return obj.position + obj.size / 2.0
 
 
-static func get_center_global_position(control: Control) -> Vector2:
-	return control.global_position + control.size / 2.0
+static func get_center_global_position(obj: CanvasItem) -> Vector2:
+	return obj.global_position + obj.size / 2.0
+
+
+static func get_position_relative_to_canvas(obj: CanvasItem) -> Vector2:
+	var canvas_layer = obj.get_canvas_layer_node()
+	if canvas_layer.follow_viewport_enabled:
+		return obj.global_position + canvas_layer.get_final_transform().origin
+	else:
+		return obj.global_position
+
+
+static func get_center_relative_to_canvas_layer(obj: CanvasItem) -> Vector2:
+	return get_position_relative_to_canvas(obj) + obj.size / 2.0
+
+
+static func canvas_relative_to_classic_position(pos: Vector2, obj: CanvasItem) -> Vector2:
+	var canvas_layer = obj.get_canvas_layer_node()
+	if canvas_layer.follow_viewport_enabled:
+		return pos - canvas_layer.get_final_transform().origin
+	else:
+		return pos
