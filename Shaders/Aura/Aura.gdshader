@@ -34,7 +34,6 @@ void fragment() {
 	vec2 aspect_ratio = vec2(1.0) - (texture_size / abs(noise_size - texture_size));
 	vec2 resolution = vec2(1.0) / texture_size;
 	vec4 texture_color = texture(TEXTURE, UV);
-	vec2 noise_uv = UV;
 	
     float kernel[32];
     calculate_kernel(kernel, blur_radius, blur_strength);
@@ -53,7 +52,7 @@ void fragment() {
 
     blured_texture_color /= total_weight;
 
-	vec4 noise_color = texture(noise, noise_uv + TIME * speed * direction);
+	vec4 noise_color = texture(noise, SCREEN_UV + TIME * speed * direction);
 	float noise_value = noise_color.r;
 	vec4 result_color = texture(color_ramp, vec2(noise_value));
 	float alpha = noise_value * blured_texture_color.a * opacity;
