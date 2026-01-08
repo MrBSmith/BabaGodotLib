@@ -60,7 +60,7 @@ static func get_center_global_position(obj: CanvasItem) -> Vector2:
 
 static func get_position_relative_to_canvas(obj: CanvasItem) -> Vector2:
 	var canvas_layer = obj.get_canvas_layer_node()
-	if canvas_layer.follow_viewport_enabled:
+	if canvas_layer and canvas_layer.follow_viewport_enabled:
 		return obj.global_position + canvas_layer.get_final_transform().origin
 	else:
 		return obj.global_position
