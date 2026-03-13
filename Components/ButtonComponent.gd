@@ -65,12 +65,12 @@ signal focus_changed
 func get_state_name() -> String:
 	return STATE.keys()[state]
 
-func set_toggled(toggled: bool) -> void:
+func set_toggled(_toggled: bool) -> void:
 	if state == STATE.DISABLED:
 		push_warning("Can't toggle a disabled button")
 		return
 	
-	if toggled:
+	if _toggled:
 		if state in [STATE.FOCUS, STATE.TOGGLED_FOCUS]:
 			state = STATE.TOGGLED_FOCUS
 		else:
