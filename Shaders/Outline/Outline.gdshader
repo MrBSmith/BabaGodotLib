@@ -2,6 +2,7 @@ shader_type canvas_item;
 
 uniform vec4 outline_color : source_color = vec4(1.0);
 uniform vec4 texture_tint : source_color = vec4(vec3(1.0), 0.0);
+uniform vec4 transparant_color : source_color = vec4(0.0);
 uniform float opacity : hint_range(0.0, 1.0, 0.01) = 1.0;
 uniform float width : hint_range(0, 10) = 1.0;
 uniform int pattern : hint_range(0, 2) = 0; // diamond, circle, square

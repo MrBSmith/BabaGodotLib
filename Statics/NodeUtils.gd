@@ -55,7 +55,7 @@ static func get_center_position(obj: CanvasItem) -> Vector2:
 
 
 static func get_center_global_position(obj: CanvasItem) -> Vector2:
-	return obj.global_position + obj.size / 2.0
+	return obj.global_position + (obj.size / 2.0 * obj.scale)
 
 
 static func get_position_relative_to_canvas(obj: CanvasItem) -> Vector2:
