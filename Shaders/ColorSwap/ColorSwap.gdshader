@@ -5,7 +5,12 @@ uniform float color_offset : hint_range(0.0, 1.0) = 0.0;
 uniform sampler2D picker_ramp : filter_nearest;
 uniform sampler2D color_ramp : filter_nearest;
 uniform bool disabled = false;
-uniform vec4 modulate : source_color = vec4(1.0);
+
+varying vec4 vertex_color;
+
+void vertex() {
+	vertex_color = COLOR;
+}
 
 vec4 map_ramp_color(vec4 color) {
 	float ramp_size = float(textureSize(picker_ramp, 0).x);
@@ -26,6 +31,6 @@ void fragment() {
 	if (disabled) {
 		COLOR = texture(TEXTURE, UV);
 	} else {
-		COLOR = map_ramp_color(texture(TEXTURE, UV)) * modulate;
+		COLOR = map_ramp_color(texture(TEXTURE, UV)) * vertex_color;
 	}
 }
