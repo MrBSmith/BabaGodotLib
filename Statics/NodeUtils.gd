@@ -76,3 +76,7 @@ static func canvas_relative_to_classic_position(pos: Vector2, obj: CanvasItem) -
 		return pos - canvas_layer.get_final_transform().origin
 	else:
 		return pos
+
+
+static func screen_pos_to_global_pos(screen_pos: Vector2, viewport: Viewport) -> Vector2:
+	return (viewport.get_screen_transform() * viewport.get_canvas_transform()).affine_inverse() * screen_pos
