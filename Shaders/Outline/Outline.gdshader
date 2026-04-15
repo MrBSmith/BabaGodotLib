@@ -8,6 +8,12 @@ uniform float width : hint_range(0, 10) = 1.0;
 uniform int pattern : hint_range(0, 2) = 0; // diamond, circle, square
 uniform bool inside = false;
 
+varying vec4 vertex_color;
+
+void vertex() {
+	vertex_color = COLOR;
+}
+
 bool hasContraryNeighbour(vec2 uv, vec2 texture_pixel_size, sampler2D texture) {
 	for (float i = -ceil(width); i <= ceil(width); i++) {
 		float x = abs(i) > width ? width * sign(i) : i;
@@ -48,5 +54,5 @@ void fragment() {
 		result_color = texture_color;
 	}
 	float alpha = min(opacity, result_color.a);
-	COLOR = vec4(result_color.rgb, alpha);
+	COLOR = vec4(result_color.rgb, alpha) * vertex_color;
 }
